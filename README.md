@@ -21,6 +21,14 @@ $ mvn clean install -DskipDocker
 
 For easy bootstrapping an IxorTalk instance, see [ixortalk-config-docker](https://github.com/ixortalk/ixortalk-config-docker) which contains a Docker compose configuration for the complete stack.
 
+## Configuration
+
+See [application-test.yml](src/test/resources/application-test.yml) for an example on how to configure this module.  For instance callback URLs can be configured using `ixortalk.organization.callback-api.*` properties.
+
+## Rest Docs
+
+RestDocs are available under `/organization/docs/index.html`
+
 ## Contributing
 
 Pull request are welcome.
