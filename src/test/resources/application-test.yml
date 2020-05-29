@@ -1,0 +1,105 @@
+#
+# The MIT License (MIT)
+#
+# Copyright (c) 2016-present IxorTalk CVBA
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
+server:
+  forward-headers-strategy: NATIVE
+  servlet:
+    context-path: /organization
+
+security:
+  oauth2:
+    client:
+      grant-type: client_credentials
+
+spring:
+  jpa:
+    open-in-view: false
+    show-sql: false
+  datasource:
+    url: jdbc:h2:mem:test-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;Mode=PostgreSQL
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://dummy
+  liquibase:
+    change-log: classpath:liquibase/master.xml
+
+ixortalk:
+  test:
+    token-server:
+      port: 65300
+
+  organization:
+    callback-api:
+      url: http://localhost:65301/org-callback-api
+      paths:
+        user-accepted: /user-accepted
+        user-removed: /user-removed
+        device-removed: /device-removed
+        organization-removed: /organization-removed
+        pre-delete-check: /organization-pre-delete-check
+    api:
+      mail:
+        invite-mail-subject-key: theInviteMailSubjectKey
+        invite-mail-template: theInviteMailTemplate
+        verify-mail-subject-key: theVerifyMailSubjectKey
+        verify-mail-template: theVerifyMailTemplate
+        default-mail-language-tag: nl
+      device-info-fields:
+        - deviceId # Mapped
+        - deviceName #Unmapped
+        - actions
+      accept-key-max-age-in-hours: 3
+      verify-email-landing-page-path: /onboarding/complete-registration
+
+  server:
+    assetmgmt:
+      url: http://localhost:65303/assetmgmt
+    mailing-service:
+      url: http://localhost:65304/mailing
+    image-service:
+      url: http://localhost:65305/image
+      context-path: /image
+      download-path: /download
+    assetstate:
+      context-path: /assetstate
+
+  loadbalancer:
+    external:
+      protocol: https
+      host: integration-test.ixortalk.com
+      port: 443
+      url: https://integration-test.ixortalk.com
+
+  security:
+    jwt:
+      custom-claims-namespace: https://test-namespace.ixortalk.com/
+    feign:
+      service-to-service-client-registration-id: internal-api
+
+  auth0:
+    management-api:
+      client-registration-id: auth0-management-api
+    domain: integration-test.auth0.com

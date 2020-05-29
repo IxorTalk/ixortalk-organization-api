@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    The MIT License (MIT)
+
+    Copyright (c) 2016-present IxorTalk CVBA
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+-->
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="hibernate_sequence" author="rhellemans">
+        <createSequence sequenceName="hibernate_sequence" startValue="1000" incrementBy="1"/>
+    </changeSet>
+
+    <changeSet id="organization_00001" author="rhellemans">
+
+        <createTable tableName="organization">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="organization_00002" author="rhellemans">
+        <addColumn tableName="organization">
+            <column name="role" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="organization_00003" author="wjans">
+        <addColumn tableName="organization">
+            <column name="address" type="varchar(1024)"/>
+            <column name="phone_number" type="varchar(255)"/>
+            <column name="email_address" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="organization_00004" author="wjans">
+        <addUniqueConstraint tableName="organization" columnNames="name"/>
+    </changeSet>
+
+    <changeSet id="organization_00005" author="wjans">
+        <addUniqueConstraint tableName="organization" columnNames="role"/>
+    </changeSet>
+
+    <changeSet id="org_user_00001" author="wjans">
+        <createTable tableName="org_user">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="organization_id" type="bigint"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="org_user" baseColumnNames="organization_id"
+                                 constraintName="org_user_organization_id_fk"
+                                 referencedTableName="organization" referencedColumnNames="id"/>
+        <createIndex tableName="org_user" indexName="org_user_organization_id_idx">
+            <column name="organization_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="org_role_00001" author="wjans">
+        <createTable tableName="org_role">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="varchar(30)"/>
+            <column name="organization_id" type="bigint"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="org_role" baseColumnNames="organization_id"
+                                 constraintName="org_role_organization_id_fk"
+                                 referencedTableName="organization" referencedColumnNames="id"/>
+        <createIndex tableName="org_role" indexName="org_role_organization_id_idx">
+            <column name="organization_id"/>
+        </createIndex>
+        <addUniqueConstraint tableName="org_role" columnNames="role"/>
+    </changeSet>
+
+    <changeSet id="org_user_00002" author="wjans">
+        <renameColumn tableName="org_user" oldColumnName="user_id" newColumnName="login"/>
+    </changeSet>
+
+    <changeSet id="org_user_00003" author="tbuckinx">
+        <addColumn tableName="org_user">
+            <column name="status" type="varchar(50)"/>
+        </addColumn>
+        <update tableName="org_user">
+            <column name="status" value="ACCEPTED"/>
+        </update>
+        <addNotNullConstraint tableName="org_user" columnName="status" columnDataType="varchar(50)"/>
+    </changeSet>
+    <changeSet id="org_role_in_user_00006" author="tbuckinx">
+        <createTable tableName="org_role_in_user">
+            <column name="user_id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="org_role_in_user" baseColumnNames="user_id"
+                                 constraintName="org_role_in_user_id_fk1"
+                                 referencedTableName="org_role" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="org_role_in_user" baseColumnNames="role_id"
+                                 constraintName="org_role_in_user_id_fk2"
+                                 referencedTableName="org_user" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="add_image_to_organization" author="wjans">
+        <addColumn tableName="organization">
+            <column name="image" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_logo_to_organization" author="wjans">
+        <addColumn tableName="organization">
+            <column name="logo" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_accept_key_to_user" author="wjans">
+        <addColumn tableName="org_user">
+            <column name="accept_key" type="varchar(255)" />
+            <column name="accept_key_timestamp" type="datetime with time zone" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="organization_address_fields" author="wjans">
+        <addColumn tableName="organization">
+            <column name="street_and_number" type="varchar(255)" />
+            <column name="postal_code" type="varchar(255)" />
+            <column name="city" type="varchar(255)" />
+            <column name="country" type="varchar(255)" />
+        </addColumn>
+        <sql>update organization set street_and_number = address</sql>
+        <sql>update organization set postal_code = ' '</sql>
+        <sql>update organization set city = ' '</sql>
+        <sql>update organization set country = 'Belgium'</sql>
+        <dropColumn tableName="organization" columnName="address"/>
+        <addNotNullConstraint tableName="organization" columnName="street_and_number" columnDataType="varchar(255)"/>
+        <addNotNullConstraint tableName="organization" columnName="postal_code" columnDataType="varchar(255)"/>
+        <addNotNullConstraint tableName="organization" columnName="city" columnDataType="varchar(255)"/>
+        <addNotNullConstraint tableName="organization" columnName="country" columnDataType="varchar(255)"/>
+    </changeSet>
+
+</databaseChangeLog>

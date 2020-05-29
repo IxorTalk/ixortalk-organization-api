@@ -1,0 +1,11 @@
+{
+  "actions": [
+    {
+      "name": "myActionName",
+      "payload": {
+        "relayNr": 37,
+        "action": "HIGH"
+      }
+    }
+  ]
+}

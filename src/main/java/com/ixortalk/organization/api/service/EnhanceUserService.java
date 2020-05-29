@@ -1,0 +1,64 @@
+/**
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2016-present IxorTalk CVBA
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+package com.ixortalk.organization.api.service;
+
+import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
+import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
+import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
+import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.rest.OrganizationRestResource;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@Named
+public class EnhanceUserService {
+
+    @Inject
+    private OrganizationRestResource organizationRestResource;
+
+    @Inject
+    private Auth0Users auth0Users;
+
+    @Inject
+    private Auth0Roles auth0Roles;
+
+    public UserInfo getUserInfo(User user) {
+        if (user.isAccepted() && organizationRestResource.findByUsers(user).isPresent())
+            return auth0Users.getUserInfo(user.getLogin()).orElse(null);
+        return null;
+    }
+
+    public boolean isAdmin(User user) {
+
+        if (!auth0Users.userExists(user.getLogin())) {
+            return false;
+        }
+
+        return organizationRestResource
+                .findByUsers(user)
+                .map(organization -> auth0Roles.getUsersRoles(user.getLogin()).contains(organization.getRole()))
+                .orElse(false);
+    }
+}

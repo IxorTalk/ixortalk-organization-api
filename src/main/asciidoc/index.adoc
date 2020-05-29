@@ -1,0 +1,1433 @@
+= IxorTalk Organization API
+:doctype: book
+:icons: font
+:toc: left
+:toclevels: 4
+:sectlinks:
+:source-highlighter: highlightjs
+
+= Organization
+
+== Get Organizations
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/get-all/as-admin/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/get-all/as-admin/http-request.adoc[]
+
+Specifying paging and/or sorting criteria:
+
+Via curl:
+include::{snippets}/organizations/get-all/sorting-on-organization-name/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/get-all/sorting-on-organization-name/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/get-all/as-admin/request-headers.adoc[]
+
+==== Request Parameters (Paging/Sorting)
+
+When required, additional links are added for paging, specifying the right request parameters to use.
+
+include::{snippets}/organizations/get-all/sorting-on-organization-name/request-parameters.adoc[]
+
+=== Response
+
+As an administrator:
+
+include::{snippets}/organizations/get-all/as-admin/http-response.adoc[]
+
+As member of the organization admin role
+
+include::{snippets}/organizations/get-all/rbac/http-response.adoc[]
+
+== Get Organization Information
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/organization-information/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/organization-information/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/organization-information/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/organization-information/ok/path-parameters.adoc[]
+
+==== Response Fields
+include::{snippets}/organizations/organization-information/ok/response-fields.adoc[]
+
+=== Response
+
+As admin or user:
+
+include::{snippets}/organizations/organization-information/ok/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/organization-information/does-not-exist/http-response.adoc[]
+
+This call is read-only:
+
+include::{snippets}/organizations/organization-information/read-only/http-response.adoc[]
+
+== Get Accepted Organization id's
+
+=== Request
+
+GET call to retrieve the id's for all accepted organizations (for the current principal).  This call is intended for internal use.
+
+Via curl:
+include::{snippets}/organizations/find-accepted-organization-ids/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/find-accepted-organization-ids/ok/http-request.adoc[]
+
+=== Response
+
+include::{snippets}/organizations/find-accepted-organization-ids/ok/http-response.adoc[]
+
+== Save Organization
+
+Save an organization
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/save/no-admin-token/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/save/no-admin-token/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/save/no-admin-token/request-headers.adoc[]
+
+==== Request Fields
+include::{snippets}/organizations/save/no-admin-token/request-fields.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/save/no-admin-token/http-response.adoc[]
+
+With an invalid role:
+
+include::{snippets}/organizations/save/no-admin-token/http-response.adoc[]
+
+When the name of the organization is already in use:
+
+include::{snippets}/organizations/save/name-already-in-use/http-response.adoc[]
+
+With the name of the role (generated behind the scenes) is conflicting:
+
+include::{snippets}/organizations/save/generated-role-name-already-in-use/http-response.adoc[]
+
+
+== Update an Organization
+
+Update an existing organization
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/update/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/update/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/update/ok/request-headers.adoc[]
+
+==== Request Fields
+include::{snippets}/organizations/update/ok/request-fields.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/update/ok/http-response.adoc[]
+
+With an invalid role:
+
+include::{snippets}/organizations/update/no-admin-token/http-response.adoc[]
+
+When the name of the organization is already in use:
+
+include::{snippets}/organizations/update/name-already-in-use/http-response.adoc[]
+
+When the user does not have the correct role:
+
+include::{snippets}/organizations/update/incorrect-role/http-response.adoc[]
+
+== Delete an Organization
+
+Deletes an existing organization, the organization should be empty (i.e. no users, no roles, no devices and no badges)
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/delete/as-organization-admin/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/delete/as-organization-admin/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/delete/as-organization-admin/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/delete/as-organization-admin/path-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/delete/as-organization-admin/http-response.adoc[]
+
+With an invalid role:
+
+include::{snippets}/organizations/delete/no-access/http-response.adoc[]
+
+When the organization is not empty:
+
+include::{snippets}/organizations/delete/organization-not-empty/http-response.adoc[]
+
+== Delete an Organization (Cascade)
+
+Deletes an existing organization, cascading to roles, users, devices and badges.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/delete-cascade/as-organization-admin/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/delete-cascade/as-organization-admin/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/delete-cascade/as-organization-admin/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/delete-cascade/as-organization-admin/path-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/delete-cascade/as-organization-admin/http-response.adoc[]
+
+With an invalid role:
+
+include::{snippets}/organizations/delete-cascade/no-access/http-response.adoc[]
+
+= Users in Organization
+
+[#list_users_in_organization]
+== List Users in Organization
+
+List enhanced users in an organization (`enhancedUsers` link to be followed from the Organization)
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/users/get-users-in-org/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/users/get-users-in-org/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/users/get-users-in-org/ok/request-headers.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/users/get-users-in-org/ok/http-response.adoc[]
+
+When the user has no access:
+
+include::{snippets}/organizations/users/get-users-in-org/no-access-to-organization/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/organizations/users/get-users-in-org/ok/response-fields.adoc[]
+
+== Find Users in Organization
+
+Find call that queries users in an organization, semantically it's the same as <<list_users_in_organization>> but this one supports paging and sorting.  Also to be followed from the link `findUsersByOrganization` on Organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/users/find-by-organization/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/users/find-by-organization/ok/http-request.adoc[]
+
+Including paging and sorting:
+
+Via curl:
+include::{snippets}/users/find-by-organization/paging-and-sorting/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/users/find-by-organization/paging-and-sorting/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/users/find-by-organization/ok/request-headers.adoc[]
+
+==== Request Parameters
+include::{snippets}/users/find-by-organization/ok/request-parameters.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/users/find-by-organization/paging-and-sorting/request-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/users/find-by-organization/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/users/find-by-organization/no-access-to-organization/http-response.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/users/find-by-organization/paging-and-sorting/http-response.adoc[]
+
+== Find Users in Organization By Login
+
+Find call that queries users in an organization while also filtering on login.
+
+=== Request
+
+Via curl:
+include::{snippets}/users/find-by-organization-and-login/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/users/find-by-organization-and-login/ok/http-request.adoc[]
+
+Including paging and sorting:
+
+Via curl:
+include::{snippets}/users/find-by-organization-and-login/paging-and-sorting/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/users/find-by-organization-and-login/paging-and-sorting/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/users/find-by-organization-and-login/ok/request-headers.adoc[]
+
+==== Request Parameters
+include::{snippets}/users/find-by-organization-and-login/ok/request-parameters.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/users/find-by-organization-and-login/paging-and-sorting/request-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/users/find-by-organization-and-login/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/users/find-by-organization-and-login/no-access-to-organization/http-response.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/users/find-by-organization-and-login/paging-and-sorting/http-response.adoc[]
+
+== Find Admin Users in Organization
+
+Find call that queries users that are admin in the organization, and already applies the endhanced user projections.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/users/get-admin-users-in-org/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/users/get-admin-users-in-org/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/users/get-admin-users-in-org/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/users/get-admin-users-in-org/ok/path-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/users/get-admin-users-in-org/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/organizations/users/get-admin-users-in-org/no-access/http-response.adoc[]
+
+When the organization is not found:
+
+include::{snippets}/organizations/users/get-admin-users-in-org/not-found/http-response.adoc[]
+
+
+
+== Add Users to Organization
+
+Adding users to an organization happens in two steps, adding a user and linking it to the organization
+
+=== Add User
+
+==== Request
+
+Via curl:
+include::{snippets}/organizations/add-user/add/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/add-user/add/ok/http-request.adoc[]
+
+===== Request Headers
+include::{snippets}/organizations/add-user/add/ok/request-headers.adoc[]
+
+==== Response
+
+include::{snippets}/organizations/add-user/add/ok/http-response.adoc[]
+
+=== Link User to Organization
+
+==== Request
+
+Via curl:
+include::{snippets}/organizations/add-user/link/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/add-user/link/ok/http-request.adoc[]
+
+===== Request Headers
+include::{snippets}/organizations/add-user/link/ok/request-headers.adoc[]
+
+==== Response
+
+Success:
+
+include::{snippets}/organizations/add-user/link/ok/http-response.adoc[]
+
+When the user has no access:
+
+include::{snippets}/organizations/add-user/link/no-access/http-response.adoc[]
+
+== Delete Users From Organization
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/delete-user/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/delete-user/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/delete-user/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/delete-user/ok/path-parameters.adoc[]
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/delete-user/ok/http-response.adoc[]
+
+When admin from a different organization:
+
+include::{snippets}/organizations/delete-user/different-organization/http-response.adoc[]
+
+When not an organization admin:
+
+include::{snippets}/organizations/delete-user/as-user/http-response.adoc[]
+
+When admin but the user is not in the organization:
+
+include::{snippets}/organizations/delete-user/user-not-in-organization/http-response.adoc[]
+
+When the user does not exist:
+
+include::{snippets}/organizations/delete-user/user-does-not-exist/http-response.adoc[]
+
+When the logged in user executes the request:
+
+include::{snippets}/organizations/delete-user/self/http-response.adoc[]
+
+When the logged in user does not longer exist:
+
+include::{snippets}/organizations/delete-user/self-not-exist/http-response.adoc[]
+
+When the logged in user is not in the organization anymore:
+
+include::{snippets}/organizations/delete-user/self-not-in-organization/http-response.adoc[]
+
+== Users used
+
+REST call to be made when users are actually being used.  This call will trigger an invite for created (status `CREATED`) users.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/users-used/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/users-used/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/users-used/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/users-used/ok/path-parameters.adoc[]
+
+==== Request fields
+include::{snippets}/organizations/users-used/ok/request-fields.adoc[]
+
+==== Request Fields
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/users-used/ok/http-response.adoc[]
+
+When no organization admin privileges for this organization:
+
+include::{snippets}/organizations/users-used/not-an-organization-admin/http-response.adoc[]
+
+= Roles in Organization
+
+[#list_roles_in_organization]
+== List Roles in Organization
+
+List roles in the organization, link `roles` to be followed on the organization entity.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/roles/get-roles-in-org/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/roles/get-roles-in-org/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/roles/get-roles-in-org/ok/request-headers.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/roles/get-roles-in-org/ok/http-response.adoc[]
+
+When the user has no access:
+
+include::{snippets}/organizations/roles/get-roles-in-org/no-access-to-organization/http-response.adoc[]
+
+==== Response Fields
+include::{snippets}/organizations/roles/get-roles-in-org/ok/response-fields.adoc[]
+
+== Find Roles in Organization
+
+Find call that queries roles in an organization, semantically it's the same as <<list_roles_in_organization>> but this one supports paging and sorting.  Also to be followed from the link `findRolesByOrganization` on Organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/roles/find-by-organization/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/roles/find-by-organization/ok/http-request.adoc[]
+
+Including paging and sorting:
+
+Via curl:
+include::{snippets}/roles/find-by-organization/paging-and-sorting/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/roles/find-by-organization/paging-and-sorting/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/roles/find-by-organization/ok/request-headers.adoc[]
+
+==== Request Parameters
+include::{snippets}/roles/find-by-organization/ok/request-parameters.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/roles/find-by-organization/paging-and-sorting/request-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/roles/find-by-organization/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/roles/find-by-organization/no-access-to-organization/http-response.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/roles/find-by-organization/paging-and-sorting/http-response.adoc[]
+
+== Find Roles in Organization By Role Name
+
+Find call that queries roles in an organization but filtered by the role name as well. Even part of the role name can be queried.
+
+=== Request
+
+Via curl:
+include::{snippets}/roles/find-by-organization-and-role/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/roles/find-by-organization-and-role/ok/http-request.adoc[]
+
+Including paging and sorting:
+
+Via curl:
+include::{snippets}/roles/find-by-organization-and-role/paging-and-sorting/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/roles/find-by-organization-and-role/paging-and-sorting/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/roles/find-by-organization-and-role/ok/request-headers.adoc[]
+
+==== Request Parameters
+include::{snippets}/roles/find-by-organization-and-role/ok/request-parameters.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/roles/find-by-organization-and-role/paging-and-sorting/request-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/roles/find-by-organization-and-role/ok/http-response.adoc[]
+
+Success with part of the role name:
+
+include::{snippets}/roles/find-by-organization-and-role/disambiguous/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/roles/find-by-organization-and-role/no-access-to-organization/http-response.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/roles/find-by-organization-and-role/paging-and-sorting/http-response.adoc[]
+
+== Add Roles to Organization
+
+Adding roles to an organization happens in two steps, adding a role and linking it to the organization
+
+=== Add Role
+
+==== Request
+
+Via curl:
+include::{snippets}/organizations/add-role/add/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/add-role/add/ok/http-request.adoc[]
+
+===== Request Headers
+include::{snippets}/organizations/add-role/add/ok/request-headers.adoc[]
+
+==== Response
+
+include::{snippets}/organizations/add-role/add/ok/http-response.adoc[]
+
+=== Link Role to Organization
+
+==== Request
+
+Via curl:
+include::{snippets}/organizations/add-role/link/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/add-role/link/ok/http-request.adoc[]
+
+===== Request Headers
+include::{snippets}/organizations/add-role/link/ok/request-headers.adoc[]
+
+==== Response
+
+Success:
+
+include::{snippets}/organizations/add-role/link/ok/http-response.adoc[]
+
+When the role name is already in use within the organization:
+
+include::{snippets}/organizations/add-role/link/conflict/http-response.adoc[]
+
+When the user has no access (via the organization):
+
+include::{snippets}/organizations/add-role/link/no-access-to-organization/http-response.adoc[]
+
+== Update a Role
+
+Update an existing role belonging to a particular organization
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/update-role/as-admin/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/update-role/as-admin/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/update-role/as-admin/request-headers.adoc[]
+
+==== Request Fields
+include::{snippets}/organizations/update-role/as-admin/request-fields.adoc[]
+
+=== Response
+
+As admin:
+
+include::{snippets}/organizations/update-role/as-admin/http-response.adoc[]
+
+When from the same organization:
+
+include::{snippets}/organizations/update-role/as-admin-from-organization-x/http-response.adoc[]
+
+When from a different organization:
+
+include::{snippets}/organizations/update-role/as-admin-from-organization-y/http-response.adoc[]
+
+== Remove a Role
+
+When a role is removed, it is first unassigned from any user and then deleted.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/delete-role/as-admin-from-organization-x/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/delete-role/as-admin-from-organization-x/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/delete-role/as-admin-from-organization-x/request-headers.adoc[]
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/delete-role/as-admin-from-organization-x/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/delete-role/as-user/http-response.adoc[]
+
+When organization admin from a different organization:
+
+include::{snippets}/organizations/delete-role/as-admin-from-organization-y/http-response.adoc[]
+
+When the role does not exist:
+
+include::{snippets}/organizations/delete-role/role-does-not-exist/http-response.adoc[]
+
+= Devices in Organization
+
+== List Devices in Organization
+
+Retrieve a list of all devices within an organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/get-devices/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/get-devices/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/get-devices/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/get-devices/ok/path-parameters.adoc[]
+
+==== Response Fields
+include::{snippets}/organizations/get-devices/ok/response-fields.adoc[]
+
+=== Response
+
+As an organization admin:
+
+include::{snippets}/organizations/get-devices/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/get-devices/as-user/http-response.adoc[]
+
+As an organization admin from a different organization:
+
+include::{snippets}/organizations/get-devices/different-admin/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/get-devices/organization-does-not-exist/http-response.adoc[]
+
+== List Device IDs in Organization
+
+Retrieve a list of id's for all devices within an organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/get-device-ids/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/get-device-ids/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/get-device-ids/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/get-device-ids/ok/path-parameters.adoc[]
+
+=== Response
+
+As an organization admin:
+
+include::{snippets}/organizations/get-device-ids/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/get-device-ids/as-user/http-response.adoc[]
+
+As an organization admin from a different organization:
+
+include::{snippets}/organizations/get-device-ids/different-admin/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/get-device-ids/organization-does-not-exist/http-response.adoc[]
+
+== Add Devices to an Organization
+
+An organization admin can add a device to the organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/add-device/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/add-device/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/add-device/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/add-device/ok/path-parameters.adoc[]
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/add-device/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/add-device/as-user/http-response.adoc[]
+
+As an organization admin from a different organization:
+
+include::{snippets}/organizations/add-device/different-admin/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/add-device/organization-does-not-exist/http-response.adoc[]
+
+When the device does not exist:
+
+include::{snippets}/organizations/add-device/asset-does-not-exist/http-response.adoc[]
+
+When the device is not suitable for onboarding in a new organization:
+
+include::{snippets}/organizations/add-device/role-present/http-response.adoc[]
+
+== Save Actions of an Organization
+
+Save a list of actions to a device belonging to an organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/save-actions/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/save-actions/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/save-actions/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/save-actions/ok/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/organizations/save-actions/ok/request-fields.adoc[]
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/save-actions/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/save-actions/as-user/http-response.adoc[]
+
+As an organization admin from a different organization:
+
+include::{snippets}/organizations/save-actions/different-admin/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/save-actions/organization-does-not-exist/http-response.adoc[]
+
+When the device does not exist:
+
+include::{snippets}/organizations/save-actions/deviceid-does-not-exist/http-response.adoc[]
+
+== Save Device Information of an Organization
+
+Save or update information of the device belonging to an organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/save-info/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/save-info/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/save-info/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/save-info/ok/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/organizations/save-info/ok/request-fields.adoc[]
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/save-info/ok/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/save-info/as-user/http-response.adoc[]
+
+As an organization admin from a different organization:
+
+include::{snippets}/organizations/save-info/different-admin/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/save-info/organization-does-not-exist/http-response.adoc[]
+
+When the device does not exist:
+
+include::{snippets}/organizations/save-info/deviceid-does-not-exist/http-response.adoc[]
+
+== Remove Device from Organization
+
+An organization admin can remove a device from an organization, the device will become available again to add to a new organization.  Any existing badges using this device will be updated (in case multiple devices exist on the badge) or removed.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/remove-device/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/remove-device/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/remove-device/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/remove-device/ok/path-parameters.adoc[]
+
+=== Response
+
+As an organization administrator:
+
+include::{snippets}/organizations/remove-device/ok/http-response.adoc[]
+
+As an organization administrator from a different organization:
+
+include::{snippets}/organizations/remove-device/no-access/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/remove-device/organization-doesnt-exist/http-response.adoc[]
+
+When the device does not exist:
+
+include::{snippets}/organizations/remove-device/device-doesnt-exist/http-response.adoc[]
+
+= Organization Images
+
+An organization admin can upload an image of their organization.
+
+== Upload Image
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/upload-image/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/upload-image/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/upload-image/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/upload-image/ok/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/organizations/upload-image/ok/request-parts.adoc[]
+
+=== Response
+
+==== Response Headers
+include::{snippets}/organizations/upload-image/ok/response-headers.adoc[]
+
+As organization admin:
+include::{snippets}/organizations/upload-image/ok/http-response.adoc[]
+
+As organization admin from another organization:
+include::{snippets}/organizations/upload-image/different-organization-admin/http-response.adoc[]
+
+As user:
+include::{snippets}/organizations/upload-image/as-user/http-response.adoc[]
+
+When the organization does not exist:
+include::{snippets}/organizations/upload-image/does-not-exist/http-response.adoc[]
+
+If the `file` request part is missing from the HTTP request:
+include::{snippets}/organizations/upload-image/file-part-missing/http-response.adoc[]
+
+When the filename is missing from the HTTP request:
+include::{snippets}/organizations/upload-image/filename-missing/http-response.adoc[]
+
+An organization admin can upload a logo image for their organization.
+
+== Upload Logo
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/upload-logo/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/upload-logo/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/upload-logo/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/upload-logo/ok/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/organizations/upload-logo/ok/request-parts.adoc[]
+
+=== Response
+
+==== Response Headers
+include::{snippets}/organizations/upload-logo/ok/response-headers.adoc[]
+
+As organization admin:
+include::{snippets}/organizations/upload-logo/ok/http-response.adoc[]
+
+As organization admin from another organization:
+include::{snippets}/organizations/upload-logo/different-organization-admin/http-response.adoc[]
+
+As user:
+include::{snippets}/organizations/upload-logo/as-user/http-response.adoc[]
+
+When the organization does not exist:
+include::{snippets}/organizations/upload-logo/does-not-exist/http-response.adoc[]
+
+If the `file` request part is missing from the HTTP request:
+include::{snippets}/organizations/upload-logo/file-part-missing/http-response.adoc[]
+
+When the filename is missing from the HTTP request:
+include::{snippets}/organizations/upload-logo/filename-missing/http-response.adoc[]
+
+= Device Images
+
+An organization admin can upload an image for their device.
+
+== Upload
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/upload-device-image/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/upload-device-image/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/upload-device-image/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/upload-device-image/ok/path-parameters.adoc[]
+
+==== Request Parts
+include::{snippets}/organizations/upload-device-image/ok/request-parts.adoc[]
+
+=== Response
+
+==== Response Headers
+include::{snippets}/organizations/upload-device-image/ok/response-headers.adoc[]
+
+As organization admin:
+include::{snippets}/organizations/upload-device-image/ok/http-response.adoc[]
+
+As organization admin from another organization:
+include::{snippets}/organizations/upload-device-image/different-organization-admin/http-response.adoc[]
+
+As user:
+include::{snippets}/organizations/upload-device-image/as-user/http-response.adoc[]
+
+When the organization does not exist:
+include::{snippets}/organizations/upload-device-image/does-not-exist/http-response.adoc[]
+
+When the device does not exist:
+include::{snippets}/organizations/upload-device-image/device-does-not-exist/http-response.adoc[]
+
+If the `file` request part is missing from the HTTP request:
+include::{snippets}/organizations/upload-device-image/file-part-missing/http-response.adoc[]
+
+When the filename is missing from the HTTP request:
+include::{snippets}/organizations/upload-device-image/filename-missing/http-response.adoc[]
+
+= Role Assignment
+
+== Assign Role to User
+
+To link a role to a user, the body needs to contain a list of URI's pointing to the role which has to be assigned to the user.
+The link should take the form `/organization/roles/{roleId}` or `https://www.ixortalk.com/organization/roles/{roleId}` (fully qualified).
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/link-role/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/link-role/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/link-role/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/link-role/ok/path-parameters.adoc[]
+
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/link-role/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/organizations/link-role/as-user/http-response.adoc[]
+
+When the role does not exist:
+
+include::{snippets}/organizations/link-role/role-does-not-exist/http-response.adoc[]
+
+When the user does not exist:
+
+include::{snippets}/organizations/link-role/user-does-not-exist/http-response.adoc[]
+
+When the role has already been linked:
+
+include::{snippets}/organizations/link-role/role-is-already-added/http-response.adoc[]
+
+== Remove User from Role
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/unlink-role/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/unlink-role/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/unlink-role/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/unlink-role/ok/path-parameters.adoc[]
+
+
+=== Response
+
+Success:
+
+include::{snippets}/organizations/unlink-role/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/organizations/unlink-role/as-user/http-response.adoc[]
+
+When the user does not exist:
+
+include::{snippets}/organizations/unlink-role/user-does-not-exist/http-response.adoc[]
+
+When the role does not exist:
+
+include::{snippets}/organizations/unlink-role/role-does-not-exist/http-response.adoc[]
+
+== Assign Organization Admin Role to User
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/assign-admin-role/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/assign-admin-role/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/assign-admin-role/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/assign-admin-role/ok/path-parameters.adoc[]
+
+=== Response
+
+Success when executed as an organization admin:
+
+include::{snippets}/organizations/assign-admin-role/ok/http-response.adoc[]
+
+When executed as a user of the same organization:
+
+include::{snippets}/organizations/assign-admin-role/as-user-of-org-x/http-response.adoc[]
+
+When executed as an admin of a different organization:
+
+include::{snippets}/organizations/assign-admin-role/admin-of-org-y/http-response.adoc[]
+
+== Remove Organization Admin Role from User
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/remove-admin-role/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/remove-admin-role/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/remove-admin-role/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/remove-admin-role/ok/path-parameters.adoc[]
+
+=== Response
+
+Success when executed as an organization admin:
+
+include::{snippets}/organizations/remove-admin-role/ok/http-response.adoc[]
+
+When executed as a user of the same organization:
+
+include::{snippets}/organizations/remove-admin-role/as-user-of-org-x/http-response.adoc[]
+
+When executed as an admin of a different organization:
+
+include::{snippets}/organizations/remove-admin-role/admin-of-org-y/http-response.adoc[]
+
+= Invites
+
+== Accept Invite
+
+Accept an invitation to an organization, links to this call are being sent via e-mail.  This is an unsecured call, key used is exposed nowhere, only sent via mail.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/accept-by-key/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/accept-by-key/ok/http-request.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/accept-by-key/ok/path-parameters.adoc[]
+
+
+=== Response
+
+Ok response:
+
+include::{snippets}/organizations/accept-by-key/ok/http-response.adoc[]
+
+When the key is expired:
+
+include::{snippets}/organizations/accept-by-key/expired-key/http-response.adoc[]
+
+When logged in user does not match:
+
+include::{snippets}/organizations/accept-by-key/not-authorized/http-response.adoc[]
+
+== Accept Invite
+
+Accept an invitation to an organization, links to this call are to be retrieved from <<get_organization_memberships>>. The user's status changes from INVITED to ACCEPTED.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/accept-invite/current-user/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/accept-invite/current-user/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/accept-invite/current-user/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/accept-invite/current-user/path-parameters.adoc[]
+
+
+=== Response
+
+Accept the invite (being the current user):
+
+include::{snippets}/organizations/accept-invite/current-user/http-response.adoc[]
+
+When a different user accepts:
+
+include::{snippets}/organizations/accept-invite/different-user/http-response.adoc[]
+
+When the user is not found:
+
+include::{snippets}/organizations/accept-invite/user-not-found/http-response.adoc[]
+
+== Decline Invite
+
+When the user declines the invite, the user is removed from the organization.
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/decline-invite/current-user/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/decline-invite/current-user/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/decline-invite/current-user/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/decline-invite/current-user/path-parameters.adoc[]
+
+
+=== Response
+
+Successfully removed current user from organization:
+
+include::{snippets}/organizations/decline-invite/current-user/http-response.adoc[]
+
+Access denied for a different user:
+
+include::{snippets}/organizations/decline-invite/different-user/http-response.adoc[]
+
+When the user is not found:
+
+include::{snippets}/organizations/decline-invite/user-not-found/http-response.adoc[]
+
+== Resend Invite
+
+Only an organization admin can resend an invite to a user who is already invited to the organization.
+
+=== Request
+
+Via curl:
+
+include::{snippets}/organizations/resend-invite/as-organization-admin/curl-request.adoc[]
+
+HTTP request:
+
+include::{snippets}/organizations/resend-invite/as-organization-admin/http-request.adoc[]
+
+==== Request Headers
+
+include::{snippets}/organizations/resend-invite/as-organization-admin/request-headers.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/organizations/resend-invite/as-organization-admin/path-parameters.adoc[]
+
+=== Response
+
+The organization admin can resend the invite:
+
+include::{snippets}/organizations/resend-invite/as-organization-admin/http-response.adoc[]
+
+Access denied for an organization admin but from a different organization:
+
+include::{snippets}/organizations/resend-invite/as-different-organization-admin/http-response.adoc[]
+
+A user cannot resend the invite:
+
+include::{snippets}/organizations/resend-invite/as-user/http-response.adoc[]
+
+== Verify email
+
+This is an unsecured REST call to be used in a redirect rule in Auth0.  This rest call will check the incoming request parameters and either marking the user's email to be verified already (when an invite exists with the specified key) or send a verification mail to the user.
+
+=== Request
+
+Via curl:
+
+include::{snippets}/organizations/verify-email/matched/curl-request.adoc[]
+
+HTTP request:
+
+include::{snippets}/organizations/verify-email/matched/http-request.adoc[]
+
+==== Request Parameters
+
+include::{snippets}/organizations/verify-email/matched/request-parameters.adoc[]
+
+=== Response
+
+When an invite exists for the given user's email and `acceptKey` combination:
+
+include::{snippets}/organizations/verify-email/matched/http-response.adoc[]
+
+When no match can be found:
+
+include::{snippets}/organizations/verify-email/no-match/http-response.adoc[]
+
+

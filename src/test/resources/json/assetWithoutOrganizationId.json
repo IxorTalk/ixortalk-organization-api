@@ -1,0 +1,28 @@
+{
+  "assetId": "974be746-0f22-470d-a2f0-a6bcaa673b8a",
+  "assetProperties": {
+    "properties": {
+      "hostname": "1.2.3.4",
+      "port": 7789,
+      "actions": [
+        {
+          "name": "testing",
+          "payload": {
+            "relayNr": 5,
+            "action": "HIGH"
+          }
+        }
+      ],
+      "company": {
+        "color": "#fff",
+        "logo": "",
+        "name": ""
+      },
+      "deviceId": "c1",
+      "deviceName": "assetWithoutOrganizationIdDeviceName",
+      "image": "https://my-organization/image.png"
+    }
+  },
+  "children": [],
+  "roles": []
+}

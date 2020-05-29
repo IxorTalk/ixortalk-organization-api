@@ -1,0 +1,15 @@
+{
+  "assetProperties":{
+    "properties":{
+      "hostname": "my-other-controller",
+      "port": 3828,
+      "organizationId": 1234,
+      "deviceName": "assetWithOrganizationIdDeviceName",
+      "deviceId": "c2",
+      "actions": []
+    }
+  },
+  "children": [],
+  "roles": [],
+  "assetId": "9a30d930-43d3-44ee-a399-bfdde7e0dbb4"
+}
