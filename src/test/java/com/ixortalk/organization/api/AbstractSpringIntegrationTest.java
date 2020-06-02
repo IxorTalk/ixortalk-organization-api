@@ -24,7 +24,6 @@
 package com.ixortalk.organization.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration;
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
@@ -41,7 +40,9 @@ import com.ixortalk.organization.api.rest.docs.RestDocDescriptors;
 import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -77,7 +78,6 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.buildJwtToken;
 import static com.ixortalk.autoconfigure.oauth2.TokenServerWireMockHelper.stubAdminToken;
-import static com.ixortalk.autoconfigure.oauth2.TokenServerWireMockHelper.stubTokenForSpringContextLoading;
 import static com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfoTestBuilder.aUserInfo;
 import static com.ixortalk.organization.api.TestConstants.CUSTOM_CLAIMS_NAMESPACE;
 import static com.ixortalk.organization.api.TestConstants.IMAGE_SERVICE_CONTEXT_PATH;
@@ -187,11 +187,8 @@ public abstract class AbstractSpringIntegrationTest  {
     @Rule
     public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("target/generated-snippets");
 
-    @ClassRule
-    public static WireMockClassRule tokenServerWireMockRule = new WireMockClassRule(TOKEN_SERVER_PORT);
-
     @Rule
-    public WireMockClassRule instanceRule = tokenServerWireMockRule;
+    public WireMockRule tokenServerWireMockRule = new WireMockRule(TOKEN_SERVER_PORT);
 
     @Rule
     public WireMockRule organizationCallbackApiWireMockRule = new WireMockRule(65301);
@@ -269,11 +266,6 @@ public abstract class AbstractSpringIntegrationTest  {
      */
     public static HeaderDescriptor describeAuthorizationTokenHeader() {
         return headerWithName("Authorization").description("The bearer token needed to authorize this request.");
-    }
-
-    @BeforeClass
-    public static void beforeClass() {
-        stubTokenForSpringContextLoading(tokenServerWireMockRule);
     }
 
     @Before
