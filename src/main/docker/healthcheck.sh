@@ -24,7 +24,7 @@
 
  #!/bin/sh
 
-MANAGEMENT_PORT=${MANAGEMENT_PORT:="8101"}
+MANAGEMENT_PORT=${MANAGEMENT_PORT:="8008"}
 HEALTH_PATH=${HEALTH_PATH:="/organization/actuator/health"}
 
 wget -q http://localhost:${MANAGEMENT_PORT}${HEALTH_PATH} -O /dev/null

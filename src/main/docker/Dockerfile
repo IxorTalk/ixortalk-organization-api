@@ -27,6 +27,6 @@ ADD healthcheck.sh /
 ADD ixortalk-organization-api-*.jar app.jar
 RUN chmod +x /healthcheck.sh && sh -c 'touch /app.jar'
 ENV JAVA_OPTS=""
-EXPOSE 8101
+EXPOSE 8008
 HEALTHCHECK CMD ./healthcheck.sh
 ENTRYPOINT [ "sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar" ]
