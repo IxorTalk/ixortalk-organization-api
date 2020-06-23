@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -56,6 +57,7 @@ import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHe
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.Optional.of;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -106,7 +108,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         AcceptKey acceptKey = userRestResource.findById(userInOrganizationXCreated.getId()).map(User::getAcceptKey).orElseThrow(() -> new IllegalStateException("User should be present"));
         assertThat(acceptKey).isNotNull();
         assertThat(acceptKey.getAcceptKey()).isNotNull();
-        assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock));
+        assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock).truncatedTo(MILLIS));
 
         mailingServiceWireMockRule.verify(1,
                 postRequestedFor(urlEqualTo("/mailing/send"))
