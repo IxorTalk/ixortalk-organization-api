@@ -108,7 +108,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         AcceptKey acceptKey = userRestResource.findById(userInOrganizationXCreated.getId()).map(User::getAcceptKey).orElseThrow(() -> new IllegalStateException("User should be present"));
         assertThat(acceptKey).isNotNull();
         assertThat(acceptKey.getAcceptKey()).isNotNull();
-        assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock).truncatedTo(MILLIS));
+        assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock));
 
         mailingServiceWireMockRule.verify(1,
                 postRequestedFor(urlEqualTo("/mailing/send"))
