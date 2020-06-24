@@ -69,11 +69,11 @@ public class OrganizationTest {
 
     @Test
     public void generateRoleName_chopped() {
-        Organization organization = anOrganization().withName("My Organization" + Strings.repeat("n", 100)).withRole(null).build();
+        Organization organization = anOrganization().withName("My Organization" + Strings.repeat("n", 300)).withRole(null).build();
 
         organization.generateRoleName();
 
-        assertThat(organization.getRole()).hasSize(50);
+        assertThat(organization.getRole()).hasSize(200);
     }
 
 }

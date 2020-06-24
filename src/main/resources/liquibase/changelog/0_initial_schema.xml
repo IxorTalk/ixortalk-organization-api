@@ -174,4 +174,13 @@
         <addNotNullConstraint tableName="organization" columnName="country" columnDataType="varchar(255)"/>
     </changeSet>
 
+    <changeSet id="increase_role_on_organization" author="ddewaele">
+        <modifyDataType columnName="role" newDataType="varchar(200)" tableName="organization"/>
+    </changeSet>
+
+
+    <changeSet id="increase_role_on_orgrole" author="ddewaele">
+        <modifyDataType columnName="role"  newDataType="varchar(200)" tableName="org_role"/>
+    </changeSet>
+
 </databaseChangeLog>

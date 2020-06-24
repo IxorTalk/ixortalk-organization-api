@@ -47,7 +47,7 @@ public class Organization {
 
     public static final String ADMIN_ROLE_SUFFIX = "_ADMIN";
     private static final String ROLE_PREFIX = "ROLE_";
-    private static final int ROLE_MAX_LENGTH = 50;
+    private static final int ROLE_MAX_LENGTH = 200;
     private static final int ROLE_NAME_DYNAMIC_PART_MAX_LENGTH = ROLE_MAX_LENGTH - ROLE_PREFIX.length() - ADMIN_ROLE_SUFFIX.length();
 
     @Id
