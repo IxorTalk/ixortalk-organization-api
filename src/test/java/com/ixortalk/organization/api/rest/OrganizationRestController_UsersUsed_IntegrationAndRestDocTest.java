@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -57,7 +56,6 @@ import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHe
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.time.Instant.now;
-import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.Optional.of;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
