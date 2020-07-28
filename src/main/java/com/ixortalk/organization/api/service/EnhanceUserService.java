@@ -58,7 +58,7 @@ public class EnhanceUserService {
 
         return organizationRestResource
                 .findByUsers(user)
-                .map(organization -> auth0Roles.getUsersRoles(user.getLogin()).contains(organization.getRole()))
+                .map(organization -> auth0Roles.getUsersInRole(organization.getRole()).contains(user.getLogin()))
                 .orElse(false);
     }
 }

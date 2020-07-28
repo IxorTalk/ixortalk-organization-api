@@ -450,6 +450,11 @@ public abstract class AbstractSpringIntegrationTest  {
         when(auth0Users.userExists(USER_EMAIL)).thenReturn(true);
         when(auth0Users.getUserInfo(USER_EMAIL)).thenReturn(of(new UserInfo(USER_EMAIL)));
         when(auth0Roles.getUsersRoles(USER_EMAIL)).thenReturn(newHashSet());
+
+        when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL));
+        when(auth0Roles.getUsersInRole(ROLE_ONLY_IN_AUTH0)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL));
+        when(auth0Roles.getUsersInRole(SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL));
+        when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_Y_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL));
     }
 
     @Before
