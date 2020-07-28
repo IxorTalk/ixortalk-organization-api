@@ -50,7 +50,7 @@
         <spring-restdocs.version>2.0.4.RELEASE</spring-restdocs.version>
         <ixortalk-test.version>2.0.0</ixortalk-test.version>
         <ixortalk-util.version>1.0.2</ixortalk-util.version>
-        <ixortalk-oauth2-spring-boot-starter.version>1.0.9</ixortalk-oauth2-spring-boot-starter.version>
+        <ixortalk-oauth2-spring-boot-starter.version>1.0.10-SNAPSHOT</ixortalk-oauth2-spring-boot-starter.version>
     </properties>
 
     <organization>
