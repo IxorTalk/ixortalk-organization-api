@@ -29,7 +29,7 @@
 
     <groupId>com.ixortalk</groupId>
     <artifactId>ixortalk-organization-api</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <name>ixortalk-organization-api</name>
     <description>IxorTalk microservice for managing Organization entities</description>
@@ -81,7 +81,7 @@
         <connection>scm:git:git@github.com:ixortalk/ixortalk-organization-api.git</connection>
         <developerConnection>scm:git:git@github.com:ixortalk/ixortalk-organization-api.git</developerConnection>
         <url>https://github.com/ixortalk/ixortalk-organization-api/tree/master</url>
-        <tag>ixortalk-organization-api-1.0.3</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
