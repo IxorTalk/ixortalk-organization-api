@@ -31,38 +31,28 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
-import static com.ixortalk.organization.api.TestConstants.DEFAULT_MAIL_LANGUAGE_TAG;
-import static com.ixortalk.organization.api.TestConstants.INVITE_MAIL_SUBJECT_KEY;
-import static com.ixortalk.organization.api.TestConstants.INVITE_MAIL_TEMPLATE;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.TestConstants.*;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_FORBIDDEN;
-import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static java.net.HttpURLConnection.*;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final ParameterDescriptor USER_ID_PATH_PARAMETER = parameterWithName("userId").description("Primary key for the user to be accepted/declined");
+
+
 
     @Before
     public void before() {
@@ -105,7 +95,29 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
                                                         convertToHowItShouldBeSentToMailingService(userInOrganizationXInvited),
                                                         IMAGE_DOWNLOAD_URL_PREFIX + organizationX.getLogo(), true,
                                                         userRestResource.findById(userInOrganizationXInvited.getId()).get().getAcceptKey().getAcceptKey()))))));
+    }
 
+    @Test
+    public void organizationAdminResendInviteForUserWithInviteLanguageNl() throws JsonProcessingException {
+        setField(userInOrganizationXInvited, "inviteLanguage", "en");
+        userRestResource.save(userInOrganizationXInvited);
+
+        given()
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .contentType(JSON)
+                .filter(
+                        document("organizations/resend-invite/as-organization-admin",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(USER_ID_PATH_PARAMETER)
+                        )
+                )
+                .post("/users/{userId}/resend-invite", userInOrganizationXInvited.getId())
+                .then()
+                .statusCode(HTTP_NO_CONTENT);
+
+        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"en\"")));
     }
 
     @Test

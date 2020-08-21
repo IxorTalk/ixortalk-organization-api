@@ -399,6 +399,9 @@ include::{snippets}/organizations/add-user/add/ok/http-request.adoc[]
 ===== Request Headers
 include::{snippets}/organizations/add-user/add/ok/request-headers.adoc[]
 
+===== Request Fields
+include::{snippets}/organizations/add-user/add/ok/request-fields.adoc[]
+
 ==== Response
 
 include::{snippets}/organizations/add-user/add/ok/http-response.adoc[]

@@ -23,31 +23,24 @@
  */
 package com.ixortalk.organization.api.service;
 
-import com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration;
+import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
-import com.ixortalk.organization.api.OrganizationApiApplication;
+import com.ixortalk.organization.api.domain.Status;
+import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.mail.InviteUserService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.inject.Inject;
-
 import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static com.ixortalk.organization.api.domain.UserTestBuilder.aUser;
+import static java.util.Optional.of;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest(
-        classes = {OrganizationApiApplication.class, OAuth2TestConfiguration.class},
-        webEnvironment = RANDOM_PORT,
-        properties = {
-                "ixortalk.organization.api.mail.default-mail-language-tag=en",
-        }
-)
 public class InviteUserServiceIntegrationTest extends AbstractSpringIntegrationTest {
 
     @Inject
@@ -56,9 +49,13 @@ public class InviteUserServiceIntegrationTest extends AbstractSpringIntegrationT
     @MockBean
     private UserEmailProvider userEmailProvider;
 
+    private static final String USER_LOGIN = "test@organization";
+
     @Before
     public void setupUserEmailProvicer() {
-        Mockito.when(userEmailProvider.getCurrentUsersEmail()).thenReturn(Optional.of(USER_IN_ORGANIZATION_X_CREATED_EMAIL));
+        when(auth0Users.userExists(USER_LOGIN)).thenReturn(true);
+        when(auth0Users.getUserInfo(USER_LOGIN)).thenReturn(of(new UserInfo(USER_LOGIN, "test", "invite", "language")));
+        when(userEmailProvider.getCurrentUsersEmail()).thenReturn(Optional.of(USER_LOGIN));
     }
 
     @Before
@@ -71,21 +68,24 @@ public class InviteUserServiceIntegrationTest extends AbstractSpringIntegrationT
     @Test
     public void inviteUser_givenUserWithDefinedInviteLanguage_languageIsUsedToSentMail() {
         // given
-        userInOrganizationXCreated.setInviteLanguage("nl");
+        User userWithInviteLanguageNl = aUser().withLogin(USER_LOGIN).withStatus(Status.CREATED).withInviteLanguage("en").build();
 
         // act
-        inviteUserService.inviteUser(userInOrganizationXCreated, organizationX);
+        inviteUserService.inviteUser(userWithInviteLanguageNl, organizationX);
 
         // assert
-        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"nl\"")));
+        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"en\"")));
     }
 
     @Test
     public void inviteUser_givenUserWithoutDefinedInviteLanguage_defaultLanguageIsUsedToSentMail() {
+        // given
+        User userWithoutLanguage = aUser().withLogin(USER_LOGIN).withStatus(Status.CREATED).build();
+
         // act
-        inviteUserService.inviteUser(userInOrganizationXCreated, organizationX);
+        inviteUserService.inviteUser(userWithoutLanguage, organizationX);
 
         // assert
-        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"en\"")));
+        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"nl\"")));
     }
 }

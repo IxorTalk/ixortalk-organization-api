@@ -21,45 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.organization.api.domain;
+package com.ixortalk.organization.api.error;
 
-import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
+import java.util.List;
 
-import static com.ixortalk.test.util.Randomizer.nextString;
-import static com.ixortalk.organization.api.domain.Status.ACCEPTED;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
+public class ErrorReport {
 
-public class UserTestBuilder extends ReflectionInstanceTestBuilder<User> {
+    private String errorUUID;
+    private List<ValidationError> errors;
 
-    private String login = nextString("testUser");
-    private String inviteLanguage = "nl";
-    private Status status = ACCEPTED;
-
-    private UserTestBuilder() {}
-
-    public static UserTestBuilder aUser() {
-        return new UserTestBuilder();
+    public ErrorReport(String errorUUID, List<ValidationError> errors) {
+        this.errorUUID = errorUUID;
+        this.errors = errors;
     }
 
-    @Override
-    public void setFields(User user) {
-        setField(user, "login", login);
-        setField(user, "inviteLanguage", inviteLanguage);
-        setField(user, "status", status);
+    public static ErrorReport of(String errorUUID, List<ValidationError> errors) {
+        return new ErrorReport(errorUUID, errors);
     }
 
-    public UserTestBuilder withLogin(String login) {
-        this.login = login;
-        return this;
+    public String getErrorUUID() {
+        return errorUUID;
     }
 
-    public UserTestBuilder withInviteLanguage(String inviteLanguage) {
-        this.inviteLanguage = inviteLanguage;
-        return this;
-    }
-
-    public UserTestBuilder withStatus(Status status) {
-        this.status = status;
-        return this;
+    public List<ValidationError> getErrors() {
+        return errors;
     }
 }

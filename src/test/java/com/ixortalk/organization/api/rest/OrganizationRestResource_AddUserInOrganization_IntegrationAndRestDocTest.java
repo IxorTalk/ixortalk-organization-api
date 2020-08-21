@@ -24,12 +24,12 @@
 package com.ixortalk.organization.api.rest;
 
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
-import com.ixortalk.organization.api.domain.UserTestBuilder;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Organization;
+import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
 import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.domain.UserTestBuilder;
 import io.restassured.path.json.JsonPath;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +55,7 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+
 
 public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
@@ -100,6 +101,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                 .extracting(User::getLogin)
                 .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }
+
 
     @Test
     public void alreadyAddedUserId() {
@@ -230,13 +232,13 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                                         requestHeaders(describeAuthorizationTokenHeader()),
                                         requestFields(
                                                 fieldWithPath("login").type(STRING).description("The `login` (email address) for the user to add"),
-                                                fieldWithPath("inviteLanguage").type(STRING).description("The language that will be used for the invite mail (ISO 639-1 2-letter code)").optional()
+                                                fieldWithPath("inviteLanguage").type(STRING).description("Optional language that will be used for the invite mail (ISO 639-1 2-letter code)").optional()
                                         )
                                 )
                         )
                         .when()
                         .contentType(JSON)
-                        .body("{ \"login\": \"" + LOGIN_TO_ADD + "\", \"inviteLanguage\": \"nl\" }")
+                        .body("{ \"login\": \"" + LOGIN_TO_ADD + "\", \"inviteLanguage\": \"en\" }")
                         .post("/users")
                         .then()
                         .statusCode(SC_CREATED)

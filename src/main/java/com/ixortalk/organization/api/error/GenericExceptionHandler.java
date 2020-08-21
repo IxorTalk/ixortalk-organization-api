@@ -43,11 +43,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.UUID.randomUUID;
 import static org.springframework.http.HttpStatus.*;
@@ -103,15 +102,15 @@ public class GenericExceptionHandler {
     @ResponseBody
     public ErrorReport handleRepositoryConstraintViolationException(RepositoryConstraintViolationException e) {
         String errorUUID = logError(e);
-        List<ValidationError> errors = new ArrayList<>();
 
-        for (FieldError fieldError : e.getErrors().getFieldErrors()) {
-            errors.add(ValidationError.of(
+        List<ValidationError> errors = e.getErrors().getFieldErrors().stream()
+                .map(fieldError -> ValidationError.of(
                     fieldError.getObjectName(),
                     fieldError.getField(),
                     fieldError.getRejectedValue(),
-                    fieldError.getDefaultMessage()));
-        }
+                    fieldError.getDefaultMessage()))
+                .collect(Collectors.toList());
+
         return ErrorReport.of(errorUUID, errors);
     }
 
@@ -137,61 +136,5 @@ public class GenericExceptionHandler {
         String errorUUID = randomUUID().toString();
         LOGGER.error("Error - {}: {}", errorUUID, e.getMessage(), e);
         return errorUUID;
-    }
-
-    public static class ErrorReport {
-        private String errorUUID;
-        private List<ValidationError> errors;
-
-        public ErrorReport(String errorUUID, List<ValidationError> errors) {
-            this.errorUUID = errorUUID;
-            this.errors = errors;
-        }
-
-        public static ErrorReport of(String errorUUID, List<ValidationError> errors) {
-            return new ErrorReport(errorUUID, errors);
-        }
-
-        public String getErrorUUID() {
-            return errorUUID;
-        }
-
-        public List<ValidationError> getErrors() {
-            return errors;
-        }
-    }
-
-    public static class ValidationError {
-        private String entity;
-        private String property;
-        private Object invalidValue;
-        private String message;
-
-        public ValidationError(String entity, String property, Object invalidValue, String message) {
-            this.entity = entity;
-            this.property = property;
-            this.invalidValue = invalidValue;
-            this.message = message;
-        }
-
-        public static ValidationError of(String entity, String property, Object invalidValue, String message) {
-            return new ValidationError(entity, property, invalidValue, message);
-        }
-
-        public String getEntity() {
-            return entity;
-        }
-
-        public String getProperty() {
-            return property;
-        }
-
-        public Object getInvalidValue() {
-            return invalidValue;
-        }
-
-        public String getMessage() {
-            return message;
-        }
     }
 }

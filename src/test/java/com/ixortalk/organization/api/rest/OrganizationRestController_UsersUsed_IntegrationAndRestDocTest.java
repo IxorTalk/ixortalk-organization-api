@@ -34,13 +34,7 @@ import org.junit.Test;
 
 import java.time.Instant;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfoTestBuilder.aUserInfo;
@@ -70,6 +64,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
@@ -127,6 +122,33 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
                                                         acceptKey.getAcceptKey()
                                                         ))))));
 
+    }
+
+    public void asAdminForUserWithInviteLanguageNl() throws JsonProcessingException {
+        setField(userInOrganizationXInvited, "inviteLanguage", "en");
+        userRestResource.save(userInOrganizationXInvited);
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .filter(
+                        document("organizations/users-used/ok",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
+                                pathParameters(ORGANIZATION_ID_PATH_PARAMETER),
+                                requestFields(
+                                        fieldWithPath("[]").description("A list of logins that have been used")
+                                )
+                        ))
+                .contentType(JSON)
+                .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin(), userInOrganizationXInvited.getLogin())))
+                .post("/organizations/{id}/users/used", organizationX.getId())
+                .then()
+                .statusCode(SC_OK);
+
+        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"nl\"")));
     }
 
     @Test

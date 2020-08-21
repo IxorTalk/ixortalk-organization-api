@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.time.Instant.now;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -72,7 +73,7 @@ public class InviteUserService {
         user.invited(now(clock));
         mailingService.send(new SendInviteMailToOrganizationVO(
                 user.getLogin(),
-                Optional.ofNullable(user.getInviteLanguage()).orElse(ixorTalkConfigProperties.getOrganization().getApi().getMail().getDefaultMailLanguageTag()),
+                ofNullable(user.getInviteLanguage()).orElse(ixorTalkConfigProperties.getOrganization().getApi().getMail().getDefaultMailLanguageTag()),
                 ixorTalkConfigProperties.getOrganization().getApi().getMail().getInviteMailSubjectKey(),
                 ixorTalkConfigProperties.getOrganization().getApi().getMail().getInviteMailTemplate(),
                 new TemplateVariables(

@@ -74,10 +74,7 @@ public class User {
         return login;
     }
 
-    public void setInviteLanguage(String inviteLanguage) {
-        this.inviteLanguage = inviteLanguage;
-    }
-
+    @JsonIgnore
     public String getInviteLanguage() {
         return inviteLanguage;
     }
