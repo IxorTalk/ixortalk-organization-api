@@ -28,11 +28,18 @@ import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
+import org.springframework.validation.Validator;
+
+import javax.inject.Inject;
 
 import static org.springframework.data.rest.core.mapping.RepositoryDetectionStrategy.RepositoryDetectionStrategies.ANNOTATED;
 
 @Configuration
 public class RepositoryRestConfigurer implements org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer {
+
+    @Inject
+    private Validator validator;
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
@@ -40,5 +47,11 @@ public class RepositoryRestConfigurer implements org.springframework.data.rest.w
         config.exposeIdsFor(Organization.class);
         config.exposeIdsFor(User.class);
         config.exposeIdsFor(Role.class);
+    }
+
+    @Override
+    public void configureValidatingRepositoryEventListener(ValidatingRepositoryEventListener validatingListener) {
+        validatingListener.addValidator("beforeCreate", validator);
+        validatingListener.addValidator("beforeSave", validator);
     }
 }

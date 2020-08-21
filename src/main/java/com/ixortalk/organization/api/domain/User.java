@@ -24,6 +24,7 @@
 package com.ixortalk.organization.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ixortalk.organization.api.domain.validation.LanguageISO639;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
 import javax.persistence.*;
@@ -45,6 +46,9 @@ public class User {
     private Long id;
 
     private String login;
+
+    @LanguageISO639
+    private String inviteLanguage;
 
     @ManyToMany(cascade = ALL)
     @JoinTable(name = "org_role_in_user",
@@ -68,6 +72,14 @@ public class User {
 
     public String getLogin() {
         return login;
+    }
+
+    public void setInviteLanguage(String inviteLanguage) {
+        this.inviteLanguage = inviteLanguage;
+    }
+
+    public String getInviteLanguage() {
+        return inviteLanguage;
     }
 
     public Status getStatus() {

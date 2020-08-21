@@ -229,13 +229,14 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                                         preprocessResponse(prettyPrint()),
                                         requestHeaders(describeAuthorizationTokenHeader()),
                                         requestFields(
-                                                fieldWithPath("login").type(STRING).description("The `login` (email address) for the user to add")
+                                                fieldWithPath("login").type(STRING).description("The `login` (email address) for the user to add"),
+                                                fieldWithPath("inviteLanguage").type(STRING).description("The language that will be used for the invite mail (ISO 639-1 2-letter code)").optional()
                                         )
                                 )
                         )
                         .when()
                         .contentType(JSON)
-                        .body("{ \"login\": \"" + LOGIN_TO_ADD + "\" }")
+                        .body("{ \"login\": \"" + LOGIN_TO_ADD + "\", \"inviteLanguage\": \"nl\" }")
                         .post("/users")
                         .then()
                         .statusCode(SC_CREATED)

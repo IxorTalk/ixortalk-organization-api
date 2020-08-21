@@ -36,6 +36,7 @@ import com.ixortalk.organization.api.service.UserEmailProvider;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.Clock;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.time.Instant.now;
@@ -71,7 +72,7 @@ public class InviteUserService {
         user.invited(now(clock));
         mailingService.send(new SendInviteMailToOrganizationVO(
                 user.getLogin(),
-                ixorTalkConfigProperties.getOrganization().getApi().getMail().getDefaultMailLanguageTag(),
+                Optional.ofNullable(user.getInviteLanguage()).orElse(ixorTalkConfigProperties.getOrganization().getApi().getMail().getDefaultMailLanguageTag()),
                 ixorTalkConfigProperties.getOrganization().getApi().getMail().getInviteMailSubjectKey(),
                 ixorTalkConfigProperties.getOrganization().getApi().getMail().getInviteMailTemplate(),
                 new TemplateVariables(

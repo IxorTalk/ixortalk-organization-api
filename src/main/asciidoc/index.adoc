@@ -479,6 +479,7 @@ include::{snippets}/organizations/delete-user/self-not-in-organization/http-resp
 == Users used
 
 REST call to be made when users are actually being used.  This call will trigger an invite for created (status `CREATED`) users.
+The optional invite language of the users will be used as language of the invite mails. If not present a configurable default language will be used.
 
 === Request
 
@@ -1369,6 +1370,7 @@ include::{snippets}/organizations/decline-invite/user-not-found/http-response.ad
 == Resend Invite
 
 Only an organization admin can resend an invite to a user who is already invited to the organization.
+The optional invite language of the user will be used as language of the invite mail. If not present a configurable default language will be used.
 
 === Request
 

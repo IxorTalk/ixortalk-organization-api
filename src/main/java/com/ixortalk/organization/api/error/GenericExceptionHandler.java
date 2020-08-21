@@ -28,17 +28,26 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.rest.core.RepositoryConstraintViolationException;
 import org.springframework.data.rest.webmvc.RepositoryRestExceptionHandler;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.UUID.randomUUID;
 import static org.springframework.http.HttpStatus.*;
@@ -89,6 +98,23 @@ public class GenericExceptionHandler {
         return new ResponseEntity<>("Not Found - " + errorUUID, new HttpHeaders(), NOT_FOUND);
     }
 
+    @ExceptionHandler(value = RepositoryConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorReport handleRepositoryConstraintViolationException(RepositoryConstraintViolationException e) {
+        String errorUUID = logError(e);
+        List<ValidationError> errors = new ArrayList<>();
+
+        for (FieldError fieldError : e.getErrors().getFieldErrors()) {
+            errors.add(ValidationError.of(
+                    fieldError.getObjectName(),
+                    fieldError.getField(),
+                    fieldError.getRejectedValue(),
+                    fieldError.getDefaultMessage()));
+        }
+        return ErrorReport.of(errorUUID, errors);
+    }
+
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException e) {
         String errorUUID = logError(e);
@@ -111,5 +137,61 @@ public class GenericExceptionHandler {
         String errorUUID = randomUUID().toString();
         LOGGER.error("Error - {}: {}", errorUUID, e.getMessage(), e);
         return errorUUID;
+    }
+
+    public static class ErrorReport {
+        private String errorUUID;
+        private List<ValidationError> errors;
+
+        public ErrorReport(String errorUUID, List<ValidationError> errors) {
+            this.errorUUID = errorUUID;
+            this.errors = errors;
+        }
+
+        public static ErrorReport of(String errorUUID, List<ValidationError> errors) {
+            return new ErrorReport(errorUUID, errors);
+        }
+
+        public String getErrorUUID() {
+            return errorUUID;
+        }
+
+        public List<ValidationError> getErrors() {
+            return errors;
+        }
+    }
+
+    public static class ValidationError {
+        private String entity;
+        private String property;
+        private Object invalidValue;
+        private String message;
+
+        public ValidationError(String entity, String property, Object invalidValue, String message) {
+            this.entity = entity;
+            this.property = property;
+            this.invalidValue = invalidValue;
+            this.message = message;
+        }
+
+        public static ValidationError of(String entity, String property, Object invalidValue, String message) {
+            return new ValidationError(entity, property, invalidValue, message);
+        }
+
+        public String getEntity() {
+            return entity;
+        }
+
+        public String getProperty() {
+            return property;
+        }
+
+        public Object getInvalidValue() {
+            return invalidValue;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }
