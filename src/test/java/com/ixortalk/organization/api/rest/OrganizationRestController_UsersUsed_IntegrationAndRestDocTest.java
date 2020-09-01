@@ -124,7 +124,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
 
     }
 
-    public void asAdminForUserWithInviteLanguageNl() throws JsonProcessingException {
+    public void asAdminForUserWithInviteLanguageEn() throws JsonProcessingException {
         setField(userInOrganizationXInvited, "inviteLanguage", "en");
         userRestResource.save(userInOrganizationXInvited);
 

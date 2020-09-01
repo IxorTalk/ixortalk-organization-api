@@ -32,7 +32,7 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 public class UserTestBuilder extends ReflectionInstanceTestBuilder<User> {
 
     private String login = nextString("testUser");
-    private String inviteLanguage = "nl";
+    private String inviteLanguage;
     private Status status = ACCEPTED;
 
     private UserTestBuilder() {}
