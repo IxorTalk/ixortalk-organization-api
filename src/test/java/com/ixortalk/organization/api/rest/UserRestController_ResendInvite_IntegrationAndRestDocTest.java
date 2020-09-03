@@ -98,7 +98,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
     }
 
     @Test
-    public void organizationAdminResendInviteForUserWithInviteLanguageNl() throws JsonProcessingException {
+    public void organizationAdminResendInviteForUserWithInviteLanguageEn() {
         setField(userInOrganizationXInvited, "inviteLanguage", "en");
         userRestResource.save(userInOrganizationXInvited);
 

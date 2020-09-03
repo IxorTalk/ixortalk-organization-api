@@ -124,9 +124,10 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
 
     }
 
+    @Test
     public void asAdminForUserWithInviteLanguageEn() throws JsonProcessingException {
-        setField(userInOrganizationXInvited, "inviteLanguage", "en");
-        userRestResource.save(userInOrganizationXInvited);
+        setField(userInOrganizationXCreated, "inviteLanguage", "en");
+        userRestResource.save(userInOrganizationXCreated);
 
         given()
                 .auth()
@@ -143,12 +144,12 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
                                 )
                         ))
                 .contentType(JSON)
-                .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin(), userInOrganizationXInvited.getLogin())))
+                .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin())))
                 .post("/organizations/{id}/users/used", organizationX.getId())
                 .then()
                 .statusCode(SC_OK);
 
-        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"nl\"")));
+        mailingServiceWireMockRule.verify(1, postRequestedFor(urlEqualTo("/mailing/send")).withRequestBody(containing("\"languageTag\":\"en\"")));
     }
 
     @Test
