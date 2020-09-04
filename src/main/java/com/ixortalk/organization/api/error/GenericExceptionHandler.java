@@ -28,17 +28,25 @@ import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.rest.core.RepositoryConstraintViolationException;
 import org.springframework.data.rest.webmvc.RepositoryRestExceptionHandler;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import javax.validation.ConstraintViolationException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.UUID.randomUUID;
 import static org.springframework.http.HttpStatus.*;
@@ -87,6 +95,23 @@ public class GenericExceptionHandler {
     public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException e) {
         String errorUUID = logError(e);
         return new ResponseEntity<>("Not Found - " + errorUUID, new HttpHeaders(), NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = RepositoryConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorReport handleRepositoryConstraintViolationException(RepositoryConstraintViolationException e) {
+        String errorUUID = logError(e);
+
+        List<ValidationError> errors = e.getErrors().getFieldErrors().stream()
+                .map(fieldError -> ValidationError.of(
+                    fieldError.getObjectName(),
+                    fieldError.getField(),
+                    fieldError.getRejectedValue(),
+                    fieldError.getDefaultMessage()))
+                .collect(Collectors.toList());
+
+        return ErrorReport.of(errorUUID, errors);
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
