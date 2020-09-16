@@ -74,7 +74,6 @@ public class User {
         return login;
     }
 
-    @JsonIgnore
     public String getInviteLanguage() {
         return inviteLanguage;
     }
