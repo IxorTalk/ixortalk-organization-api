@@ -25,11 +25,14 @@
 
 -->
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <include file="classpath:liquibase/changelog/0_initial_schema.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:liquibase/changelog/1_add_invite_language_to_user.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:liquibase/changelog/2_add_is_admin_to_user.xml" relativeToChangelogFile="false"/>
+    <changeSet id="add_is_admin_to_user" author="steinmaerivoet">
+        <addColumn tableName="org_user">
+            <column name="is_admin" type="boolean" defaultValue="false" />
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

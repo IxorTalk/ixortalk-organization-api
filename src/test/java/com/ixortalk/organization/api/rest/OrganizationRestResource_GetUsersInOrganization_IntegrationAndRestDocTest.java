@@ -77,6 +77,8 @@ public class OrganizationRestResource_GetUsersInOrganization_IntegrationAndRestD
     public void before() {
         when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, "completely-different-user@ixortalk.com"));
         when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL)).thenReturn(newHashSet(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME, FIRST_ROLE_IN_ORGANIZATION_X_ROLE_NAME, ROLE_IN_ORGANIZATION_Y_ROLE_NAME, "ROLE_NOT_EVEN_USED_IN_ORGANIZATION_DOMAIN"));
+        userInOrganizationXAcceptedHavingARole.setAdmin(true);
+        userRestResource.save(userInOrganizationXAcceptedHavingARole);
     }
 
     @Test

@@ -24,6 +24,7 @@
 package com.ixortalk.organization.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ixortalk.organization.api.domain.validation.LanguageISO639;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
@@ -62,6 +63,8 @@ public class User {
 
     @Embedded
     private AcceptKey acceptKey;
+
+    private boolean isAdmin = false;
 
     private User() {
     }
@@ -116,6 +119,15 @@ public class User {
     @JsonIgnore
     public boolean isCreated() {
         return this.status == CREATED;
+    }
+
+    @JsonProperty(value="isAdmin")
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     public void loginToLowercase() {

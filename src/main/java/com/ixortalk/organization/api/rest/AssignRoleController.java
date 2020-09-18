@@ -27,7 +27,9 @@ import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.service.UserService;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,9 +37,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import java.util.function.BiConsumer;
+import java.util.Optional;
 
-import static com.google.common.collect.Sets.newHashSet;
+
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.noContent;
 
@@ -52,30 +54,36 @@ public class AssignRoleController {
     private OrganizationRestResource organizationRestResource;
 
     @Inject
-    private Auth0Users auth0Users;
+    private UserService userService;
 
     @Inject
-    private Auth0Roles auth0Roles;
+    private Auth0Users auth0Users;
 
     @PostMapping(path = "/{organizationId}/{userId}/assign-admin-role")
     public ResponseEntity<?> assignAdminRole(@PathVariable("organizationId") Long organizationId, @PathVariable("userId") Long userId) {
-        return adminRoleAction(organizationId, userId, (email, roleName) -> auth0Roles.assignRolesToUser(email, newHashSet(roleName)));
+        return findOrganizationAndAssociatedUser(organizationId, userId).map(organizationAndUser -> {
+            userService.assignAdminRole(organizationAndUser.getFirst(), organizationAndUser.getSecond());
+            return noContent().build();
+        }).orElse(badRequest().build());
     }
 
     @PostMapping(path = "/{organizationId}/{userId}/remove-admin-role")
     public ResponseEntity<?> removeAdminRole(@PathVariable("organizationId") Long organizationId, @PathVariable("userId") Long userId) {
-        return adminRoleAction(organizationId, userId, (email, roleName) -> auth0Roles.removeRolesFromUser(email, newHashSet(roleName)));
+        return findOrganizationAndAssociatedUser(organizationId, userId).map(organizationAndUser -> {
+            userService.removeAdminRole(organizationAndUser.getFirst(), organizationAndUser.getSecond());
+            return noContent().build();
+        }).orElse(badRequest().build());
     }
 
-    private ResponseEntity<?> adminRoleAction(Long organizationId, Long userId, BiConsumer<String, String> roleAction) {
+
+    private Optional<Pair<Organization, User>> findOrganizationAndAssociatedUser(Long organizationId, Long userId) {
         Organization organization = organizationRestResource.findById(organizationId).orElseThrow(ResourceNotFoundException::new);
         User user = userRestResource.findById(userId).orElseThrow(ResourceNotFoundException::new);
 
         if (organization == null || user == null || !organization.containsUser(user) || !auth0Users.userExists(user.getLogin())) {
-            return badRequest().build();
+            return Optional.empty();
         }
 
-        roleAction.accept(user.getLogin(), organization.getRole());
-        return noContent().build();
+        return Optional.of(Pair.of(organization, user));
     }
 }

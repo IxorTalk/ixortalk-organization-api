@@ -330,7 +330,7 @@ public abstract class AbstractSpringIntegrationTest  {
         userInOrganizationXCreated = aUser().withLogin(USER_IN_ORGANIZATION_X_CREATED_EMAIL).withStatus(Status.CREATED).build();
         userInOrganizationXInvited = aUser().withLogin(USER_IN_ORGANIZATION_X_INVITED_EMAIL).withStatus(Status.INVITED).build();
         userInOrganizationXAcceptedHavingARole = aUser().withLogin(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL).withStatus(Status.ACCEPTED).build();
-        adminInOrganizationX = aUser().withLogin(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL).withStatus(Status.ACCEPTED).build();
+        adminInOrganizationX = aUser().withLogin(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL).withStatus(Status.ACCEPTED).withIsAdmin(true).build();
 
         firstRoleInOrganizationX = aRole().withName(FIRST_ROLE_IN_ORGANIZATION_X).withRole(FIRST_ROLE_IN_ORGANIZATION_X_ROLE_NAME).build();
         secondRoleInOrganizationX = aRole().withName(SECOND_ROLE_IN_ORGANIZATION_X).withRole(SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME).build();
@@ -357,7 +357,7 @@ public abstract class AbstractSpringIntegrationTest  {
 
         organizationXInitialNumberOfUsers = organizationX.getUsers().size();
 
-        adminInOrganizationY = aUser().withLogin(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL).withStatus(Status.ACCEPTED).build();
+        adminInOrganizationY = aUser().withLogin(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL).withStatus(Status.ACCEPTED).withIsAdmin(true).build();
         userInOrganizationY = aUser().withLogin(USER_IN_ORGANIZATION_Y_EMAIL).build();
 
         roleInOrganizationY = aRole().withName(ROLE_IN_ORGANIZATION_Y).withRole(ROLE_IN_ORGANIZATION_Y_ROLE_NAME).build();

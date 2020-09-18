@@ -131,7 +131,7 @@ public class OrganizationRestController {
                                 organization
                                         .getUsers()
                                         .stream()
-                                        .filter(user -> enhanceUserService.isAdmin(user))
+                                        .filter(User::isAdmin)
                                         .map(user -> projectionFactory.createProjection(EnhancedUserProjection.class, user))
                                         .sorted(comparing(EnhancedUserProjection::getLogin))
                                         .collect(toList())))
