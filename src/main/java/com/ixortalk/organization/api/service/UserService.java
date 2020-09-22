@@ -24,26 +24,36 @@
 package com.ixortalk.organization.api.service;
 
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
+import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.User;
-import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import com.ixortalk.organization.api.rest.UserRestResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.transaction.Transactional;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 @Named
-public class EnhanceUserService {
+public class UserService {
 
     @Inject
-    private OrganizationRestResource organizationRestResource;
+    private UserRestResource userRestResource;
 
     @Inject
-    private Auth0Users auth0Users;
+    private Auth0Roles auth0Roles;
 
-    public UserInfo getUserInfo(User user) {
-        if (user.isAccepted() && organizationRestResource.findByUsers(user).isPresent())
-            return auth0Users.getUserInfo(user.getLogin()).orElse(null);
-        return null;
+    @Transactional
+    public User assignAdminRole(Organization organization, User user) {
+        user.setAdmin(true);
+        auth0Roles.assignRolesToUser(user.getLogin(), newHashSet(organization.getRole()));
+        return userRestResource.save(user);
+    }
+
+    @Transactional
+    public User removeAdminRole(Organization organization, User user) {
+        user.setAdmin(false);
+        auth0Roles.removeRolesFromUser(user.getLogin(), newHashSet(organization.getRole()));
+        return userRestResource.save(user);
     }
 }

@@ -41,6 +41,5 @@ public interface EnhancedUserProjection {
     @Value("#{@enhanceUserService.getUserInfo(target)}")
     UserInfo getUserInfo();
 
-    @Value("#{@enhanceUserService.isAdmin(target)}")
-    Boolean isAdmin();
+    boolean isAdmin();
 }

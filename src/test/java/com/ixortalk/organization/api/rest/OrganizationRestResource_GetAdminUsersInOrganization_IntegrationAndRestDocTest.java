@@ -81,6 +81,8 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
     public void makeUserInOrganizationXAcceptedAlsoAnAdmin() {
         when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL));
         when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL)).thenReturn(newHashSet(ROLE_ONLY_IN_AUTH0, SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME, ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
+        userInOrganizationXAcceptedHavingARole.setAdmin(true);
+        userRestResource.save(userInOrganizationXAcceptedHavingARole);
     }
 
     @Test
@@ -158,23 +160,5 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
             .get("/organizations/{id}/adminUsers", MAX_VALUE)
         .then()
             .statusCode(SC_NOT_FOUND);
-    }
-
-    @Test
-    public void makeSureUsersInAdminRoleAreRequestedRatherThanRolesForEachUser() {
-
-        JsonPath result =
-                given()
-                        .auth().preemptive().oauth2(ADMIN_JWT_TOKEN)
-                        .when()
-                        .get("/organizations/{id}/adminUsers", organizationX.getId())
-                        .then()
-                        .statusCode(SC_OK)
-                        .extract().jsonPath();
-
-        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
-
-        verify(auth0Roles, atLeastOnce()).getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME);
-        verify(auth0Roles, never()).getUsersRoles(any());
     }
 }

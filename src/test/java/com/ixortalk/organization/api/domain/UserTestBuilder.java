@@ -34,6 +34,7 @@ public class UserTestBuilder extends ReflectionInstanceTestBuilder<User> {
     private String login = nextString("testUser");
     private String inviteLanguage;
     private Status status = ACCEPTED;
+    private boolean isAdmin = false;
 
     private UserTestBuilder() {}
 
@@ -46,6 +47,7 @@ public class UserTestBuilder extends ReflectionInstanceTestBuilder<User> {
         setField(user, "login", login);
         setField(user, "inviteLanguage", inviteLanguage);
         setField(user, "status", status);
+        setField(user, "isAdmin", isAdmin);
     }
 
     public UserTestBuilder withLogin(String login) {
@@ -60,6 +62,11 @@ public class UserTestBuilder extends ReflectionInstanceTestBuilder<User> {
 
     public UserTestBuilder withStatus(Status status) {
         this.status = status;
+        return this;
+    }
+
+    public UserTestBuilder withIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
         return this;
     }
 }
