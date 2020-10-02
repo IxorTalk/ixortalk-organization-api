@@ -111,6 +111,7 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
 
         verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
         verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
+        assertThat(restResourcesTransactionalHelper.getUsers("My Organization").size()).isEqualTo(0);
     }
 
     @Test
@@ -133,8 +134,8 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
                 .then()
                 .statusCode(SC_CREATED);
 
-        verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
-        verify(auth0Roles).assignRolesToUser(TestConstants.USER_EMAIL, newHashSet(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION));
+        assertThat(organizationRestResource.findByName("My Organization")).isPresent();
+        assertThat(restResourcesTransactionalHelper.getUsers("My Organization").size()).isEqualTo(1);
     }
 
     @Test

@@ -53,6 +53,10 @@ public class RestResourcesTransactionalHelper {
         return newArrayList(organizationRestResource.findById(organizationId).map(Organization::getUsers).orElseThrow(() -> new IllegalStateException("Organization should be present")));
     }
 
+    public List<User> getUsers(String name) {
+        return newArrayList(organizationRestResource.findByName(name).map(Organization::getUsers).orElseThrow(() -> new IllegalStateException("Organization should be present")));
+    }
+
     public List<Role> getRoles(Long organizationId) {
         return newArrayList((Collection<? extends Role>) getField(organizationRestResource.findById(organizationId).orElseThrow(ResourceNotFoundException::new), "roles"));
     }

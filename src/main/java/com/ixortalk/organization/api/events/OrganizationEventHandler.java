@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 2016-present IxorTalk CVBA
- *
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * <p>
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- *
+ * <p>
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,6 @@ package com.ixortalk.organization.api.events;
 
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
 import com.ixortalk.organization.api.callback.api.OrganizationCallbackAPI;
-import com.ixortalk.organization.api.service.UserEmailProvider;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
@@ -34,6 +33,7 @@ import com.ixortalk.organization.api.error.ConflictException;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import com.ixortalk.organization.api.rest.RoleRestResource;
 import com.ixortalk.organization.api.service.AssetMgmtFacade;
+import com.ixortalk.organization.api.service.UserEmailProvider;
 import org.springframework.data.rest.core.annotation.*;
 
 import javax.inject.Inject;
@@ -79,6 +79,11 @@ public class OrganizationEventHandler {
         });
 
         validateRoleDoesNotExistInAuth0(organization.getRole());
+
+        userEmailProvider.getCurrentUsersEmail().ifPresent(email ->
+        {
+            organization.getUsers().add(User.initialOrganizationAdminUser(email));
+        });
     }
 
     @HandleAfterCreate
@@ -92,7 +97,8 @@ public class OrganizationEventHandler {
         if (!organization.getUsers().isEmpty()) throw new BadRequestException("Users not empty");
         if (!organization.getRoles().isEmpty()) throw new BadRequestException("Roles not empty");
         organizationCallbackAPI.organizationPreDeleteCheck(organization.getId());
-        if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent()) throw new BadRequestException("Devices still exist");
+        if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent())
+            throw new BadRequestException("Devices still exist");
     }
 
     @HandleAfterDelete
