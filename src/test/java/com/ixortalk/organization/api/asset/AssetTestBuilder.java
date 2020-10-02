@@ -23,11 +23,11 @@
  */
 package com.ixortalk.organization.api.asset;
 
-import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 import com.ixortalk.organization.api.domain.OrganizationId;
+import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 
-import static com.ixortalk.test.util.Randomizer.nextString;
 import static com.ixortalk.organization.api.asset.AssetId.assetId;
+import static com.ixortalk.test.util.Randomizer.nextString;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class AssetTestBuilder extends ReflectionInstanceTestBuilder<Asset> {

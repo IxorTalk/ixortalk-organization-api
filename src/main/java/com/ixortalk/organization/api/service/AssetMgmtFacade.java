@@ -23,12 +23,12 @@
  */
 package com.ixortalk.organization.api.service;
 
-import com.ixortalk.organization.api.domain.Organization;
-import com.ixortalk.organization.api.domain.OrganizationId;
-import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
 import com.ixortalk.organization.api.asset.Asset;
 import com.ixortalk.organization.api.asset.AssetMgmt;
+import com.ixortalk.organization.api.domain.Organization;
+import com.ixortalk.organization.api.domain.OrganizationId;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import javax.inject.Inject;

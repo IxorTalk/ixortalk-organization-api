@@ -23,12 +23,12 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
-import com.ixortalk.organization.api.domain.RoleTestBuilder;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Organization;
+import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
 import com.ixortalk.organization.api.domain.Role;
+import com.ixortalk.organization.api.domain.RoleTestBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -333,7 +333,6 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
         Organization otherOrganization =
                 organizationRestResource.save(
                         OrganizationTestBuilder.anOrganization()
-                                .withRole("ROLE_THE_USER_DOES_NOT_HAVE")
                                 .withRoles(RoleTestBuilder.aRole().withName("existingRole").build())
                                 .build()
                 );
@@ -354,7 +353,6 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
         Organization otherOrganization =
                 organizationRestResource.save(
                         OrganizationTestBuilder.anOrganization()
-                                .withRole("ROLE_THE_USER_DOES_NOT_HAVE")
                                 .withRoles(RoleTestBuilder.aRole().withName("existingRole").build())
                                 .build()
                 );

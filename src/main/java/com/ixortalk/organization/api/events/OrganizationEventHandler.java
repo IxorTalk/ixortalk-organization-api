@@ -25,7 +25,6 @@ package com.ixortalk.organization.api.events;
 
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
 import com.ixortalk.organization.api.callback.api.OrganizationCallbackAPI;
-import com.ixortalk.organization.api.service.UserEmailProvider;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
@@ -34,6 +33,8 @@ import com.ixortalk.organization.api.error.ConflictException;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import com.ixortalk.organization.api.rest.RoleRestResource;
 import com.ixortalk.organization.api.service.AssetMgmtFacade;
+import com.ixortalk.organization.api.service.SecurityService;
+import com.ixortalk.organization.api.service.UserEmailProvider;
 import org.springframework.data.rest.core.annotation.*;
 
 import javax.inject.Inject;
@@ -41,7 +42,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -67,38 +67,40 @@ public class OrganizationEventHandler {
     @Inject
     private AssetMgmtFacade assetMgmtFacade;
 
+    @Inject
+    private SecurityService securityService;
+
     @HandleBeforeCreate
     public void handleBeforeCreate(Organization organization) {
-        organization.generateRoleName();
-
         organizationRestResource.findByName(organization.getName()).ifPresent(existing -> {
             throw new ConflictException();
         });
-        organizationRestResource.findByRole(organization.getRole()).ifPresent(existing -> {
-            throw new ConflictException();
-        });
-
-        validateRoleDoesNotExistInAuth0(organization.getRole());
     }
 
     @HandleAfterCreate
     public void handleAfterCreate(Organization organization) {
-        auth0Roles.addRole(organization.getRole());
-        userEmailProvider.getCurrentUsersEmail().ifPresent(email -> auth0Roles.assignRolesToUser(email, newHashSet(organization.getRole())));
+
     }
 
     @HandleBeforeDelete
     public void handleBeforeDelete(Organization organization) {
-        if (!organization.getUsers().isEmpty()) throw new BadRequestException("Users not empty");
+        //only allow deletion when no users available in the database, or when current user is the only admin user of the organization.
+        if (!organization.getUsers().isEmpty() && !deletingAsLastAdminUser(organization)) throw new BadRequestException("Users not empty");
+
         if (!organization.getRoles().isEmpty()) throw new BadRequestException("Roles not empty");
         organizationCallbackAPI.organizationPreDeleteCheck(organization.getId());
         if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent()) throw new BadRequestException("Devices still exist");
     }
 
-    @HandleAfterDelete
-    public void handleAfterDelete(Organization organization) {
-        auth0Roles.deleteRole(organization.getRole());
+    private boolean deletingAsLastAdminUser(Organization organization) {
+        if (organization.getUsers().size() > 1) {
+            return false;
+        }
+        return securityService.isCurrentUser(organization.getUsers().get(0));
     }
+
+    @HandleAfterDelete
+    public void handleAfterDelete(Organization organization) { }
 
     @HandleBeforeSave
     public void handleBeforeSave(Organization organization) {
@@ -126,7 +128,7 @@ public class OrganizationEventHandler {
         roles
                 .stream()
                 .filter(role -> role.getRole() == null)
-                .map(role -> role.assignRoleName(organization.getRole()))
+                .map(role -> role.assignRoleName(organization))
                 .map(this::validateRoleNameNotInUse)
                 .map(Role::getRole)
                 .map(this::validateRoleDoesNotExistInAuth0)

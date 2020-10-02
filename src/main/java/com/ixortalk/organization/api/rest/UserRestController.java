@@ -29,10 +29,10 @@ import com.ixortalk.organization.api.callback.api.OrganizationCallbackAPI;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
-import com.ixortalk.organization.api.rest.dto.UserInOrganizationDTO;
-import com.ixortalk.organization.api.service.SecurityService;
 import com.ixortalk.organization.api.error.BadRequestException;
 import com.ixortalk.organization.api.mail.InviteUserService;
+import com.ixortalk.organization.api.rest.dto.UserInOrganizationDTO;
+import com.ixortalk.organization.api.service.SecurityService;
 import com.ixortalk.organization.api.service.UserService;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
@@ -97,10 +97,6 @@ public class UserRestController {
                     userRestResource.save(user.accepted());
                     organizationCallbackAPI.userAccepted(new UserInOrganizationDTO(user.getLogin(), organizationRestResource.findByUsers(user).map(Organization::getId).orElseThrow(BadRequestException::new)));
                     auth0Users.unblockUser(user.getLogin());
-                    if (user.isAdmin()) {
-                        Organization organization = organizationRestResource.findByUsers(user).orElseThrow(() -> new IllegalStateException("Error while accepting invite. User is not added to inviting organization."));
-                        userService.assignAdminRole(organization, user);
-                    }
                     auth0Roles.assignRolesToUser(user.getLogin(), user.getRoles().stream().map(Role::getRole).collect(toSet()));
                     return noContent().build();
                 })

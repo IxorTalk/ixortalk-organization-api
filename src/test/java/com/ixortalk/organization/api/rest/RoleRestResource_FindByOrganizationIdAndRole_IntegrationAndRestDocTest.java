@@ -23,8 +23,8 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import io.restassured.path.json.JsonPath;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;

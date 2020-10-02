@@ -23,11 +23,11 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import io.restassured.path.json.JsonPath;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
@@ -36,9 +36,7 @@ import org.springframework.restdocs.request.PathParametersSnippet;
 import javax.inject.Inject;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.domain.EnhancedUserProjection.ENHANCED_USER_PROJECTION_NAME;
 import static io.restassured.RestAssured.given;
 import static java.net.HttpURLConnection.*;

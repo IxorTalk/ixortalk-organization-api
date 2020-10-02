@@ -45,7 +45,7 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
     String FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY = "from org_role o where (o.organization_id = :organizationId) and (o.name like %:role%)";
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #role.id == null or hasRole(@organizationRestResource.findByRoles(#role).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #role.id == null or @securityService.isAdminOfOrganization(@organizationRestResource.findByRoles(#role))")
     <S extends Role> S save(@P("role") S role);
 
     @Override
@@ -57,14 +57,14 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
     @RestResource(exported = false)
     Optional<Role> findByRole(String name);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(@organizationRestResource.findById(#organizationId).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(@organizationRestResource.findOneById(#organizationId))")
     @Query(
             value = "select * " + FIND_BY_ORGANIZATION_ID_QUERY,
             countQuery = "select count(*) " + FIND_BY_ORGANIZATION_ID_QUERY,
             nativeQuery = true)
     Page<Role> findByOrganizationId(Pageable pageable, @Param("organizationId") Long organizationId);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(@organizationRestResource.findById(#organizationId).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(@organizationRestResource.findOneById(#organizationId))")
     @Query(
             value = "select * " + FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY,
             countQuery = "select count(*) " + FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY,
@@ -73,6 +73,6 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN') " +
-            "or hasRole(@organizationRestResource.findByRoles(#role).get().getRole())")
+            "or @securityService.isAdminOfOrganization(@organizationRestResource.findByRoles(#role))")
     void delete(@P("role") Role role);
 }

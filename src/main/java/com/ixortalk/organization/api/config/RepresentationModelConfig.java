@@ -146,20 +146,30 @@ public class RepresentationModelConfig {
                         methodOn(UserRestController.class)
                                 .resendInvite(user.getId()))
                         .withRel("resend-invite"));
+
+        //deprecated link
         resource.add(
                 linkTo(
-                        methodOn(AssignRoleController.class)
-                                .assignAdminRole(
-                                        organizationRestResource.findByUsers(user).map(Organization::getId).orElse(null),
-                                        user.getId()))
+                        methodOn(OrganizationAdminController.class)
+                                .promoteToAdmin(organizationRestResource.findByUsers(user).map(Organization::getId).orElse(null), user.getId()))
                         .withRel("assignAdminRole"));
+        //deprecated link
         resource.add(
                 linkTo(
-                        methodOn(AssignRoleController.class)
-                                .removeAdminRole(
-                                        organizationRestResource.findByUsers(user).map(Organization::getId).orElse(null),
-                                        user.getId()))
+                        methodOn(OrganizationAdminController.class)
+                                .removeAdminRights(organizationRestResource.findByUsers(user).map(Organization::getId).orElse(null), user.getId()))
                         .withRel("removeAdminRole"));
+
+        resource.add(
+                linkTo(
+                        methodOn(OrganizationAdminController.class)
+                                .promoteToAdmin(organizationRestResource.findByUsers(user).map(Organization::getId).orElse(null), user.getId()))
+                        .withRel("promoteToAdmin"));
+        resource.add(
+                linkTo(
+                        methodOn(OrganizationAdminController.class)
+                                .removeAdminRights(organizationRestResource.findByUsers(user).map(Organization::getId).orElse(null), user.getId()))
+                        .withRel("removeAdminRights"));
     }
 
     static class VarsBuilder {

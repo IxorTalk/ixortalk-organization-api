@@ -25,8 +25,8 @@ package com.ixortalk.organization.api.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Role;
 import org.junit.Test;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;

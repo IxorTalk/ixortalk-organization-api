@@ -24,12 +24,12 @@
 package com.ixortalk.organization.api.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.asset.AssetId;
 import com.ixortalk.organization.api.asset.AssetTestBuilder;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
-import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
-import com.ixortalk.organization.api.asset.AssetId;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
@@ -40,10 +40,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.allRequests;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.test.util.Randomizer.nextString;
 import static com.ixortalk.organization.api.TestConstants.ORGANIZATION_REMOVED_CALLBACK_PATH;
 import static com.ixortalk.organization.api.asset.AssetId.assetId;
+import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
+import static com.ixortalk.test.util.Randomizer.nextString;
 import static io.restassured.RestAssured.given;
 import static java.lang.Long.MAX_VALUE;
 import static java.lang.String.valueOf;
@@ -163,21 +163,6 @@ public class OrganizationRestController_DeleteCascade_IntegrationAndRestDocTest 
                 .statusCode(SC_NO_CONTENT);
 
         existingOrganizationXRoleNames.forEach(role -> verify(auth0Roles).deleteRole(role));
-    }
-
-    @Test
-    public void adminRoleDeletedFromAuth0() {
-
-        given()
-                .auth()
-                .preemptive()
-                .oauth2(ADMIN_JWT_TOKEN)
-                .when()
-                .delete("/organizations/{id}/cascade", organizationX.getId())
-                .then()
-                .statusCode(SC_NO_CONTENT);
-
-        verify(auth0Roles).deleteRole(organizationX.getRole());
     }
 
     @Test

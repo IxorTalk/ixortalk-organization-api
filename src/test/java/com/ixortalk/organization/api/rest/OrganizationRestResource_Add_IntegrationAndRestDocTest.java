@@ -24,10 +24,9 @@
 package com.ixortalk.organization.api.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.domain.Organization;
+import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
 import io.restassured.path.json.JsonPath;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,10 +41,8 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -108,14 +105,11 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
                 .post("/organizations")
                 .then()
                 .statusCode(SC_CREATED);
-
-        verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
-        verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
     }
 
     @Test
     public void asUser() throws JsonProcessingException {
-        given()
+        JsonPath jsonPath = given()
                 .auth()
                 .preemptive()
                 .oauth2(USER_JWT_TOKEN)
@@ -131,10 +125,8 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
                 .when()
                 .post("/organizations")
                 .then()
-                .statusCode(SC_CREATED);
-
-        verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
-        verify(auth0Roles).assignRolesToUser(TestConstants.USER_EMAIL, newHashSet(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION));
+                .statusCode(SC_CREATED)
+                .extract().jsonPath();
     }
 
     @Test
@@ -164,68 +156,4 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
         verify(auth0Roles, never()).addRole(anyString());
     }
 
-    @Test
-    public void generatedRoleNameAlreadyInUse() throws JsonProcessingException {
-
-        organizationRestResource.save(OrganizationTestBuilder.anOrganization().withRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION).build());
-
-        given()
-                .auth()
-                .preemptive()
-                .oauth2(ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(objectMapper.writeValueAsString(myTestOrganization))
-                .filter(
-                        document("organizations/save/generated-role-name-already-in-use",
-                                preprocessRequest(staticUris(), prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
-                                ORGANIZATION_REQUEST_FIELDS
-                        ))
-                .when()
-                .post("/organizations")
-                .then()
-                .statusCode(SC_CONFLICT)
-                .body(not(containsString("SQL")));
-
-        verify(auth0Roles, never()).addRole(anyString());
-    }
-
-    @Test
-    public void generatedRoleNameAlreadyExistsInAuth0() throws JsonProcessingException {
-
-        when(auth0Roles.getAllRoleNames()).thenReturn(newHashSet("ROLE_EXISTING_1", "ROLE_EXISTING_2", EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION));
-
-        given()
-                .auth()
-                .preemptive()
-                .oauth2(ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(objectMapper.writeValueAsString(myTestOrganization))
-                .when()
-                .post("/organizations")
-                .then()
-                .statusCode(SC_CONFLICT);
-
-        verify(auth0Roles, never()).addRole(anyString());
-    }
-
-    @Test
-    public void roleNameGenerated() throws JsonProcessingException {
-
-        JsonPath response =
-                given()
-                        .auth()
-                        .preemptive()
-                        .oauth2(TestConstants.USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN)
-                        .contentType(JSON)
-                        .body(objectMapper.writeValueAsString(myTestOrganization))
-                        .when()
-                        .post("/organizations")
-                        .then()
-                        .statusCode(SC_CREATED)
-                        .extract().jsonPath();
-
-        assertThat(organizationRestResource.findById(response.getLong("id"))).get().extracting(Organization::getRole).isEqualTo("ROLE_MY_ORGANIZATION_ADMIN");
-    }
 }

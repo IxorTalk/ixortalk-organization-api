@@ -23,8 +23,6 @@
  */
 package com.ixortalk.organization.api.service;
 
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
-import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.rest.UserRestResource;
 
@@ -32,28 +30,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.transaction.Transactional;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 @Named
 public class UserService {
 
     @Inject
     private UserRestResource userRestResource;
 
-    @Inject
-    private Auth0Roles auth0Roles;
-
     @Transactional
-    public User assignAdminRole(Organization organization, User user) {
+    public User promoteToAdmin(User user) {
         user.setAdmin(true);
-        auth0Roles.assignRolesToUser(user.getLogin(), newHashSet(organization.getRole()));
         return userRestResource.save(user);
     }
 
     @Transactional
-    public User removeAdminRole(Organization organization, User user) {
+    public User takeAwayAdminRights(User user) {
         user.setAdmin(false);
-        auth0Roles.removeRolesFromUser(user.getLogin(), newHashSet(organization.getRole()));
         return userRestResource.save(user);
     }
 }

@@ -24,9 +24,7 @@
 package com.ixortalk.organization.api.rest;
 
 import com.ixortalk.organization.api.domain.Organization;
-import com.ixortalk.organization.api.image.ImageService;
-import feign.Response;
-import org.springframework.http.HttpHeaders;
+import com.ixortalk.organization.api.service.ImageMethodsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,46 +33,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.function.BiFunction;
-
-import static org.springframework.http.ResponseEntity.created;
-import static org.springframework.http.ResponseEntity.notFound;
 
 @RestController
 public class ImageController {
 
     @Inject
-    private ImageService imageService;
-
-    @Inject
-    private OrganizationRestResource organizationRestResource;
+    private ImageMethodsService imageMethodService;
 
     @PostMapping(path = "/organizations/{organizationId}/image")
     public ResponseEntity<?> uploadImage(@PathVariable("organizationId") Long organizationId, @RequestPart("file") MultipartFile multipartFile) {
-        return uploadToImageService(organizationId, multipartFile, Organization::setImage, "image");
+        return imageMethodService.uploadToImageService(organizationId, multipartFile, Organization::setImage, "image");
     }
 
     @PostMapping(path = "/organizations/{organizationId}/logo")
     public ResponseEntity<?> uploadLogo(@PathVariable("organizationId") Long organizationId, @RequestPart("file") MultipartFile multipartFile) {
-        return uploadToImageService(organizationId, multipartFile, Organization::setLogo, "logo");
-    }
-
-    private ResponseEntity<?> uploadToImageService(Long organizationId, MultipartFile multipartFile, BiFunction<Organization, String, Organization> function, String keyName) {
-        return organizationRestResource.findById(organizationId)
-                .map(organization -> {
-                            Response response = imageService.uploadImage(multipartFile, "organizations/" + organizationId + "/" + keyName);
-                            String location = new ArrayList<>(response.headers().get(HttpHeaders.LOCATION)).get(0);
-                            organizationRestResource.save(function.apply(organization, location));
-                            try {
-                                return created(new URI(location)).build();
-                            } catch (URISyntaxException e) {
-                                throw new IllegalArgumentException("Could not save image: " + e.getMessage());
-                            }
-                        }
-                )
-                .orElse(notFound().build());
+        return imageMethodService.uploadToImageService(organizationId, multipartFile, Organization::setLogo, "logo");
     }
 }

@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.*;
 import static com.ixortalk.organization.api.config.TestConstants.*;
@@ -40,7 +39,6 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.net.HttpURLConnection.*;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -141,8 +139,6 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
 
     @Test
     public void differentOrganizationAdminResendInvite() {
-
-        when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL)).thenReturn(newHashSet(ADMIN_ROLE_IN_ORGANIZATION_Y_ROLE_NAME));
 
         given()
                 .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)

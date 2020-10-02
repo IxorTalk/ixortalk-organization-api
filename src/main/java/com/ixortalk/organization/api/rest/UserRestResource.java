@@ -49,7 +49,7 @@ public interface UserRestResource extends PagingAndSortingRepository<User, Long>
     @PreAuthorize("hasAnyRole('ROLE_ADMIN') " +
             "or #user.id == null " +
             "or @securityService.isCurrentUser(#user) " +
-            "or hasRole(@organizationRestResource.findByUsers(#user).get().getRole()) ")
+            "or @securityService.hasAdminAccess(#user)")
     <S extends User> S save(@P("user") S user);
 
     @Override
@@ -58,17 +58,17 @@ public interface UserRestResource extends PagingAndSortingRepository<User, Long>
             "or !returnObject.isPresent() " +
             "or @securityService.isCurrentUser(returnObject) " +
             "or !@organizationRestResource.findByUsers(returnObject.get()).isPresent() " +
-            "or hasRole(@organizationRestResource.findByUsers(returnObject.get()).get().getRole())")
+            "or @securityService.hasAdminAccess(returnObject.get())")
     Optional<User> findById(Long id);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(@organizationRestResource.findById(#organizationId).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(@organizationRestResource.findOneById(#organizationId))")
     @Query(
             value = "select * "+ FIND_BY_ORGANIZATION_ID_QUERY,
             countQuery = "select count(*) "+ FIND_BY_ORGANIZATION_ID_QUERY,
             nativeQuery = true)
     Page<User> findByOrganizationId(Pageable pageable, @Param("organizationId") Long organizationId);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(@organizationRestResource.findById(#organizationId).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(@organizationRestResource.findOneById(#organizationId))")
     @Query(
             value = "select * "+ FIND_BY_ORGANIZATION_ID_AND_LOGIN_QUERY,
             countQuery = "select count(*) "+ FIND_BY_ORGANIZATION_ID_AND_LOGIN_QUERY,
@@ -77,7 +77,7 @@ public interface UserRestResource extends PagingAndSortingRepository<User, Long>
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isCurrentUser(#user) " +
-            "or hasRole(@organizationRestResource.findByUsers(#user).get().getRole())")
+            "or @securityService.hasAdminAccess(#user)")
     void delete(@P("user") User user);
 
     @RestResource(exported = false)

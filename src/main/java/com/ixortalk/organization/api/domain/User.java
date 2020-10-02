@@ -29,7 +29,6 @@ import com.ixortalk.organization.api.domain.validation.LanguageISO639;
 import org.springframework.data.annotation.ReadOnlyProperty;
 
 import javax.persistence.*;
-
 import java.time.Instant;
 import java.util.List;
 

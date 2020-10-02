@@ -74,10 +74,18 @@ public class SecurityService {
     }
 
     public boolean hasAccessToRole(Optional<Role> role) {
-        return organizationRestResource.findByRoles(role.orElseThrow(ResourceNotFoundException::new)).map(Organization::getRole).map(this::hasRole).orElse(true);
+        return organizationRestResource.findByRoles(role.orElseThrow(ResourceNotFoundException::new)).map(this::isAdminOfOrganization).orElse(true);
     }
 
-    private boolean hasRole(String role) {
-        return getAuthorities().contains(role);
+    public boolean isAdminOfOrganization(Optional<Organization> organization) {
+        return organization.map(this::isAdminOfOrganization).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public boolean isAdminOfOrganization(Organization organization) {
+        return userEmailProvider.getCurrentUsersEmail().map(email -> organization.getUsers().stream().anyMatch(user -> email.equals(user.getLogin()) && user.isAdmin())).orElse(false);
+    }
+
+    public boolean hasAdminAccess(User user) {
+        return userEmailProvider.getCurrentUsersEmail().map(email -> organizationRestResource.hasAdminAccess(email, user).isPresent()).orElse(false);
     }
 }

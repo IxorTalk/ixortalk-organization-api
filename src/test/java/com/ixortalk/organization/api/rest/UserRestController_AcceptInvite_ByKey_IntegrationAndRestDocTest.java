@@ -24,11 +24,11 @@
 package com.ixortalk.organization.api.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.RoleTestBuilder;
 import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.rest.dto.UserInOrganizationDTO;
-import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;

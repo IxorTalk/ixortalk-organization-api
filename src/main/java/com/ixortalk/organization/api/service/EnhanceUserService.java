@@ -23,7 +23,6 @@
  */
 package com.ixortalk.organization.api.service;
 
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Roles;
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
 import com.ixortalk.organization.api.domain.User;

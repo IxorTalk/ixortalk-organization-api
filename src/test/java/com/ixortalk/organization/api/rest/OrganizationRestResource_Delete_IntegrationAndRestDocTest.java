@@ -26,46 +26,29 @@ package com.ixortalk.organization.api.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.asset.AssetTestBuilder;
-import com.ixortalk.organization.api.domain.Organization;
-import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
-import com.ixortalk.organization.api.domain.RoleTestBuilder;
-import com.ixortalk.organization.api.domain.UserTestBuilder;
+import com.ixortalk.organization.api.domain.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.ORGANIZATION_PRE_DELETE_CHECK_CALLBACK_PATH;
 import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
 import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.domain.UserTestBuilder.aUser;
 import static io.restassured.RestAssured.given;
 import static java.lang.String.valueOf;
 import static java.util.Optional.of;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
@@ -88,8 +71,7 @@ public class OrganizationRestResource_Delete_IntegrationAndRestDocTest extends A
                         buildJwtTokenWithEmailCustomClaim(
                                 ORGANIZATION_ADMIN_TOKEN,
                                 of("admin@organization-to-delete.com"),
-                                "orgManager",
-                                organizationToDelete.getRole()));
+                                "orgManager"));
 
         organizationCallbackApiWireMockRule.stubFor(get(urlPathEqualTo("/org-callback-api" + ORGANIZATION_PRE_DELETE_CHECK_CALLBACK_PATH.configValue()))
                 .andMatching(retrievedAdminTokenAuthorizationHeader())
@@ -117,13 +99,14 @@ public class OrganizationRestResource_Delete_IntegrationAndRestDocTest extends A
                 .statusCode(SC_NO_CONTENT);
 
         assertThat(organizationRestResource.findById(organizationToDelete.getId())).isNotPresent();
-
-        verify(auth0Roles).deleteRole(organizationToDelete.getRole());
     }
 
     @Test
     public void asOrganizationAdmin() {
-
+        adminInOrganizationX = aUser().withLogin("admin@organization-to-delete.com").withStatus(Status.ACCEPTED).withIsAdmin(true).build();
+        organizationToDelete.getUsers().add(adminInOrganizationX);
+        organizationRestResource.save(organizationToDelete);
+        
         given()
                 .auth()
                 .preemptive()
@@ -143,8 +126,6 @@ public class OrganizationRestResource_Delete_IntegrationAndRestDocTest extends A
                 .statusCode(SC_NO_CONTENT);
 
         assertThat(organizationRestResource.findById(organizationToDelete.getId())).isNotPresent();
-
-        verify(auth0Roles).deleteRole(organizationToDelete.getRole());
     }
 
     @Test
@@ -185,6 +166,36 @@ public class OrganizationRestResource_Delete_IntegrationAndRestDocTest extends A
                 .oauth2(ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete/organization-not-empty",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(
+                                        ORGANIZATION_ID_PATH_PARAMETER
+                                ))
+                )
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+
+        verifyZeroInteractions(auth0Roles);
+    }
+
+    @Test
+    public void userNextToAdminExists() {
+        adminInOrganizationX = aUser().withLogin("admin@organization-to-delete.com").withStatus(Status.ACCEPTED).withIsAdmin(true).build();
+        organizationToDelete.getUsers().add(adminInOrganizationX);
+        organizationToDelete.getUsers().add(UserTestBuilder.aUser().build());
+        organizationRestResource.save(organizationToDelete);
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ORGANIZATION_ADMIN_TOKEN)
+                .filter(
+                        document("organizations/delete/as-organization-admin-and-other-user",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),

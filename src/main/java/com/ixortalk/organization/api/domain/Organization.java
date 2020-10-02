@@ -25,41 +25,23 @@ package com.ixortalk.organization.api.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.lang.Math.min;
 import static java.util.stream.Collectors.toSet;
 import static javax.persistence.CascadeType.ALL;
-import static org.springframework.util.Assert.isTrue;
 
 @Entity
 public class Organization {
-
-    public static final String ADMIN_ROLE_SUFFIX = "_ADMIN";
-    private static final String ROLE_PREFIX = "ROLE_";
-    private static final int ROLE_MAX_LENGTH = 200;
-    private static final int ROLE_NAME_DYNAMIC_PART_MAX_LENGTH = ROLE_MAX_LENGTH - ROLE_PREFIX.length() - ADMIN_ROLE_SUFFIX.length();
-
     @Id
     @GeneratedValue
     private Long id;
 
     @Column(unique = true)
     private String name;
-
-    @Column(updatable = false, unique = true)
-    @JsonIgnore
-    private String role;
 
     @OneToMany(cascade = ALL)
     @JoinColumn(name = "organization_id")
@@ -97,10 +79,6 @@ public class Organization {
         return name;
     }
 
-    public String getRole() {
-        return role;
-    }
-
     public Address getAddress() {
         return address;
     }
@@ -136,18 +114,6 @@ public class Organization {
 
     public Set<String> getMatchingRoles(Set<String> roles) {
         return this.roles.stream().filter(role -> roles.contains(role.getRole())).map(Role::getRole).collect(toSet());
-    }
-
-    public void generateRoleName() {
-        isTrue(this.role == null, "role should not be set");
-
-        String roleNameDynamicPart = this.name.trim().replaceAll("[\\W]+", "_").toUpperCase();
-        this.role =
-                new StringBuilder()
-                        .append(ROLE_PREFIX)
-                        .append(roleNameDynamicPart, 0, min(roleNameDynamicPart.length(), ROLE_NAME_DYNAMIC_PART_MAX_LENGTH))
-                        .append(ADMIN_ROLE_SUFFIX)
-                        .toString();
     }
 
     public boolean removeUser(User user) {

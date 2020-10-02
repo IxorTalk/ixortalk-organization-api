@@ -23,10 +23,10 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.util.ExpectedValueObjectSerializer;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.asset.Asset;
+import com.ixortalk.organization.api.config.TestConstants;
+import com.ixortalk.organization.api.util.ExpectedValueObjectSerializer;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;

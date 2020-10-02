@@ -146,7 +146,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     }
 
     @Test
-    public void assignAdminRoleLink() throws MalformedURLException {
+    public void promoteToAdminRoleLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
                         .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
@@ -156,13 +156,13 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
                         .statusCode(SC_OK)
                         .extract().jsonPath();
 
-        assertThat(jsonPath.getString("_links.assignAdminRole.href"))
-                .isEqualTo(constructFullUri("/" + organizationX.getId() + "/" + userInOrganizationXInvited.getId() + "/assign-admin-role"));
+        assertThat(jsonPath.getString("_links.promoteToAdmin.href"))
+                .isEqualTo(constructFullUri("/" + organizationX.getId() + "/" + userInOrganizationXInvited.getId() + "/promote-to-admin"));
 
     }
 
     @Test
-    public void removeAdminRoleLink() throws MalformedURLException {
+    public void removeAdminRightsLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
                         .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
@@ -172,8 +172,8 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
                         .statusCode(SC_OK)
                         .extract().jsonPath();
 
-        assertThat(jsonPath.getString("_links.removeAdminRole.href"))
-                .isEqualTo(constructFullUri("/" + organizationX.getId() + "/" + userInOrganizationXInvited.getId() + "/remove-admin-role"));
+        assertThat(jsonPath.getString("_links.removeAdminRights.href"))
+                .isEqualTo(constructFullUri("/" + organizationX.getId() + "/" + userInOrganizationXInvited.getId() + "/remove-admin-rights"));
 
     }
 

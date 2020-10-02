@@ -318,7 +318,6 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
         Organization otherOrganization =
                 organizationRestResource.save(
                         OrganizationTestBuilder.anOrganization()
-                                .withRole("ROLE_THE_USER_DOES_NOT_HAVE")
                                 .withUsers(UserTestBuilder.aUser().withLogin(EXISTING_LOGIN).build())
                                 .build()
                 );
@@ -339,7 +338,6 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
         Organization otherOrganization =
                 organizationRestResource.save(
                         OrganizationTestBuilder.anOrganization()
-                                .withRole("ROLE_THE_USER_DOES_NOT_HAVE")
                                 .withUsers(UserTestBuilder.aUser().withLogin(EXISTING_LOGIN).build())
                                 .build()
                 );

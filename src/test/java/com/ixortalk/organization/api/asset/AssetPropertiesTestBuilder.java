@@ -23,8 +23,8 @@
  */
 package com.ixortalk.organization.api.asset;
 
-import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 import com.ixortalk.organization.api.domain.OrganizationId;
+import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
