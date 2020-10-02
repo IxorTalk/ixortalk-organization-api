@@ -90,7 +90,7 @@ public class OrganizationEventHandler {
     @HandleBeforeDelete
     public void handleBeforeDelete(Organization organization) {
         //only allow deletion when no users available in the database, or when current user is the only admin user of the organization.
-        if (!organization.getUsers().isEmpty() && !deletingAsLastAdminUser(organization)) throw new BadRequestException("Users not empty");
+        if (!containsOnlyCurrentUser(organization)) throw new BadRequestException("Organization still contains a user besides current user");
 
         if (!organization.getRoles().isEmpty()) throw new BadRequestException("Roles not empty");
         organizationCallbackAPI.organizationPreDeleteCheck(organization.getId());
@@ -98,7 +98,10 @@ public class OrganizationEventHandler {
             throw new BadRequestException("Devices still exist");
     }
 
-    private boolean deletingAsLastAdminUser(Organization organization) {
+    private boolean containsOnlyCurrentUser(Organization organization) {
+        if (organization.getUsers().isEmpty()) {
+            return true;
+        }
         if (organization.getUsers().size() > 1) {
             return false;
         }
