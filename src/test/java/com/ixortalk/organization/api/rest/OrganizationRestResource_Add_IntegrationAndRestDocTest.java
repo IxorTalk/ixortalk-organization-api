@@ -36,8 +36,7 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import javax.inject.Inject;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
@@ -111,6 +110,7 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
 
         verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
         verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName())).isEmpty();
     }
 
     @Test
@@ -135,6 +135,10 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
 
         verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
         verify(auth0Roles).assignRolesToUser(TestConstants.USER_EMAIL, newHashSet(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION));
+        assertThat(organizationRestResource.findByName(myTestOrganization.getName())).isPresent();
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).size()).isEqualTo(1);
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).isAdmin()).isTrue();
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).getLogin()).isEqualTo(USER_EMAIL);
     }
 
     @Test
