@@ -110,7 +110,7 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
 
         verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
         verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
-        assertThat(restResourcesTransactionalHelper.getUsers("My Organization").size()).isEqualTo(0);
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName())).isEmpty();
     }
 
     @Test
@@ -135,10 +135,10 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
 
         verify(auth0Roles).addRole(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION);
         verify(auth0Roles).assignRolesToUser(TestConstants.USER_EMAIL, newHashSet(EXPECTED_GENERATED_ROLE_NAME_FOR_MY_TEST_ORGANIZATION));
-        assertThat(organizationRestResource.findByName("My Organization")).isPresent();
-        assertThat(restResourcesTransactionalHelper.getUsers("My Organization").size()).isEqualTo(1);
-        assertThat(restResourcesTransactionalHelper.getUsers("My Organization").get(0).isAdmin()).isTrue();
-        assertThat(restResourcesTransactionalHelper.getUsers("My Organization").get(0).getLogin()).isEqualTo(USER_EMAIL);
+        assertThat(organizationRestResource.findByName(myTestOrganization.getName())).isPresent();
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).size()).isEqualTo(1);
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).isAdmin()).isTrue();
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).getLogin()).isEqualTo(USER_EMAIL);
     }
 
     @Test
