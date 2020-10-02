@@ -28,21 +28,18 @@ import com.ixortalk.organization.api.rest.UserRestResource;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.transaction.Transactional;
 
 @Named
 public class UserService {
 
     @Inject
     private UserRestResource userRestResource;
-
-    @Transactional
+    
     public User promoteToAdmin(User user) {
         user.setAdmin(true);
         return userRestResource.save(user);
     }
 
-    @Transactional
     public User takeAwayAdminRights(User user) {
         user.setAdmin(false);
         return userRestResource.save(user);

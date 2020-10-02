@@ -32,6 +32,8 @@ import com.ixortalk.organization.api.mail.invite.TemplateVariables;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Instant;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
@@ -42,6 +44,7 @@ import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.PathPar
 import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHeaderDescriptors.TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static java.time.Instant.now;
 import static java.util.Optional.of;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -53,6 +56,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static org.springframework.test.util.ReflectionTestUtils.getField;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
@@ -90,7 +94,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         AcceptKey acceptKey = userRestResource.findById(userInOrganizationXCreated.getId()).map(User::getAcceptKey).orElseThrow(() -> new IllegalStateException("User should be present"));
         assertThat(acceptKey).isNotNull();
         assertThat(acceptKey.getAcceptKey()).isNotNull();
-        //assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock));
+        assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock));
 
         mailingServiceWireMockRule.verify(1,
                 postRequestedFor(urlEqualTo("/mailing/send"))
