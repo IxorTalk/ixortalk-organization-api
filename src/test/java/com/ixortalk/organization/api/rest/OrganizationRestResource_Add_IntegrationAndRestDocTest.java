@@ -34,12 +34,12 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import javax.inject.Inject;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.Matchers.anyString;
