@@ -75,6 +75,11 @@ public class OrganizationEventHandler {
         organizationRestResource.findByName(organization.getName()).ifPresent(existing -> {
             throw new ConflictException();
         });
+
+        userEmailProvider.getCurrentUsersEmail().ifPresent(email ->
+        {
+            organization.getUsers().add(User.initialOrganizationAdminUser(email));
+        });
     }
 
     @HandleAfterCreate
@@ -89,7 +94,8 @@ public class OrganizationEventHandler {
 
         if (!organization.getRoles().isEmpty()) throw new BadRequestException("Roles not empty");
         organizationCallbackAPI.organizationPreDeleteCheck(organization.getId());
-        if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent()) throw new BadRequestException("Devices still exist");
+        if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent())
+            throw new BadRequestException("Devices still exist");
     }
 
     private boolean deletingAsLastAdminUser(Organization organization) {

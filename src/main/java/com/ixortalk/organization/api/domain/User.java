@@ -68,6 +68,13 @@ public class User {
     private User() {
     }
 
+    public static User initialOrganizationAdminUser(String login) {
+        User newUser = new User().accepted();
+        newUser.login = login;
+        newUser.setAdmin(true);
+        return newUser;
+    }
+
     public Long getId() {
         return id;
     }

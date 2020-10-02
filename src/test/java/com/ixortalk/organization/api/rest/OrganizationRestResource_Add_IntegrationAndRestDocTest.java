@@ -27,7 +27,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
-import io.restassured.path.json.JsonPath;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
@@ -105,11 +104,13 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
                 .post("/organizations")
                 .then()
                 .statusCode(SC_CREATED);
+
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName())).isEmpty();
     }
 
     @Test
     public void asUser() throws JsonProcessingException {
-        JsonPath jsonPath = given()
+        given()
                 .auth()
                 .preemptive()
                 .oauth2(USER_JWT_TOKEN)
@@ -125,8 +126,12 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
                 .when()
                 .post("/organizations")
                 .then()
-                .statusCode(SC_CREATED)
-                .extract().jsonPath();
+                .statusCode(SC_CREATED);
+
+        assertThat(organizationRestResource.findByName(myTestOrganization.getName())).isPresent();
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).size()).isEqualTo(1);
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).isAdmin()).isTrue();
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).getLogin()).isEqualTo(USER_EMAIL);
     }
 
     @Test
