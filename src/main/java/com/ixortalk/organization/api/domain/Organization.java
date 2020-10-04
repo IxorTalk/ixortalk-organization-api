@@ -134,4 +134,8 @@ public class Organization {
         this.logo = logo;
         return this;
     }
+
+    public boolean hasAdminAccess(String login) {
+        return this.getUsers().stream().anyMatch(user -> login.equals(user.getLogin()) && user.isAdmin());
+    }
 }

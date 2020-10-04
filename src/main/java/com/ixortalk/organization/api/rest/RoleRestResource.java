@@ -45,12 +45,12 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
     String FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY = "from org_role o where (o.organization_id = :organizationId) and (o.name like %:role%)";
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #role.id == null or @securityService.isAdminOfOrganization(@organizationRestResource.findByRoles(#role))")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #role.id == null or @securityService.hasAdminAccess(#role)")
     <S extends Role> S save(@P("role") S role);
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostAuthorize("hasRole('ROLE_ADMIN') or @securityService.hasAccessToRole(returnObject)")
+    @PostAuthorize("hasRole('ROLE_ADMIN') or @securityService.hasAdminAccess(returnObject)")
     Optional<Role> findById(Long id);
 
     @PreAuthorize("permitAll()")
@@ -72,7 +72,6 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
     Page<Role> findByOrganizationIdAndRole(Pageable pageable, @Param("role") String role, @Param("organizationId") Long organizationId);
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') " +
-            "or @securityService.isAdminOfOrganization(@organizationRestResource.findByRoles(#role))")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.hasAdminAccess(#role)")
     void delete(@P("role") Role role);
 }

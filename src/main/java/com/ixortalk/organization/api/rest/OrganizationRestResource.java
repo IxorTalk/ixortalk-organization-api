@@ -35,7 +35,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 
@@ -48,12 +47,12 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostFilter("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(filterObject)")
+    @RestResource(exported = false)
     Collection<Organization> findAll();
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostFilter("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(filterObject)")
+    @RestResource(exported = false)
     Iterable<Organization> findAll(Sort sort);
 
     @Override
@@ -98,6 +97,7 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
 
     @PreAuthorize("permitAll()")
     @RestResource(exported = false)
-    @Query("from Organization o where exists(from Organization o2, User u2 where :user member of o2.users and o2.id = o.id and u2 in elements(o2.users) and u2.login = :login and u2.isAdmin = true)")
-    Optional<Organization> hasAdminAccess(String login, User user);
+    @Query("from Organization o where exists(from Organization o2, User u2 where " +
+            ":user member of o2.users and o2.id = o.id and u2 in elements(o2.users) and u2.login = :login and u2.isAdmin = true)")
+    Optional<Organization> hasAdminAccessToUser(String login, User user);
 }

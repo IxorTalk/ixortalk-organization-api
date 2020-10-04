@@ -31,9 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.PathParametersSnippet;
 
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
@@ -59,9 +56,6 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
     );
 
     private UserInOrganizationDTO userInOrganizationDTO;
-
-    @Inject
-    private EntityManager entityManager;
 
     @Before
     public void before() {
