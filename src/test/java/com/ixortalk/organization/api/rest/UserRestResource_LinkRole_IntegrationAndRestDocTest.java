@@ -84,7 +84,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleAsOrganizationAdmin() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/link-role/ok",
@@ -136,7 +136,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleWhenRoleDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/link-role/role-does-not-exist",
@@ -162,7 +162,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleWhenUserDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/link-role/user-does-not-exist",
@@ -188,7 +188,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleWhenUserHasNotAccepted() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .body("/organization/roles/" + firstRoleInOrganizationX.getId())
                 .post("/users/{userId}/roles", userInOrganizationXInvited.getId())
@@ -246,7 +246,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
         JsonPath result = given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .get("/users/" + userId + "/?projection=" + ENHANCED_USER_PROJECTION_NAME)
                 .then()
                 .statusCode(HttpStatus.SC_OK)

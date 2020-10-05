@@ -29,7 +29,7 @@ import org.junit.Test;
 
 import java.net.MalformedURLException;
 
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static com.ixortalk.organization.api.domain.EnhancedUserProjection.ENHANCED_USER_PROJECTION_NAME;
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -41,7 +41,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void enhancedUsersLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -57,7 +57,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void adminUsersLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -73,7 +73,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void findUsersByOrganization() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -88,7 +88,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void findRolesByOrganization() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -103,7 +103,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void resendInviteLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/users/{id}", userInOrganizationXInvited.getId())
                         .then()
@@ -118,7 +118,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void userEnhancedProjectionLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/users/{id}", userInOrganizationXInvited.getId())
                         .then()
@@ -133,7 +133,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void enhancedUserResendInviteLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .param("projection", ENHANCED_USER_PROJECTION_NAME)
                         .get("/users/{id}", userInOrganizationXInvited.getId())
@@ -149,7 +149,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void promoteToAdminRoleLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/users/{id}", userInOrganizationXInvited.getId())
                         .then()
@@ -165,7 +165,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void removeAdminRightsLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/users/{id}", userInOrganizationXInvited.getId())
                         .then()
@@ -181,7 +181,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void findAssetsLink() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -197,7 +197,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
     public void getOrganizationInformation() throws MalformedURLException {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -213,7 +213,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
 
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()
@@ -228,7 +228,7 @@ public class CustomLinksIntegrationTest extends AbstractSpringIntegrationTest {
 
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}", organizationX.getId())
                         .then()

@@ -36,7 +36,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.ORGANIZATION_PRE_DELETE_CHECK_CALLBACK_PATH;
 import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static com.ixortalk.organization.api.domain.UserTestBuilder.aUser;
 import static io.restassured.RestAssured.given;
 import static java.lang.String.valueOf;
@@ -134,7 +134,7 @@ public class OrganizationRestResource_Delete_IntegrationAndRestDocTest extends A
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete/no-access",
                                 preprocessRequest(staticUris(), prettyPrint()),

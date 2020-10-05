@@ -134,7 +134,7 @@ public class RepresentationModelConfig {
         return new RepresentationModelProcessor<EntityModel<EnhancedUserProjection>>() {
             @Override
             public EntityModel<EnhancedUserProjection> process(EntityModel<EnhancedUserProjection> resource) {
-                addUserLinks(resource, userRestResource.findById(resource.getContent().getId()).get());
+                addUserLinks(resource, userRestResource.findOneById(resource.getContent().getId()).get());
                 return resource;
             }
         };

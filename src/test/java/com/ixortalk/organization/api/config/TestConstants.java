@@ -30,17 +30,17 @@ public class TestConstants {
     public static final String ADMIN_JWT_TOKEN = nextString("adminJwtToken");
     public static final String USER_JWT_TOKEN = nextString("userJwtToken");
     public static final String OTHER_USER_JWT_TOKEN = nextString("otherUserJwtToken");
-    public static final String USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN = nextString("userInOrganizationXAdminRoleJwtToken");
-    public static final String USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN = nextString("userInOrganizationYAdminRoleJwtToken");
+    public static final String USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN = nextString("userInOrganizationXAdminJwtToken");
+    public static final String USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN = nextString("userInOrganizationYAdminJwtToken");
     public static final String USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN = nextString("userInOrganizationXInvitedJwtToken");
     public static final String USER_IN_ORGANIZATION_X_ACCEPTED_JWT_TOKEN = nextString("userInOrganizationXAcceptedJwtToken");
     public static final String USER_WITHOUT_ROLES_JWT_TOKEN = nextString("userWithoutRolesJwtToken");
 
-    public static final String USER_IN_ORGANIZATION_X_ADMIN_ROLE_ID = "userInOrganizationXAdminRoleId";
-    public static final String USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL = "admin@organization-x.com";
+    public static final String USER_IN_ORGANIZATION_X_ADMIN_ID = "userInOrganizationXAdminId";
+    public static final String USER_IN_ORGANIZATION_X_ADMIN_EMAIL = "admin@organization-x.com";
 
-    public static final String USER_IN_ORGANIZATION_Y_ADMIN_ROLE_ID = "userInOrganizationYAdminRoleId";
-    public static final String USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL = "admin@organization-y.com";
+    public static final String USER_IN_ORGANIZATION_Y_ADMIN_ID = "userInOrganizationYAdminId";
+    public static final String USER_IN_ORGANIZATION_Y_ADMIN_EMAIL = "admin@organization-y.com";
 
     public static final String USER_IN_ORGANIZATION_X_INVITED_ID = "user-in-organization-x-invited-id";
     public static final String USER_IN_ORGANIZATION_X_INVITED_EMAIL = "user-invited@organization-x.com";

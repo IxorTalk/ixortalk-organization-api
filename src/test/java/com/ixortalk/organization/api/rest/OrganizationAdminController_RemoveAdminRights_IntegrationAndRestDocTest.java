@@ -67,7 +67,7 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
     public void asUserInOrganizationXAdminRole() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-admin-rights/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -89,7 +89,7 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
     public void asUserInOrganizationYAdminRole() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-admin-rights/admin-of-org-y",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -129,7 +129,7 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
     public void organizationDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-admin-rights/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -149,7 +149,7 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
     public void userDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-admin-rights/user-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -172,7 +172,7 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
         when(auth0Users.userExists(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL)).thenReturn(false);
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-admin-rights/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),

@@ -98,7 +98,7 @@ public class OrganizationRestResource_Update_IntegrationAndRestDocTest extends A
         setField(organizationX, "name", MY_UPDATED_TEST_ORGANIZATION_NAME);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(organizationX))
                 .when()
@@ -115,7 +115,7 @@ public class OrganizationRestResource_Update_IntegrationAndRestDocTest extends A
         setField(organizationX, "name", MY_UPDATED_TEST_ORGANIZATION_NAME);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(organizationX))
                 .filter(

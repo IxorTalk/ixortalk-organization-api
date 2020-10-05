@@ -86,7 +86,7 @@ public class OrganizationRestResource_GetUsersInOrganization_IntegrationAndRestD
         assertThat(result.getList("_embedded.users.login.flatten()"))
                 .containsOnly(
                         USER_IN_ORGANIZATION_X_INVITED_EMAIL,
-                        USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL,
+                        USER_IN_ORGANIZATION_X_ADMIN_EMAIL,
                         USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
                         USER_IN_ORGANIZATION_X_AND_Y_EMAIL,
                         USER_IN_ORGANIZATION_X_CREATED_EMAIL);
@@ -105,7 +105,7 @@ public class OrganizationRestResource_GetUsersInOrganization_IntegrationAndRestD
 
         JsonPath result =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/users/get-users-in-org/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -122,15 +122,15 @@ public class OrganizationRestResource_GetUsersInOrganization_IntegrationAndRestD
         assertThat(result.getList("_embedded.users.login.flatten()"))
                 .containsOnly(
                         USER_IN_ORGANIZATION_X_INVITED_EMAIL,
-                        USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL,
+                        USER_IN_ORGANIZATION_X_ADMIN_EMAIL,
                         USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
                         USER_IN_ORGANIZATION_X_AND_Y_EMAIL,
                         USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
-        assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL + "') }.userInfo.firstName")).containsExactly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME);
-        assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL + "') }.userInfo.lastName")).containsExactly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME);
+        assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_ADMIN_EMAIL + "') }.userInfo.firstName")).containsExactly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME);
+        assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_ADMIN_EMAIL + "') }.userInfo.lastName")).containsExactly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME);
 
-        assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL + "') }.admin")).containsExactly(true);
+        assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_ADMIN_EMAIL + "') }.admin")).containsExactly(true);
 
         assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_AND_Y_EMAIL + "') }.userInfo").get(0)).isNull();
         assertThat(result.getList("_embedded.users.findAll { user -> user.login.equals('" + USER_IN_ORGANIZATION_X_AND_Y_EMAIL + "') }.admin")).containsExactly(false);
@@ -142,7 +142,7 @@ public class OrganizationRestResource_GetUsersInOrganization_IntegrationAndRestD
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/users/get-users-in-org/no-access-to-organization",
                                 preprocessRequest(staticUris(), prettyPrint()),

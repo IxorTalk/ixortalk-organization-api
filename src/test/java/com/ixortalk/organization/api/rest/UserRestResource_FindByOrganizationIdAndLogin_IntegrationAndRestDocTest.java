@@ -113,7 +113,7 @@ public class UserRestResource_FindByOrganizationIdAndLogin_IntegrationAndRestDoc
         JsonPath jsonPath =
                 given()
                         .auth().preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("users/find-by-organization-and-login/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),

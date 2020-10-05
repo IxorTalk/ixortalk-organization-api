@@ -67,7 +67,7 @@ public class RoleRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
         JsonPath jsonPath =
                 given()
                         .auth().preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("roles/find-by-organization/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),

@@ -96,7 +96,7 @@ public class OrganizationRestController_GetDeviceIds_IntegrationAndRestDocTest e
                 given()
                         .auth()
                         .preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .contentType(JSON)
                         .filter(
                                 document("organizations/get-device-ids/ok",
@@ -123,7 +123,7 @@ public class OrganizationRestController_GetDeviceIds_IntegrationAndRestDocTest e
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/get-device-ids/different-admin",
@@ -202,7 +202,7 @@ public class OrganizationRestController_GetDeviceIds_IntegrationAndRestDocTest e
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .get("/organizations/{id}/deviceIds", organizationX.getId())
                 .then()

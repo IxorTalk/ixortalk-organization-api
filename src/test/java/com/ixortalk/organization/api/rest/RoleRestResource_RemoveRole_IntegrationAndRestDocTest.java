@@ -61,7 +61,7 @@ public class RoleRestResource_RemoveRole_IntegrationAndRestDocTest extends Abstr
     public void asOrganizationAdminX() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete-role/as-admin-from-organization-x",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -88,7 +88,7 @@ public class RoleRestResource_RemoveRole_IntegrationAndRestDocTest extends Abstr
     public void asOrganizationAdminY() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete-role/as-admin-from-organization-y",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -148,7 +148,7 @@ public class RoleRestResource_RemoveRole_IntegrationAndRestDocTest extends Abstr
     public void whenRoleDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete-role/role-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),

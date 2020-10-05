@@ -99,7 +99,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers + 1)
                 .extracting(User::getLogin)
-                .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }
 
 
@@ -172,7 +172,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
 
         String createdUserURI =
                 given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/add-user/add/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -193,7 +193,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                         .getString("_links.self.href");
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/add-user/link/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -210,7 +210,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers + 1)
                 .extracting(User::getLogin)
-                .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
 
         String createdUserURI =
                 given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/add-user/add/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -246,7 +246,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                         .getString("_links.self.href");
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/add-user/link/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -264,7 +264,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers + 1)
                 .extracting(User::getLogin)
-                .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(LOGIN_TO_ADD, TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         mailingServiceWireMockRule.verify(0, postRequestedFor(urlEqualTo("/mailing/send")));
     }
@@ -274,7 +274,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
 
         String createdUserURI =
                 given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/add-user/add/no-access",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -295,7 +295,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                         .getString("_links.self.href");
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/add-user/link/no-access",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -323,7 +323,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                 );
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .body("{ \"login\": \"someEvilUsersLogin\" }")
@@ -343,7 +343,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
                 );
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .get("/users/{id}", restResourcesTransactionalHelper.getUsers(otherOrganization.getId()).get(0).getId())
@@ -358,7 +358,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
 
         JsonPath jsonpath =
                 given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .contentType(JSON)
                         .body("{ \"login\": \"" + LOGIN_TO_ADD + "\" }")
@@ -370,7 +370,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
         String createdUserURI = jsonpath.getString("_links.self.href");
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .body(createdUserURI)
                 .post("/organizations/{id}/users", organizationX.getId())
@@ -387,7 +387,7 @@ public class OrganizationRestResource_AddUserInOrganization_IntegrationAndRestDo
 
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .contentType(JSON)
                         .body("{ \"login\": \"" + loginContainingSomeUppercaseLetters + "\" }")

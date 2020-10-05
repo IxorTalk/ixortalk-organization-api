@@ -118,7 +118,7 @@ public class OrganizationRestController_RemoveDevice_IntegrationAndRestDocTest e
 
         given()
                 .auth().preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-device/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -164,7 +164,7 @@ public class OrganizationRestController_RemoveDevice_IntegrationAndRestDocTest e
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/remove-device/no-access",
                                 preprocessRequest(staticUris(), prettyPrint()),

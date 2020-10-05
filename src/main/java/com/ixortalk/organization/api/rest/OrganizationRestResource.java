@@ -57,8 +57,11 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
 
     @Override
     @PreAuthorize("permitAll()")
-    @Query("from Organization o where ?#{ hasRole('ROLE_ADMIN') } = true or exists " +
-            "(from Organization o2 join o2.users u where (u.login = ?#{ @userEmailProvider.currentUsersEmail.orElse(null) } and u.isAdmin = true and o2.id = o.id)) ")
+    @Query("select distinct o" +
+            " from Organization o" +
+            "   left outer join o.users u" +
+            " where ?#{ hasRole('ROLE_ADMIN') } = true or " +
+            "                (u.login = ?#{ @userEmailProvider.currentUsersEmail.orElse(null) } and u.isAdmin = true)")
     Page<Organization> findAll(Pageable pageable);
 
     @Override

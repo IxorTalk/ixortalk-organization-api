@@ -86,5 +86,9 @@ public interface UserRestResource extends PagingAndSortingRepository<User, Long>
 
     @RestResource(exported = false)
     @PreAuthorize("permitAll()")
+    Optional<User> findOneById(Long id);
+
+    @RestResource(exported = false)
+    @PreAuthorize("permitAll()")
     Optional<User> findByLoginAndAcceptKeyAcceptKeyAndAcceptKeyAcceptKeyTimestampAfter(String login, String acceptKey, Instant timestamp);
 }

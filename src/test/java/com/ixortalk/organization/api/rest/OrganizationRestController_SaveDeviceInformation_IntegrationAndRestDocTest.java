@@ -114,7 +114,7 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
         given()
             .auth()
             .preemptive()
-            .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+            .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
             .contentType(JSON)
             .filter(
                     document("organizations/save-info/ok",
@@ -166,7 +166,7 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/save-info/different-admin",
@@ -222,7 +222,7 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/save-info/deviceid-does-not-exist",
@@ -250,7 +250,7 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(deviceInformation))
                 .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())

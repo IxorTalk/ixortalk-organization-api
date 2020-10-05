@@ -63,7 +63,11 @@ public class SecurityService {
     }
 
     public boolean hasAdminAccess(User user) {
-        return userEmailProvider.getCurrentUsersEmail().map(email -> organizationRestResource.hasAdminAccessToUser(email, user).isPresent()).orElse(false);
+        //TODO investigate: line below makes the user-deletion tests fail because of https://stackoverflow.com/a/34843369
+        //return organizationRestResource.findByUsers(user).map(this::isAdminOfOrganization).orElse(true);
+        return userEmailProvider.getCurrentUsersEmail().map(
+                email -> organizationRestResource.hasAdminAccessToUser(email, user).isPresent()
+        ).orElse(false);
     }
 
     public boolean hasAdminAccess(Optional<Role> role) {

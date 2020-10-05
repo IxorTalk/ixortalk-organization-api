@@ -68,7 +68,7 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
 
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/promote-to-admin/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -89,7 +89,7 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
     public void asUserInOrganizationYAdminRole() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/promote-to-admin/admin-of-org-y",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -130,7 +130,7 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
     public void organizationDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/promote-to-admin/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -150,7 +150,7 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
     public void userDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/promote-to-admin/user-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -173,7 +173,7 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
         when(auth0Users.userExists(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL)).thenReturn(false);
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/promote-to-admin/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),

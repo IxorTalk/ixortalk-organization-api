@@ -34,7 +34,7 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import javax.inject.Inject;
 import java.io.IOException;
 
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static com.ixortalk.test.util.Randomizer.nextString;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -95,7 +95,7 @@ public class RoleRestResource_UpdateRole_IntegrationAndRestDocTest extends Abstr
         setField(firstRoleInOrganizationX, "name", NEW_ROLE);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/update-role/as-admin-from-organization-x",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -121,7 +121,7 @@ public class RoleRestResource_UpdateRole_IntegrationAndRestDocTest extends Abstr
         setField(firstRoleInOrganizationX, "name", NEW_ROLE);
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/update-role/as-admin-from-organization-y",
                                 preprocessRequest(staticUris(), prettyPrint()),

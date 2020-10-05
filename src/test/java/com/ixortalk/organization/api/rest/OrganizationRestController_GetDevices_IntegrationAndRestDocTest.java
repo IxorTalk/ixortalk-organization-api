@@ -132,7 +132,7 @@ public class OrganizationRestController_GetDevices_IntegrationAndRestDocTest ext
         JsonPath devices = given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/get-devices/ok",
@@ -162,7 +162,7 @@ public class OrganizationRestController_GetDevices_IntegrationAndRestDocTest ext
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/get-devices/different-admin",
@@ -235,7 +235,7 @@ public class OrganizationRestController_GetDevices_IntegrationAndRestDocTest ext
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .get("/organizations/{id}/devices", organizationX.getId())
                 .then()
@@ -246,7 +246,7 @@ public class OrganizationRestController_GetDevices_IntegrationAndRestDocTest ext
     public void getAssetStateLink() {
         JsonPath jsonPath =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .when()
                         .get("/organizations/{id}/devices", organizationX.getId())
                         .then()

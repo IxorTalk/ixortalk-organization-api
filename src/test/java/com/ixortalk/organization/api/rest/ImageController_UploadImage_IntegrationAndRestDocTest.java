@@ -114,7 +114,7 @@ public class ImageController_UploadImage_IntegrationAndRestDocTest extends Abstr
 
         String location = given()
                 .auth().preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/upload-image/ok",
@@ -147,7 +147,7 @@ public class ImageController_UploadImage_IntegrationAndRestDocTest extends Abstr
 
         given()
                 .auth().preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/upload-image/different-organization-admin",

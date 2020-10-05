@@ -34,7 +34,7 @@ import org.junit.Test;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static com.ixortalk.test.util.Randomizer.nextString;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -243,7 +243,7 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
 
         String createdRoleURI =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/add-role/add/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -264,7 +264,7 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
                         .getString("_links.self.href");
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/add-role/link/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -289,7 +289,7 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
 
         String createdRoleURI =
                 given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/add-role/add/no-access-to-organization",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -310,7 +310,7 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
                         .getString("_links.self.href");
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/add-role/link/no-access-to-organization",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -338,7 +338,7 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
                 );
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .body("{ \"name\": \"someEvilRoleName\" }")
@@ -358,7 +358,7 @@ public class OrganizationRestResource_AddRoleToOrganization_IntegrationAndRestDo
                 );
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .body("{ \"name\": \"someEvilRoleName\" }")

@@ -102,7 +102,7 @@ public class OrganizationRestController_AddDevice_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/add-device/ok",
@@ -128,7 +128,7 @@ public class OrganizationRestController_AddDevice_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/add-device/different-admin",

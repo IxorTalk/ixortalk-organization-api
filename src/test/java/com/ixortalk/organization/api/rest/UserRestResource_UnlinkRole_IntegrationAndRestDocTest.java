@@ -93,7 +93,7 @@ public class UserRestResource_UnlinkRole_IntegrationAndRestDocTest extends Abstr
     public void unlinkRoleAsOrganizationAdmin() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/unlink-role/ok",

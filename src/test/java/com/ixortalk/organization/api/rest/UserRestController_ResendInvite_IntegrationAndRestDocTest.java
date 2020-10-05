@@ -63,7 +63,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
     public void organizationAdminResendInvite() throws JsonProcessingException {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/resend-invite/as-organization-admin",
@@ -101,7 +101,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
         userRestResource.save(userInOrganizationXInvited);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/resend-invite/as-organization-admin",
@@ -141,7 +141,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
     public void differentOrganizationAdminResendInvite() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/resend-invite/as-different-organization-admin",
@@ -163,7 +163,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
     public void organizationAdminResendInviteToAcceptedUser() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/resend-invite/accepted-user",
@@ -184,7 +184,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
     public void userDoesNotExistResendInvite() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/resend-invite/user-does-not-exist",

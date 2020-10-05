@@ -64,7 +64,7 @@ public class UserRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
                 .containsOnly(
                         USER_IN_ORGANIZATION_X_INVITED_EMAIL,
                         USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
-                        USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL,
+                        USER_IN_ORGANIZATION_X_ADMIN_EMAIL,
                         USER_IN_ORGANIZATION_X_AND_Y_EMAIL,
                         USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }
@@ -75,7 +75,7 @@ public class UserRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
         JsonPath jsonPath =
                 given()
                         .auth().preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("users/find-by-organization/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -96,7 +96,7 @@ public class UserRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
                 .containsOnly(
                         USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
                         USER_IN_ORGANIZATION_X_INVITED_EMAIL,
-                        USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL,
+                        USER_IN_ORGANIZATION_X_ADMIN_EMAIL,
                         USER_IN_ORGANIZATION_X_AND_Y_EMAIL,
                         USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }

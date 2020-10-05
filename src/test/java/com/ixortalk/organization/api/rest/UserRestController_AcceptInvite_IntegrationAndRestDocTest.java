@@ -34,7 +34,7 @@ import org.springframework.restdocs.request.ParameterDescriptor;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.USER_ACCEPTED_CALLBACK_PATH;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -108,7 +108,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
     public void accept_AsDifferentUser() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/accept-invite/different-user",
@@ -151,7 +151,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
     public void decline_AsDifferentUser() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/decline-invite/different-user",

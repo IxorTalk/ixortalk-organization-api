@@ -117,7 +117,7 @@ public class OrganizationRestController_UploadDeviceImage_IntegrationAndRestDocT
 
         given()
                 .auth().preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/upload-device-image/ok",
@@ -148,7 +148,7 @@ public class OrganizationRestController_UploadDeviceImage_IntegrationAndRestDocT
 
         given()
                 .auth().preemptive()
-                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/upload-device-image/different-organization-admin",

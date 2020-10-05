@@ -82,7 +82,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers - 1)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles).removeRolesFromUser(USER_IN_ORGANIZATION_X_INVITED_EMAIL, newHashSet(FIRST_ROLE_IN_ORGANIZATION_X_ROLE_NAME, SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
 
@@ -95,7 +95,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
     @Test
     public void asOrganizationAdminX() throws JsonProcessingException {
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/delete-user/ok",
@@ -113,7 +113,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers - 1)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles).removeRolesFromUser(USER_IN_ORGANIZATION_X_INVITED_EMAIL, newHashSet(FIRST_ROLE_IN_ORGANIZATION_X_ROLE_NAME, SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
 
@@ -127,7 +127,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
     public void asOrganizationAdminY() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/delete-user/different-organization",
@@ -145,7 +145,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySet());
 
@@ -174,7 +174,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySet());
 
@@ -185,7 +185,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
     public void asOrganizationAdminXButUserNotInOrganization() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/delete-user/user-not-in-organization",
@@ -219,7 +219,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
     public void userDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/delete-user/user-does-not-exist",
@@ -237,7 +237,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySet());
 
@@ -250,7 +250,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         when(auth0Users.userExists(USER_IN_ORGANIZATION_X_INVITED_EMAIL)).thenReturn(false);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .delete("/users/{userId}", userInOrganizationXInvited.getId())
@@ -260,7 +260,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers - 1)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySet());
 
@@ -278,7 +278,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
                 .willReturn(serverError()));
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .delete("/users/{userId}", userInOrganizationXInvited.getId())
@@ -296,7 +296,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
                 .willReturn(notFound()));
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .contentType(JSON)
                 .delete("/users/{userId}", userInOrganizationXInvited.getId())
@@ -328,7 +328,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers - 1)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles).removeRolesFromUser(USER_IN_ORGANIZATION_X_INVITED_EMAIL, newHashSet(FIRST_ROLE_IN_ORGANIZATION_X_ROLE_NAME, SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
 
@@ -360,7 +360,7 @@ public class UserRestResource_Delete_IntegrationAndRestDocTest extends AbstractS
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId()))
                 .hasSize(organizationXInitialNumberOfUsers)
                 .extracting(User::getLogin)
-                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
+                .containsOnly(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL, USER_IN_ORGANIZATION_X_AND_Y_EMAIL, USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_CREATED_EMAIL);
 
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySet());
 

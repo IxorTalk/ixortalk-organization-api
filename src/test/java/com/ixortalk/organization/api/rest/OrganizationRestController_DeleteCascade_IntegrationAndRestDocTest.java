@@ -211,7 +211,7 @@ public class OrganizationRestController_DeleteCascade_IntegrationAndRestDocTest 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete-cascade/as-organization-admin",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -252,7 +252,7 @@ public class OrganizationRestController_DeleteCascade_IntegrationAndRestDocTest 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/delete-cascade/no-access",
                                 preprocessRequest(staticUris(), prettyPrint()),

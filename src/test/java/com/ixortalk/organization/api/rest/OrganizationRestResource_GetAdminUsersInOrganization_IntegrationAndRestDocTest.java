@@ -88,7 +88,7 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
                         .statusCode(SC_OK)
                         .extract().jsonPath();
 
-        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
+        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
         assertThat(result.getList("_embedded.users.userInfo.firstName.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME, USER_IN_ORGANIZATION_X_ACCEPTED_FIRST_NAME);
     }
 
@@ -99,14 +99,14 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
                 given()
                         .auth()
                         .preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                         .get("/organizations/{id}/adminUsers", organizationX.getId())
                 .then()
                         .statusCode(SC_OK)
                         .extract().jsonPath();
 
-        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
+        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
         assertThat(result.getList("_embedded.users.userInfo.firstName.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME, USER_IN_ORGANIZATION_X_ACCEPTED_FIRST_NAME);
     }
 
@@ -114,7 +114,7 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
     public void noOrganizationAdmin() {
 
         given()
-            .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+            .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/users/get-admin-users-in-org/no-access",
                                 preprocessRequest(staticUris(), prettyPrint()),
