@@ -24,20 +24,13 @@
 package com.ixortalk.organization.api.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.domain.Organization;
+import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
 import org.junit.Test;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.Role.ORGANIZATION_Y_ADMIN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.apache.http.HttpStatus.*;
@@ -105,7 +98,7 @@ public class OrganizationRestResource_Update_IntegrationAndRestDocTest extends A
         setField(organizationX, "name", MY_UPDATED_TEST_ORGANIZATION_NAME);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(organizationX))
                 .when()
@@ -122,7 +115,7 @@ public class OrganizationRestResource_Update_IntegrationAndRestDocTest extends A
         setField(organizationX, "name", MY_UPDATED_TEST_ORGANIZATION_NAME);
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(organizationX))
                 .filter(
@@ -177,41 +170,6 @@ public class OrganizationRestResource_Update_IntegrationAndRestDocTest extends A
                 .statusCode(SC_OK);
 
         assertThat(organizationRestResource.findById(organizationX.getId())).get().extracting(Organization::getEmailAddress).isEqualTo(NEW_EMAIL_ADDRESS);
-    }
-
-    @Test
-    public void generatedRoleNameNotChanged() throws JsonProcessingException {
-
-        setField(organizationX, "name", MY_UPDATED_TEST_ORGANIZATION_NAME);
-
-        given()
-                .auth().preemptive().oauth2(ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(objectMapper.writeValueAsString(organizationX))
-                .when()
-                .put("/organizations/{id}", organizationX.getId())
-                .then()
-                .statusCode(SC_OK);
-
-        assertThat(organizationRestResource.findById(organizationX.getId())).get().extracting(Organization::getRole).isEqualTo(TestConstants.Role.ORGANIZATION_X_ADMIN.roleName());
-    }
-
-    @Test
-    public void roleNameCannotBeUpdated() throws JsonProcessingException {
-
-        JsonNode jsonNode = objectMapper.valueToTree(organizationX);
-        ((ObjectNode) jsonNode).put("role", ORGANIZATION_Y_ADMIN.roleName());
-
-        given()
-                .auth().preemptive().oauth2(ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(objectMapper.writeValueAsString(jsonNode))
-                .when()
-                .put("/organizations/{id}", organizationX.getId())
-                .then()
-                .statusCode(SC_OK);
-
-        assertThat(organizationRestResource.findById(organizationX.getId())).get().extracting(Organization::getRole).isEqualTo(TestConstants.Role.ORGANIZATION_X_ADMIN.roleName());
     }
 
     @Test

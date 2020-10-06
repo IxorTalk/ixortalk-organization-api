@@ -30,33 +30,17 @@ import org.junit.Test;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHeaderDescriptors.TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES;
 import static io.restassured.RestAssured.given;
 import static java.lang.Long.MAX_VALUE;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
-import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
-import static org.springframework.restdocs.payload.JsonFieldType.STRING;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
@@ -79,8 +63,7 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
 
     @Before
     public void makeUserInOrganizationXAcceptedAlsoAnAdmin() {
-        when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL));
-        when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL)).thenReturn(newHashSet(ROLE_ONLY_IN_AUTH0, SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME, ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
+        when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL)).thenReturn(newHashSet(ROLE_ONLY_IN_AUTH0, SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
         userInOrganizationXAcceptedHavingARole.setAdmin(true);
         userRestResource.save(userInOrganizationXAcceptedHavingARole);
     }
@@ -105,7 +88,7 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
                         .statusCode(SC_OK)
                         .extract().jsonPath();
 
-        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
+        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
         assertThat(result.getList("_embedded.users.userInfo.firstName.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME, USER_IN_ORGANIZATION_X_ACCEPTED_FIRST_NAME);
     }
 
@@ -116,14 +99,14 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
                 given()
                         .auth()
                         .preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                         .get("/organizations/{id}/adminUsers", organizationX.getId())
                 .then()
                         .statusCode(SC_OK)
                         .extract().jsonPath();
 
-        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
+        assertThat(result.getList("_embedded.users.login.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL);
         assertThat(result.getList("_embedded.users.userInfo.firstName.flatten()")).containsOnly(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME, USER_IN_ORGANIZATION_X_ACCEPTED_FIRST_NAME);
     }
 
@@ -131,7 +114,7 @@ public class OrganizationRestResource_GetAdminUsersInOrganization_IntegrationAnd
     public void noOrganizationAdmin() {
 
         given()
-            .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+            .auth().preemptive().oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/users/get-admin-users-in-org/no-access",
                                 preprocessRequest(staticUris(), prettyPrint()),

@@ -25,8 +25,8 @@ package com.ixortalk.organization.api.domain;
 
 import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 
-import static com.ixortalk.test.util.Randomizer.nextString;
 import static com.ixortalk.organization.api.domain.Status.ACCEPTED;
+import static com.ixortalk.test.util.Randomizer.nextString;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class UserTestBuilder extends ReflectionInstanceTestBuilder<User> {

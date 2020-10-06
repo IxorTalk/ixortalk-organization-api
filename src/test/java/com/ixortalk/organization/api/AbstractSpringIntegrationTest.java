@@ -31,6 +31,7 @@ import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
 import com.ixortalk.organization.api.asset.DeviceId;
 import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
+import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.*;
 import com.ixortalk.organization.api.rest.ImageController_UploadImage_IntegrationAndRestDocTest;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
@@ -79,33 +80,9 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.buildJwtToken;
 import static com.ixortalk.autoconfigure.oauth2.TokenServerWireMockHelper.stubAdminToken;
 import static com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfoTestBuilder.aUserInfo;
-import static com.ixortalk.organization.api.TestConstants.CUSTOM_CLAIMS_NAMESPACE;
-import static com.ixortalk.organization.api.TestConstants.IMAGE_SERVICE_CONTEXT_PATH;
-import static com.ixortalk.organization.api.TestConstants.IMAGE_SERVICE_DOWNLOAD_PATH;
-import static com.ixortalk.organization.api.TestConstants.LOADBALANCER_EXTERNAL_URL;
+import static com.ixortalk.organization.api.TestConstants.*;
 import static com.ixortalk.organization.api.asset.DeviceId.deviceId;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.OTHER_USER_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.OTHER_USER_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.Role.ORGANIZATION_X_ADMIN;
-import static com.ixortalk.organization.api.config.TestConstants.Role.ORGANIZATION_Y_ADMIN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_ID;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_ID;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_ID;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_ID;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_WITHOUT_ROLES_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_WITHOUT_ROLES_ID;
-import static com.ixortalk.organization.api.config.TestConstants.USER_WITHOUT_ROLES_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.domain.RoleTestBuilder.aRole;
 import static com.ixortalk.organization.api.domain.UserTestBuilder.aUser;
 import static com.ixortalk.test.util.Randomizer.nextString;
@@ -126,9 +103,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
-import static wiremock.com.google.common.net.HttpHeaders.X_FORWARDED_HOST;
-import static wiremock.com.google.common.net.HttpHeaders.X_FORWARDED_PORT;
-import static wiremock.com.google.common.net.HttpHeaders.X_FORWARDED_PROTO;
+import static wiremock.com.google.common.net.HttpHeaders.*;
 
 @SpringBootTest(classes = {OrganizationApiApplication.class, OAuth2TestConfiguration.class}, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -143,6 +118,7 @@ public abstract class AbstractSpringIntegrationTest  {
 
     protected static final String ORGANIZATION_X = "Organization X";
     protected static final String ORGANIZATION_Y = "Organization Y";
+    protected static final String ORGANIZATION_Z = "Organization Z";
 
     protected static final String USER_IN_ORGANIZATION_X_CREATED_EMAIL = nextString("user-created@organiation-x.com");
     protected static final String USER_IN_ORGANIZATION_X_AND_Y_EMAIL = nextString("user@organization-x-and-y.com");
@@ -160,9 +136,6 @@ public abstract class AbstractSpringIntegrationTest  {
 
     protected static final String ROLE_IN_ORGANIZATION_Y = "roleInOrganizationY";
     protected static final String ROLE_IN_ORGANIZATION_Y_ROLE_NAME = "ROLE_IN_ORG_Y_ROLE_NAME";
-
-    protected static final String ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME = ORGANIZATION_X_ADMIN.roleName();
-    protected static final String ADMIN_ROLE_IN_ORGANIZATION_Y_ROLE_NAME = ORGANIZATION_Y_ADMIN.roleName();
 
     protected static final PathParametersSnippet DEVICE_IN_ORGANIZATION_PATH_PARAMETERS = pathParameters(
             parameterWithName("id").description("The id of the organization."),
@@ -246,7 +219,7 @@ public abstract class AbstractSpringIntegrationTest  {
     @Inject
     protected Clock clock;
 
-    protected Organization organizationX, organizationY;
+    protected Organization organizationX, organizationY, organizationZ;
 
     protected User userInOrganizationXCreated, userInOrganizationXInvited, userInOrganizationXAcceptedHavingARole, adminInOrganizationX, adminInOrganizationY, userInOrganizationY;
 
@@ -296,8 +269,8 @@ public abstract class AbstractSpringIntegrationTest  {
         when(jwtDecoder.decode(ADMIN_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(ADMIN_JWT_TOKEN, empty(), "admin", "ROLE_ADMIN"));
         when(jwtDecoder.decode(USER_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_JWT_TOKEN, of(USER_EMAIL), "user", "ROLE_USER"));
         when(jwtDecoder.decode(OTHER_USER_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(OTHER_USER_JWT_TOKEN, of(OTHER_USER_EMAIL), "user", "ROLE_USER"));
-        when(jwtDecoder.decode(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN, of(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL), USER_IN_ORGANIZATION_X_ADMIN_ROLE_ID, ORGANIZATION_X_ADMIN.roleName()));
-        when(jwtDecoder.decode(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN, of(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL), USER_IN_ORGANIZATION_Y_ADMIN_ROLE_ID, ORGANIZATION_Y_ADMIN.roleName()));
+        when(jwtDecoder.decode(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN, of(USER_IN_ORGANIZATION_X_ADMIN_EMAIL), USER_IN_ORGANIZATION_X_ADMIN_ID));
+        when(jwtDecoder.decode(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN, of(USER_IN_ORGANIZATION_Y_ADMIN_EMAIL), USER_IN_ORGANIZATION_Y_ADMIN_ID));
         when(jwtDecoder.decode(USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN, of(USER_IN_ORGANIZATION_X_INVITED_EMAIL), USER_IN_ORGANIZATION_X_INVITED_ID));
         when(jwtDecoder.decode(USER_IN_ORGANIZATION_X_ACCEPTED_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_IN_ORGANIZATION_X_ACCEPTED_JWT_TOKEN, of(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL), USER_IN_ORGANIZATION_X_ACCEPTED_ID));
         when(jwtDecoder.decode(USER_WITHOUT_ROLES_JWT_TOKEN)).thenReturn(buildJwtTokenWithEmailCustomClaim(USER_WITHOUT_ROLES_JWT_TOKEN, of(USER_WITHOUT_ROLES_EMAIL), USER_WITHOUT_ROLES_ID));
@@ -330,7 +303,7 @@ public abstract class AbstractSpringIntegrationTest  {
         userInOrganizationXCreated = aUser().withLogin(USER_IN_ORGANIZATION_X_CREATED_EMAIL).withStatus(Status.CREATED).build();
         userInOrganizationXInvited = aUser().withLogin(USER_IN_ORGANIZATION_X_INVITED_EMAIL).withStatus(Status.INVITED).build();
         userInOrganizationXAcceptedHavingARole = aUser().withLogin(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL).withStatus(Status.ACCEPTED).build();
-        adminInOrganizationX = aUser().withLogin(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL).withStatus(Status.ACCEPTED).withIsAdmin(true).build();
+        adminInOrganizationX = aUser().withLogin(USER_IN_ORGANIZATION_X_ADMIN_EMAIL).withStatus(Status.ACCEPTED).withIsAdmin(true).build();
 
         firstRoleInOrganizationX = aRole().withName(FIRST_ROLE_IN_ORGANIZATION_X).withRole(FIRST_ROLE_IN_ORGANIZATION_X_ROLE_NAME).build();
         secondRoleInOrganizationX = aRole().withName(SECOND_ROLE_IN_ORGANIZATION_X).withRole(SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME).build();
@@ -338,7 +311,6 @@ public abstract class AbstractSpringIntegrationTest  {
         organizationX =
                 OrganizationTestBuilder.anOrganization()
                         .withName(ORGANIZATION_X)
-                        .withRole(ORGANIZATION_X_ADMIN.roleName())
                         .withPhoneNumber("+32 15 43 43 67")
                         .withEmailAddress("info@organization_x.com")
                         .withImage("organizations/1000/image/abcde")
@@ -357,7 +329,7 @@ public abstract class AbstractSpringIntegrationTest  {
 
         organizationXInitialNumberOfUsers = organizationX.getUsers().size();
 
-        adminInOrganizationY = aUser().withLogin(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL).withStatus(Status.ACCEPTED).withIsAdmin(true).build();
+        adminInOrganizationY = aUser().withLogin(USER_IN_ORGANIZATION_Y_ADMIN_EMAIL).withStatus(Status.ACCEPTED).withIsAdmin(true).build();
         userInOrganizationY = aUser().withLogin(USER_IN_ORGANIZATION_Y_EMAIL).build();
 
         roleInOrganizationY = aRole().withName(ROLE_IN_ORGANIZATION_Y).withRole(ROLE_IN_ORGANIZATION_Y_ROLE_NAME).build();
@@ -365,7 +337,6 @@ public abstract class AbstractSpringIntegrationTest  {
         organizationY =
                 OrganizationTestBuilder.anOrganization()
                         .withName(ORGANIZATION_Y)
-                        .withRole(ORGANIZATION_Y_ADMIN.roleName())
                         .withPhoneNumber("+32 15 43 43 67")
                         .withEmailAddress("info@organization_y.com")
                         .withImage("organizations/1000/image/abcde")
@@ -382,7 +353,18 @@ public abstract class AbstractSpringIntegrationTest  {
 
         organizationYInitialNumberOfUsers = organizationY.getUsers().size();
 
-        organizationRestResource.saveAll(newArrayList(organizationX, organizationY));
+        organizationZ =
+                OrganizationTestBuilder.anOrganization()
+                        .withName(ORGANIZATION_Z)
+                        .withPhoneNumber("+32 15 43 43 67")
+                        .withEmailAddress("info@organization_z.com")
+                        .withImage("organizations/1000/image/abcde")
+                        .withLogo("organizations/1000/logo/abcde")
+                        .build();
+
+        organizationYInitialNumberOfUsers = organizationY.getUsers().size();
+
+        organizationRestResource.saveAll(newArrayList(organizationX, organizationY, organizationZ));
     }
 
     @Before
@@ -393,15 +375,14 @@ public abstract class AbstractSpringIntegrationTest  {
 
     @Before
     public void auth0MockedCalls() {
-        when(auth0Users.userExists(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)).thenReturn(true);
-        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)).thenReturn(of(
+        when(auth0Users.userExists(USER_IN_ORGANIZATION_X_ADMIN_EMAIL)).thenReturn(true);
+        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_EMAIL)).thenReturn(of(
                 aUserInfo()
-                        .withEmail(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)
+                        .withEmail(USER_IN_ORGANIZATION_X_ADMIN_EMAIL)
                         .withFirstName(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME)
                         .withLastName(USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME)
                         .withProfilePictureUrl("https://user-in-organization-x-admin-role-profile-picture")
                         .build()));
-        when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)).thenReturn(newHashSet(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
 
         when(auth0Users.userExists(USER_IN_ORGANIZATION_X_CREATED_EMAIL)).thenReturn(true);
         when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_CREATED_EMAIL)).thenReturn(of(
@@ -437,24 +418,21 @@ public abstract class AbstractSpringIntegrationTest  {
         when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_AND_Y_EMAIL)).thenReturn(of(new UserInfo(USER_IN_ORGANIZATION_X_AND_Y_EMAIL)));
         when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_X_AND_Y_EMAIL)).thenReturn(newHashSet());
 
-        when(auth0Users.userExists(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL)).thenReturn(true);
-        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL)).thenReturn(of(
+        when(auth0Users.userExists(USER_IN_ORGANIZATION_Y_ADMIN_EMAIL)).thenReturn(true);
+        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_Y_ADMIN_EMAIL)).thenReturn(of(
                 aUserInfo()
-                        .withEmail(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL)
+                        .withEmail(USER_IN_ORGANIZATION_Y_ADMIN_EMAIL)
                         .withFirstName(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_FIRST_NAME)
                         .withLastName(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_LAST_NAME)
                         .withProfilePictureUrl("https://user-in-organization-y-admin-role-profile-picture")
                         .build()));
-        when(auth0Roles.getUsersRoles(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL)).thenReturn(newHashSet(ADMIN_ROLE_IN_ORGANIZATION_Y_ROLE_NAME));
 
         when(auth0Users.userExists(USER_EMAIL)).thenReturn(true);
         when(auth0Users.getUserInfo(USER_EMAIL)).thenReturn(of(new UserInfo(USER_EMAIL)));
         when(auth0Roles.getUsersRoles(USER_EMAIL)).thenReturn(newHashSet());
 
-        when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL));
         when(auth0Roles.getUsersInRole(ROLE_ONLY_IN_AUTH0)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_INVITED_EMAIL, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL));
         when(auth0Roles.getUsersInRole(SECOND_ROLE_IN_ORGANIZATION_X_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL));
-        when(auth0Roles.getUsersInRole(ADMIN_ROLE_IN_ORGANIZATION_Y_ROLE_NAME)).thenReturn(newHashSet(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_EMAIL));
     }
 
     @Before

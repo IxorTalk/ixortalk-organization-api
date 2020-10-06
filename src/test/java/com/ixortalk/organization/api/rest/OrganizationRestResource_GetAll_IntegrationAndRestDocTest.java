@@ -29,19 +29,14 @@ import org.junit.Test;
 
 import java.util.Objects;
 
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_WITHOUT_ROLES_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.domain.IdOnlyProjection.ID_ONLY_PROJECTION_NAME;
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
@@ -68,7 +63,7 @@ public class OrganizationRestResource_GetAll_IntegrationAndRestDocTest extends A
                         .statusCode(SC_OK)
                         .extract().response().jsonPath();
 
-        assertThat(result.getList("_embedded.organizations.name.flatten()")).containsOnly(ORGANIZATION_X, ORGANIZATION_Y);
+        assertThat(result.getList("_embedded.organizations.name.flatten()")).containsOnly(ORGANIZATION_X, ORGANIZATION_Y, ORGANIZATION_Z);
     }
 
     @Test
@@ -92,13 +87,13 @@ public class OrganizationRestResource_GetAll_IntegrationAndRestDocTest extends A
                         .when()
                         .request()
                             .param("sort", "name,desc")
-                            .param("size", "2")
+                            .param("size", "3")
                         .get("/organizations")
                         .then()
                         .statusCode(SC_OK)
                         .extract().response().jsonPath();
 
-        assertThat(result.getList("_embedded.organizations.name.flatten()")).containsOnly(ORGANIZATION_X, ORGANIZATION_Y);
+        assertThat(result.getList("_embedded.organizations.name.flatten()")).containsOnly(ORGANIZATION_X, ORGANIZATION_Y, ORGANIZATION_Z);
     }
 
     @Test
@@ -115,7 +110,7 @@ public class OrganizationRestResource_GetAll_IntegrationAndRestDocTest extends A
                         .statusCode(SC_OK)
                         .extract().response().jsonPath();
 
-        assertThat(result.getList("_embedded.organizations.role.flatten()")).hasSize(2).allMatch(Objects::isNull);
+        assertThat(result.getList("_embedded.organizations.role.flatten()")).hasSize(3).allMatch(Objects::isNull);
     }
 
     @Test
@@ -125,7 +120,7 @@ public class OrganizationRestResource_GetAll_IntegrationAndRestDocTest extends A
                 given()
                         .auth()
                         .preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/get-all/rbac",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -147,7 +142,7 @@ public class OrganizationRestResource_GetAll_IntegrationAndRestDocTest extends A
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .when()
                 .get("/organizations/{id}", organizationX.getId())
                 .then()
@@ -186,6 +181,6 @@ public class OrganizationRestResource_GetAll_IntegrationAndRestDocTest extends A
                         .statusCode(SC_OK)
                         .extract().response().jsonPath();
 
-        assertThat(result.getList("_embedded.organizations.id.flatten()", Long.class)).containsOnly(organizationX.getId(), organizationY.getId());
+        assertThat(result.getList("_embedded.organizations.id.flatten()", Long.class)).containsOnly(organizationX.getId(), organizationY.getId(), organizationZ.getId());
     }
 }

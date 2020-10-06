@@ -23,11 +23,11 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import io.restassured.path.json.JsonPath;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
@@ -36,9 +36,7 @@ import org.springframework.restdocs.request.PathParametersSnippet;
 import javax.inject.Inject;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.domain.EnhancedUserProjection.ENHANCED_USER_PROJECTION_NAME;
 import static io.restassured.RestAssured.given;
 import static java.net.HttpURLConnection.*;
@@ -86,7 +84,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleAsOrganizationAdmin() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/link-role/ok",
@@ -138,7 +136,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleWhenRoleDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/link-role/role-does-not-exist",
@@ -164,7 +162,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleWhenUserDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/link-role/user-does-not-exist",
@@ -190,7 +188,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
     public void linkRoleWhenUserHasNotAccepted() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .body("/organization/roles/" + firstRoleInOrganizationX.getId())
                 .post("/users/{userId}/roles", userInOrganizationXInvited.getId())
@@ -248,7 +246,7 @@ public class UserRestResource_LinkRole_IntegrationAndRestDocTest extends Abstrac
         JsonPath result = given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .get("/users/" + userId + "/?projection=" + ENHANCED_USER_PROJECTION_NAME)
                 .then()
                 .statusCode(HttpStatus.SC_OK)

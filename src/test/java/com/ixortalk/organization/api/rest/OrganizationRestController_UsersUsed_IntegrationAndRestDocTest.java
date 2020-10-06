@@ -33,18 +33,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.Instant;
+import java.time.ZoneId;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfoTestBuilder.aUserInfo;
-import static com.ixortalk.organization.api.TestConstants.DEFAULT_MAIL_LANGUAGE_TAG;
-import static com.ixortalk.organization.api.TestConstants.INVITE_MAIL_SUBJECT_KEY;
-import static com.ixortalk.organization.api.TestConstants.INVITE_MAIL_TEMPLATE;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.TestConstants.*;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.PathParameters.ORGANIZATION_ID_PATH_PARAMETER;
 import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHeaderDescriptors.TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES;
 import static io.restassured.RestAssured.given;
@@ -56,9 +52,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -81,7 +75,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/users-used/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -101,7 +95,8 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         AcceptKey acceptKey = userRestResource.findById(userInOrganizationXCreated.getId()).map(User::getAcceptKey).orElseThrow(() -> new IllegalStateException("User should be present"));
         assertThat(acceptKey).isNotNull();
         assertThat(acceptKey.getAcceptKey()).isNotNull();
-        assertThat((Instant) getField(acceptKey, "acceptKeyTimestamp")).isEqualTo(now(clock));
+        assertThat(((Instant) getField(acceptKey, "acceptKeyTimestamp")).atZone(ZoneId.systemDefault()))
+                .isEqualToIgnoringNanos(now(clock).atZone(ZoneId.systemDefault()));
 
         mailingServiceWireMockRule.verify(1,
                 postRequestedFor(urlEqualTo("/mailing/send"))
@@ -132,7 +127,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/users-used/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -250,7 +245,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin())))
                 .post("/organizations/{id}/users/used", organizationX.getId())
@@ -295,12 +290,12 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
     @Test
     public void inviterHasNoFirstName() throws JsonProcessingException {
 
-        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)).thenReturn(of(aUserInfo().withEmail(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL).withFirstName(null).withLastName(USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME).build()));
+        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_EMAIL)).thenReturn(of(aUserInfo().withEmail(USER_IN_ORGANIZATION_X_ADMIN_EMAIL).withFirstName(null).withLastName(USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME).build()));
 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin())))
                 .post("/organizations/{id}/users/used", organizationX.getId())
@@ -316,12 +311,12 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
     @Test
     public void inviterHasNoLastName() throws JsonProcessingException {
 
-        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)).thenReturn(of(aUserInfo().withEmail(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL).withFirstName(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME).withLastName(null).build()));
+        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_EMAIL)).thenReturn(of(aUserInfo().withEmail(USER_IN_ORGANIZATION_X_ADMIN_EMAIL).withFirstName(USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME).withLastName(null).build()));
 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin())))
                 .post("/organizations/{id}/users/used", organizationX.getId())
@@ -337,12 +332,12 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
     @Test
     public void inviterHasNeitherFirstNorLastName() throws JsonProcessingException {
 
-        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL)).thenReturn(of(aUserInfo().withEmail(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL).withFirstName(null).withLastName(null).build()));
+        when(auth0Users.getUserInfo(USER_IN_ORGANIZATION_X_ADMIN_EMAIL)).thenReturn(of(aUserInfo().withEmail(USER_IN_ORGANIZATION_X_ADMIN_EMAIL).withFirstName(null).withLastName(null).build()));
 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .body(objectMapper.writeValueAsString(newArrayList(userInOrganizationXCreated.getLogin())))
                 .post("/organizations/{id}/users/used", organizationX.getId())
@@ -352,6 +347,6 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
         mailingServiceWireMockRule.verify(1,
                 postRequestedFor(urlEqualTo("/mailing/send"))
                         .withRequestBody(
-                                matchingJsonPath("$.additionalVariables.organizationInviter.name", equalTo(USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL))));
+                                matchingJsonPath("$.additionalVariables.organizationInviter.name", equalTo(USER_IN_ORGANIZATION_X_ADMIN_EMAIL))));
     }
 }

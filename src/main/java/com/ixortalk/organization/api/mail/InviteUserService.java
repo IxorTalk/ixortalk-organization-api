@@ -36,7 +36,6 @@ import com.ixortalk.organization.api.service.UserEmailProvider;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.time.Clock;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.time.Instant.now;

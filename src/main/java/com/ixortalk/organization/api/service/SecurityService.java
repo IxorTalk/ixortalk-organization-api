@@ -28,16 +28,10 @@ import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
-import java.util.Set;
-
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.stream.Collectors.toSet;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @Named
 public class SecurityService {
@@ -47,19 +41,6 @@ public class SecurityService {
 
     @Inject
     private OrganizationRestResource organizationRestResource;
-
-    public Set<String> getAuthorities() {
-        if (getContext().getAuthentication().getAuthorities().isEmpty()) {
-            return newHashSet("");
-        }
-
-        return getContext()
-                .getAuthentication()
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(toSet());
-    }
 
     public boolean isCurrentUser(Optional<User> user) {
         return user.map(this::isCurrentUser).orElse(false);
@@ -73,11 +54,27 @@ public class SecurityService {
         return userEmailProvider.getCurrentUsersEmail().map(email -> login.toLowerCase().equals(email)).orElse(false);
     }
 
-    public boolean hasAccessToRole(Optional<Role> role) {
-        return organizationRestResource.findByRoles(role.orElseThrow(ResourceNotFoundException::new)).map(Organization::getRole).map(this::hasRole).orElse(true);
+    public boolean isAdminOfOrganization(Optional<Organization> organization) {
+        return organization.map(this::isAdminOfOrganization).orElseThrow(ResourceNotFoundException::new);
     }
 
-    private boolean hasRole(String role) {
-        return getAuthorities().contains(role);
+    public boolean isAdminOfOrganization(Organization organization) {
+        return userEmailProvider.getCurrentUsersEmail().map(organization::hasAdminAccess).orElse(false);
+    }
+
+    public boolean hasAdminAccess(User user) {
+        //TODO investigate: line below makes the user-deletion tests fail because of https://stackoverflow.com/a/34843369
+        //return organizationRestResource.findByUsers(user).map(this::isAdminOfOrganization).orElse(true);
+        return userEmailProvider.getCurrentUsersEmail().map(
+                email -> organizationRestResource.hasAdminAccessToUser(email, user).isPresent()
+        ).orElse(false);
+    }
+
+    public boolean hasAdminAccess(Optional<Role> role) {
+        return role.map(this::hasAdminAccess).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public boolean hasAdminAccess(Role role) {
+        return organizationRestResource.findByRoles(role).map(this::isAdminOfOrganization).orElse(true);
     }
 }

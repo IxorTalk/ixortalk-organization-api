@@ -28,21 +28,20 @@ import com.ixortalk.organization.api.asset.Asset;
 import com.ixortalk.organization.api.asset.DeviceId;
 import com.ixortalk.organization.api.asset.DeviceInformationDTO;
 import com.ixortalk.organization.api.callback.api.OrganizationCallbackAPI;
+import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
 import com.ixortalk.organization.api.domain.EnhancedUserProjection;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.Status;
 import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.events.OrganizationEventHandler;
 import com.ixortalk.organization.api.events.RoleEventHandler;
-import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
-import com.ixortalk.organization.api.service.AssetMgmtFacade;
-import com.ixortalk.organization.api.service.EnhanceUserService;
-import com.ixortalk.organization.api.service.ImageMethodsService;
-import com.ixortalk.organization.api.service.UserEmailProvider;
-import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
 import com.ixortalk.organization.api.image.ImageService;
 import com.ixortalk.organization.api.mail.InviteUserService;
-import org.springframework.data.projection.ProjectionFactory;
+import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
+import com.ixortalk.organization.api.service.AssetMgmtFacade;
+import com.ixortalk.organization.api.service.ImageMethodsService;
+import com.ixortalk.organization.api.service.OrganizationService;
+import com.ixortalk.organization.api.service.UserEmailProvider;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -60,10 +59,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.ixortalk.organization.api.asset.Properties.MappedField.IMAGE;
 import static java.util.Collections.singletonMap;
-import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.CollectionModel.wrap;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.*;
@@ -89,10 +86,7 @@ public class OrganizationRestController {
     private InviteUserService inviteUserService;
 
     @Inject
-    private EnhanceUserService enhanceUserService;
-
-    @Inject
-    private ProjectionFactory projectionFactory;
+    private OrganizationService organizationService;
 
     @Inject
     private ImageService imageService;
@@ -125,17 +119,7 @@ public class OrganizationRestController {
 
     @GetMapping(path = "/{organizationId}/adminUsers", produces = APPLICATION_JSON_VALUE)
     public CollectionModel<EntityModel<EnhancedUserProjection>> getAdminUsers(@PathVariable("organizationId") Long organizationId) {
-        return organizationRestResource.findById(organizationId)
-                .map(organization ->
-                        wrap(
-                                organization
-                                        .getUsers()
-                                        .stream()
-                                        .filter(User::isAdmin)
-                                        .map(user -> projectionFactory.createProjection(EnhancedUserProjection.class, user))
-                                        .sorted(comparing(EnhancedUserProjection::getLogin))
-                                        .collect(toList())))
-                .orElseThrow(ResourceNotFoundException::new);
+        return organizationService.getAdminUsers(organizationId);
     }
 
     @GetMapping(path = "/{organizationId}/devices")

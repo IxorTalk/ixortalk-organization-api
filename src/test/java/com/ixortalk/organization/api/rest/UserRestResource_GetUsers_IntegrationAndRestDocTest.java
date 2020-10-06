@@ -24,9 +24,9 @@
 package com.ixortalk.organization.api.rest;
 
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
+import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.UserTestBuilder;
-import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import org.junit.Before;
 import org.junit.Test;
 

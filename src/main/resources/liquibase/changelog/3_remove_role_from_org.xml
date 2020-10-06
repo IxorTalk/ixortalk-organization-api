@@ -25,12 +25,12 @@
 
 -->
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <include file="classpath:liquibase/changelog/0_initial_schema.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:liquibase/changelog/1_add_invite_language_to_user.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:liquibase/changelog/2_add_is_admin_to_user.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:liquibase/changelog/3_remove_role_from_org.xml" relativeToChangelogFile="false"/>
+    <changeSet id="remove-role_from_org" author="jorisraeymaekers">
+        <dropColumn columnName="role" tableName="organization"/>
+    </changeSet>
+
 </databaseChangeLog>

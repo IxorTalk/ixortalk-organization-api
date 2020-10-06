@@ -28,21 +28,14 @@ import io.restassured.path.json.JsonPath;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHeaderDescriptors.TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES;
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
@@ -71,7 +64,7 @@ public class UserRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
                 .containsOnly(
                         USER_IN_ORGANIZATION_X_INVITED_EMAIL,
                         USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
-                        USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL,
+                        USER_IN_ORGANIZATION_X_ADMIN_EMAIL,
                         USER_IN_ORGANIZATION_X_AND_Y_EMAIL,
                         USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }
@@ -82,7 +75,7 @@ public class UserRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
         JsonPath jsonPath =
                 given()
                         .auth().preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("users/find-by-organization/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -103,7 +96,7 @@ public class UserRestResource_FindByOrganizationId_IntegrationAndRestDocTest ext
                 .containsOnly(
                         USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
                         USER_IN_ORGANIZATION_X_INVITED_EMAIL,
-                        USER_IN_ORGANIZATION_X_ADMIN_ROLE_EMAIL,
+                        USER_IN_ORGANIZATION_X_ADMIN_EMAIL,
                         USER_IN_ORGANIZATION_X_AND_Y_EMAIL,
                         USER_IN_ORGANIZATION_X_CREATED_EMAIL);
     }

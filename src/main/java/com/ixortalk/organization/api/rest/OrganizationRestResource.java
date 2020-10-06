@@ -35,7 +35,6 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 
@@ -48,22 +47,26 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostFilter("hasRole('ROLE_ADMIN') or hasRole(filterObject.role)")
+    @RestResource(exported = false)
     Collection<Organization> findAll();
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostFilter("hasRole('ROLE_ADMIN') or hasRole(filterObject.role)")
+    @RestResource(exported = false)
     Iterable<Organization> findAll(Sort sort);
 
     @Override
     @PreAuthorize("permitAll()")
-    @Query("select o from Organization o where ?#{ hasRole('ROLE_ADMIN') } = true or o.role in ?#{ @securityService.authorities }")
+    @Query("select distinct o" +
+            " from Organization o" +
+            "   left outer join o.users u" +
+            " where ?#{ hasRole('ROLE_ADMIN') } = true or " +
+            "                (u.login = ?#{ @userEmailProvider.currentUsersEmail.orElse(null) } and u.isAdmin = true)")
     Page<Organization> findAll(Pageable pageable);
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostAuthorize("hasRole('ROLE_ADMIN') or (returnObject.present && hasRole(returnObject.get().role))")
+    @PostAuthorize("hasRole('ROLE_ADMIN') or (returnObject.present && @securityService.isAdminOfOrganization(returnObject))")
     Optional<Organization> findById(Long id);
 
     @RestResource(exported = false)
@@ -71,21 +74,17 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
     Organization findOneById(Long id);
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(#organization.role) " +
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(#organization)" +
             "or #organization.id == null")
     <S extends Organization> S save(@P("organization") S organization);
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(#organization.role)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(#organization)")
     void delete(Organization organization);
 
     @PreAuthorize("permitAll()")
     @RestResource(exported = false)
     Optional<Organization> findByName(String name);
-
-    @PreAuthorize("permitAll()")
-    @RestResource(exported = false)
-    Optional<Organization> findByRole(String name);
 
     @PreAuthorize("permitAll()")
     @RestResource(exported = false)
@@ -98,4 +97,10 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
     @PreAuthorize("permitAll()")
     @RestResource(exported = false)
     Collection<Organization> findByUsersLoginAndUsersStatus(String login, Status status);
+
+    @PreAuthorize("permitAll()")
+    @RestResource(exported = false)
+    @Query("from Organization o where exists(from Organization o2, User u2 where " +
+            ":user member of o2.users and o2.id = o.id and u2 in elements(o2.users) and u2.login = :login and u2.isAdmin = true)")
+    Optional<Organization> hasAdminAccessToUser(String login, User user);
 }

@@ -23,9 +23,9 @@
  */
 package com.ixortalk.organization.api.rest;
 
+import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
-import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.PathParametersSnippet;
@@ -103,7 +103,7 @@ public class ImageController_UploadLogo_IntegrationAndRestDocTest extends Abstra
 
         String location = given()
                 .auth().preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/upload-logo/ok",
@@ -134,7 +134,7 @@ public class ImageController_UploadLogo_IntegrationAndRestDocTest extends Abstra
 
         given()
                 .auth().preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .when()
                 .filter(
                         document("organizations/upload-logo/different-organization-admin",

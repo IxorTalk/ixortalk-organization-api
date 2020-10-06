@@ -23,26 +23,41 @@
  */
 package com.ixortalk.organization.api.service;
 
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.UserInfo;
+import com.ixortalk.organization.api.domain.EnhancedUserProjection;
 import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.hateoas.CollectionModel.wrap;
+
 @Named
-public class EnhanceUserService {
+public class OrganizationService {
 
     @Inject
     private OrganizationRestResource organizationRestResource;
 
     @Inject
-    private Auth0Users auth0Users;
+    private ProjectionFactory projectionFactory;
 
-    public UserInfo getUserInfo(User user) {
-        if (user.isAccepted() && organizationRestResource.findByUsers(user).isPresent())
-            return auth0Users.getUserInfo(user.getLogin()).orElse(null);
-        return null;
+    public CollectionModel<EntityModel<EnhancedUserProjection>> getAdminUsers(Long organizationId) {
+        return organizationRestResource.findById(organizationId)
+                .map(organization ->
+                        wrap(
+                                organization
+                                        .getUsers()
+                                        .stream()
+                                        .filter(User::isAdmin)
+                                        .map(user -> projectionFactory.createProjection(EnhancedUserProjection.class, user))
+                                        .sorted(comparing(EnhancedUserProjection::getLogin))
+                                        .collect(toList())))
+                .orElseThrow(ResourceNotFoundException::new);
     }
 }

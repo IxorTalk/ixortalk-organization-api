@@ -23,10 +23,10 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.util.ExpectedValueObjectSerializer;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.asset.Asset;
+import com.ixortalk.organization.api.config.TestConstants;
+import com.ixortalk.organization.api.util.ExpectedValueObjectSerializer;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -102,7 +102,7 @@ public class OrganizationRestController_AddDevice_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/add-device/ok",
@@ -128,7 +128,7 @@ public class OrganizationRestController_AddDevice_IntegrationAndRestDocTest exte
         given()
                 .auth()
                 .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/add-device/different-admin",

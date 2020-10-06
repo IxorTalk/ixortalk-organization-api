@@ -23,10 +23,10 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
-import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.domain.Role;
+import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.request.PathParametersSnippet;
@@ -34,9 +34,7 @@ import org.springframework.restdocs.request.PathParametersSnippet;
 import javax.inject.Inject;
 
 import static com.google.common.collect.Sets.newHashSet;
-import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static java.net.HttpURLConnection.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -95,7 +93,7 @@ public class UserRestResource_UnlinkRole_IntegrationAndRestDocTest extends Abstr
     public void unlinkRoleAsOrganizationAdmin() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(TEXT_URI_LIST_VALUE)
                 .filter(
                         document("organizations/unlink-role/ok",

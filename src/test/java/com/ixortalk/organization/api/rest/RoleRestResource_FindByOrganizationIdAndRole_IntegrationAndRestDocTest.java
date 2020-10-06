@@ -23,14 +23,14 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import io.restassured.path.json.JsonPath;
 import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
 import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -110,7 +110,7 @@ public class RoleRestResource_FindByOrganizationIdAndRole_IntegrationAndRestDocT
         JsonPath jsonPath =
                 given()
                         .auth().preemptive()
-                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("roles/find-by-organization-and-role/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),

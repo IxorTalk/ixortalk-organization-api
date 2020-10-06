@@ -28,9 +28,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import java.util.List;
 
+import static java.lang.Math.min;
+
 @Entity
 @Table(name = "org_role")
 public class Role {
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final int ROLE_MAX_LENGTH = 190;
+    private static final int ROLE_NAME_DYNAMIC_PART_MAX_LENGTH = ROLE_MAX_LENGTH - ROLE_PREFIX.length();
+
 
     @Id
     @GeneratedValue
@@ -59,8 +65,18 @@ public class Role {
         return role;
     }
 
-    public Role assignRoleName(String organizationAdminRoleName) {
-        this.role = organizationAdminRoleName.substring(0, organizationAdminRoleName.length() - Organization.ADMIN_ROLE_SUFFIX.length()) + "_" + id;
+    public Role assignRoleName(Organization organization) {
+        this.role = generateRoleName(organization, this);
         return this;
+    }
+
+    private static String generateRoleName(Organization organization, Role role) {
+        String dynamicPart = organization.getName().trim().replaceAll("[\\W]+", "_").toUpperCase();
+        return new StringBuilder()
+                        .append(ROLE_PREFIX)
+                        .append(dynamicPart, 0, min(dynamicPart.length(), ROLE_NAME_DYNAMIC_PART_MAX_LENGTH))
+                        .append("_")
+                        .append(role.getId())
+                        .toString();
     }
 }

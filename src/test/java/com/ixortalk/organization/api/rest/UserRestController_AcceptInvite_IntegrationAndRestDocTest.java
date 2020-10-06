@@ -32,17 +32,15 @@ import org.junit.Test;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.google.common.collect.Sets.newHashSet;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.USER_ACCEPTED_CALLBACK_PATH;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.net.HttpURLConnection.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -77,7 +75,6 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
                 .statusCode(HTTP_NO_CONTENT);
 
         assertThat(userRestResource.findById(userInOrganizationXInvited.getId())).get().extracting(User::getStatus).isEqualTo(Status.ACCEPTED);
-        verify(auth0Roles, never()).assignRolesToUser(userInOrganizationXInvited.getLogin(), newHashSet(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
     }
 
     @Test
@@ -105,14 +102,13 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
                 .statusCode(HTTP_NO_CONTENT);
 
         assertThat(userRestResource.findById(userInOrganizationXInvited.getId())).get().extracting(User::getStatus).isEqualTo(Status.ACCEPTED);
-        verify(auth0Roles).assignRolesToUser(userInOrganizationXInvited.getLogin(), newHashSet(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
     }
 
     @Test
     public void accept_AsDifferentUser() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/accept-invite/different-user",
@@ -155,7 +151,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
     public void decline_AsDifferentUser() {
 
         given()
-                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/decline-invite/different-user",

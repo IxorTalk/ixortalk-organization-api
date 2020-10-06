@@ -24,15 +24,37 @@
 package com.ixortalk.organization.api.service;
 
 import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
+import com.ixortalk.organization.api.domain.Organization;
+import com.ixortalk.organization.api.image.ImageService;
+import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import feign.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.transaction.Transactional;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.function.BiFunction;
+
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.notFound;
 
 @Named
+@Transactional
 public class ImageMethodsService {
 
     @Inject
     private IxorTalkConfigProperties ixorTalkConfigProperties;
+
+    @Inject
+    private OrganizationRestResource organizationRestResource;
+
+    @Inject
+    private ImageService imageService;
 
     public String constructImageLink(String imageKey) {
         if (imageKey == null) return null;
@@ -40,5 +62,21 @@ public class ImageMethodsService {
                 ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts() +
                         ixorTalkConfigProperties.getMicroservice("image-service").getContextPath() +
                         ixorTalkConfigProperties.getMicroservice("image-service").getDownloadPath() + "/" + imageKey;
+    }
+
+    public ResponseEntity<?> uploadToImageService(Long organizationId, MultipartFile multipartFile, BiFunction<Organization, String, Organization> function, String keyName) {
+        return organizationRestResource.findById(organizationId)
+                .map(organization -> {
+                            Response response = imageService.uploadImage(multipartFile, "organizations/" + organizationId + "/" + keyName);
+                            String location = new ArrayList<>(response.headers().get(HttpHeaders.LOCATION)).get(0);
+                            organizationRestResource.save(function.apply(organization, location));
+                            try {
+                                return created(new URI(location)).build();
+                            } catch (URISyntaxException e) {
+                                throw new IllegalArgumentException("Could not save image: " + e.getMessage());
+                            }
+                        }
+                )
+                .orElse(notFound().build());
     }
 }

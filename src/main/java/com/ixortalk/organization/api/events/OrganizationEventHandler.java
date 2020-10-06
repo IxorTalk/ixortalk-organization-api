@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * <p>
+ *
  * Copyright (c) 2016-present IxorTalk CVBA
- * <p>
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * <p>
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * <p>
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,6 +33,7 @@ import com.ixortalk.organization.api.error.ConflictException;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import com.ixortalk.organization.api.rest.RoleRestResource;
 import com.ixortalk.organization.api.service.AssetMgmtFacade;
+import com.ixortalk.organization.api.service.SecurityService;
 import com.ixortalk.organization.api.service.UserEmailProvider;
 import org.springframework.data.rest.core.annotation.*;
 
@@ -41,7 +42,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -67,18 +67,14 @@ public class OrganizationEventHandler {
     @Inject
     private AssetMgmtFacade assetMgmtFacade;
 
+    @Inject
+    private SecurityService securityService;
+
     @HandleBeforeCreate
     public void handleBeforeCreate(Organization organization) {
-        organization.generateRoleName();
-
         organizationRestResource.findByName(organization.getName()).ifPresent(existing -> {
             throw new ConflictException();
         });
-        organizationRestResource.findByRole(organization.getRole()).ifPresent(existing -> {
-            throw new ConflictException();
-        });
-
-        validateRoleDoesNotExistInAuth0(organization.getRole());
 
         userEmailProvider.getCurrentUsersEmail().ifPresent(email ->
         {
@@ -88,23 +84,32 @@ public class OrganizationEventHandler {
 
     @HandleAfterCreate
     public void handleAfterCreate(Organization organization) {
-        auth0Roles.addRole(organization.getRole());
-        userEmailProvider.getCurrentUsersEmail().ifPresent(email -> auth0Roles.assignRolesToUser(email, newHashSet(organization.getRole())));
+
     }
 
     @HandleBeforeDelete
     public void handleBeforeDelete(Organization organization) {
-        if (!organization.getUsers().isEmpty()) throw new BadRequestException("Users not empty");
+        //only allow deletion when no users available in the database, or when current user is the only admin user of the organization.
+        if (!containsOnlyCurrentUser(organization)) throw new BadRequestException("Organization still contains a user besides current user");
+
         if (!organization.getRoles().isEmpty()) throw new BadRequestException("Roles not empty");
         organizationCallbackAPI.organizationPreDeleteCheck(organization.getId());
         if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent())
             throw new BadRequestException("Devices still exist");
     }
 
-    @HandleAfterDelete
-    public void handleAfterDelete(Organization organization) {
-        auth0Roles.deleteRole(organization.getRole());
+    private boolean containsOnlyCurrentUser(Organization organization) {
+        if (organization.getUsers().isEmpty()) {
+            return true;
+        }
+        if (organization.getUsers().size() > 1) {
+            return false;
+        }
+        return securityService.isCurrentUser(organization.getUsers().get(0));
     }
+
+    @HandleAfterDelete
+    public void handleAfterDelete(Organization organization) { }
 
     @HandleBeforeSave
     public void handleBeforeSave(Organization organization) {
@@ -132,7 +137,7 @@ public class OrganizationEventHandler {
         roles
                 .stream()
                 .filter(role -> role.getRole() == null)
-                .map(role -> role.assignRoleName(organization.getRole()))
+                .map(role -> role.assignRoleName(organization))
                 .map(this::validateRoleNameNotInUse)
                 .map(Role::getRole)
                 .map(this::validateRoleDoesNotExistInAuth0)

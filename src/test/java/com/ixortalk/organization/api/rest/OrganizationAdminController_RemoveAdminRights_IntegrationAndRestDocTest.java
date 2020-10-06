@@ -23,15 +23,16 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
+import com.ixortalk.organization.api.domain.User;
 import org.junit.Test;
 import org.springframework.restdocs.request.PathParametersSnippet;
 
-import static com.google.common.collect.Sets.newHashSet;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.net.HttpURLConnection.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -41,7 +42,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class AssignRoleController_RemoveAdminRole_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
 
     private static final PathParametersSnippet PATH_PARAMETERS_SNIPPET = pathParameters(
@@ -55,47 +56,49 @@ public class AssignRoleController_RemoveAdminRole_IntegrationAndRestDocTest exte
         given()
                 .auth().preemptive().oauth2(TestConstants.ADMIN_JWT_TOKEN)
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", organizationX.getId(), userInOrganizationXInvited.getId())
+                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_NO_CONTENT);
 
-        verify(auth0Roles).removeRolesFromUser(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, newHashSet(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
+        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
     }
 
     @Test
     public void asUserInOrganizationXAdminRole() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
-                        document("organizations/remove-admin-role/ok",
+                        document("organizations/remove-admin-rights/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
                                 PATH_PARAMETERS_SNIPPET
                         ))
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", organizationX.getId(), userInOrganizationXInvited.getId())
+                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_NO_CONTENT);
 
-        verify(auth0Roles).removeRolesFromUser(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL, newHashSet(ADMIN_ROLE_IN_ORGANIZATION_X_ROLE_NAME));
+        User user = userRestResource.findById(userInOrganizationXInvited.getId()).orElseThrow(() -> new IllegalStateException("User should be present"));
+        assertThat(user.isAdmin()).isFalse();
+
     }
 
     @Test
     public void asUserInOrganizationYAdminRole() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
-                        document("organizations/remove-admin-role/admin-of-org-y",
+                        document("organizations/remove-admin-rights/admin-of-org-y",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
                                 PATH_PARAMETERS_SNIPPET
                         ))
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", organizationX.getId(), userInOrganizationXInvited.getId())
+                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
 
@@ -108,14 +111,14 @@ public class AssignRoleController_RemoveAdminRole_IntegrationAndRestDocTest exte
         given()
                 .auth().preemptive().oauth2(TestConstants.USER_JWT_TOKEN)
                 .filter(
-                        document("organizations/remove-admin-role/as-user-of-org-x",
+                        document("organizations/remove-admin-rights/as-user-of-org-x",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
                                 PATH_PARAMETERS_SNIPPET
                         ))
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", organizationX.getId(), userInOrganizationXInvited.getId())
+                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
 
@@ -126,16 +129,16 @@ public class AssignRoleController_RemoveAdminRole_IntegrationAndRestDocTest exte
     public void organizationDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
-                        document("organizations/remove-admin-role/organization-does-not-exist",
+                        document("organizations/remove-admin-rights/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
                                 PATH_PARAMETERS_SNIPPET
                         ))
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", Long.MAX_VALUE, userInOrganizationXInvited.getId())
+                .post("/{organizationId}/{userId}/remove-admin-rights", Long.MAX_VALUE, userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
 
@@ -146,16 +149,16 @@ public class AssignRoleController_RemoveAdminRole_IntegrationAndRestDocTest exte
     public void userDoesNotExist() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
-                        document("organizations/remove-admin-role/user-does-not-exist",
+                        document("organizations/remove-admin-rights/user-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
                                 PATH_PARAMETERS_SNIPPET
                         ))
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", organizationX.getId(), Long.MAX_VALUE)
+                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), Long.MAX_VALUE)
                 .then()
                 .statusCode(HTTP_NOT_FOUND);
 
@@ -169,19 +172,20 @@ public class AssignRoleController_RemoveAdminRole_IntegrationAndRestDocTest exte
         when(auth0Users.userExists(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL)).thenReturn(false);
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
-                        document("organizations/remove-admin-role/organization-does-not-exist",
+                        document("organizations/remove-admin-rights/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
                                 PATH_PARAMETERS_SNIPPET
                         ))
                 .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-role", organizationX.getId(), userInOrganizationXInvited.getId())
+                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_BAD_REQUEST);
 
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
     }
 }
+

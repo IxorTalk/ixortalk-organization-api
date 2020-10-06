@@ -28,14 +28,13 @@ import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.ixortalk.test.util.Randomizer.nextString;
 import static com.ixortalk.organization.api.domain.AddressTestBuilder.anAddress;
+import static com.ixortalk.test.util.Randomizer.nextString;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class OrganizationTestBuilder extends ReflectionInstanceTestBuilder<Organization> {
 
     private String name = nextString("testOrg");
-    private String role = nextString("testOrgRole");
     private Address address = anAddress().build();
     private String phoneNumber;
     private String emailAddress;
@@ -55,7 +54,6 @@ public class OrganizationTestBuilder extends ReflectionInstanceTestBuilder<Organ
     @Override
     public void setFields(Organization organization) {
         setField(organization, "name", name);
-        setField(organization, "role", role);
         setField(organization, "address", address);
         setField(organization, "phoneNumber", phoneNumber);
         setField(organization, "emailAddress", emailAddress);
@@ -67,11 +65,6 @@ public class OrganizationTestBuilder extends ReflectionInstanceTestBuilder<Organ
 
     public OrganizationTestBuilder withName(String name) {
         this.name = name;
-        return this;
-    }
-
-    public OrganizationTestBuilder withRole(String role) {
-        this.role = role;
         return this;
     }
 

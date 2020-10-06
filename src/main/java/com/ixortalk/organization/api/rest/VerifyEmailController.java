@@ -24,11 +24,11 @@
 package com.ixortalk.organization.api.rest;
 
 import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
+import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
 import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.mail.MailingService;
 import com.ixortalk.organization.api.mail.verify.SendVerifyEmailVO;
 import com.ixortalk.organization.api.mail.verify.TemplateVariables;
-import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
-import com.ixortalk.organization.api.mail.MailingService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

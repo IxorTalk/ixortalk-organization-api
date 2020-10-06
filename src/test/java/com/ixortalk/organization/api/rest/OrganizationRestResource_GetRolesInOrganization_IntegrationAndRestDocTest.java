@@ -23,14 +23,14 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
+import com.ixortalk.organization.api.config.TestConstants;
 import io.restassured.path.json.JsonPath;
 import org.junit.Test;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 
 import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
 import static io.restassured.RestAssured.given;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_OK;
@@ -73,7 +73,7 @@ public class OrganizationRestResource_GetRolesInOrganization_IntegrationAndRestD
 
         JsonPath result =
                 given()
-                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_ROLE_JWT_TOKEN)
+                        .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("organizations/roles/get-roles-in-org/ok",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -94,7 +94,7 @@ public class OrganizationRestResource_GetRolesInOrganization_IntegrationAndRestD
     public void asUserNotInOrganizationXAdminRole() {
 
         given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_ROLE_JWT_TOKEN)
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .filter(
                         document("organizations/roles/get-roles-in-org/no-access-to-organization",
                                 preprocessRequest(staticUris(), prettyPrint()),

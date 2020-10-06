@@ -45,26 +45,26 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
     String FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY = "from org_role o where (o.organization_id = :organizationId) and (o.name like %:role%)";
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') or #role.id == null or hasRole(@organizationRestResource.findByRoles(#role).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #role.id == null or @securityService.hasAdminAccess(#role)")
     <S extends Role> S save(@P("role") S role);
 
     @Override
     @PreAuthorize("permitAll()")
-    @PostAuthorize("hasRole('ROLE_ADMIN') or @securityService.hasAccessToRole(returnObject)")
+    @PostAuthorize("hasRole('ROLE_ADMIN') or @securityService.hasAdminAccess(returnObject)")
     Optional<Role> findById(Long id);
 
     @PreAuthorize("permitAll()")
     @RestResource(exported = false)
     Optional<Role> findByRole(String name);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(@organizationRestResource.findById(#organizationId).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(@organizationRestResource.findOneById(#organizationId))")
     @Query(
             value = "select * " + FIND_BY_ORGANIZATION_ID_QUERY,
             countQuery = "select count(*) " + FIND_BY_ORGANIZATION_ID_QUERY,
             nativeQuery = true)
     Page<Role> findByOrganizationId(Pageable pageable, @Param("organizationId") Long organizationId);
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole(@organizationRestResource.findById(#organizationId).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isAdminOfOrganization(@organizationRestResource.findOneById(#organizationId))")
     @Query(
             value = "select * " + FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY,
             countQuery = "select count(*) " + FIND_BY_ORGANIZATION_ID_AND_ROLE_QUERY,
@@ -72,7 +72,6 @@ public interface RoleRestResource extends PagingAndSortingRepository<Role, Long>
     Page<Role> findByOrganizationIdAndRole(Pageable pageable, @Param("role") String role, @Param("organizationId") Long organizationId);
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN') " +
-            "or hasRole(@organizationRestResource.findByRoles(#role).get().getRole())")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.hasAdminAccess(#role)")
     void delete(@P("role") Role role);
 }
