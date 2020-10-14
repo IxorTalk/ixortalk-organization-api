@@ -1,0 +1,85 @@
+scalar Json
+scalar Date
+scalar DateTime
+
+type Query {
+    organizationsPage(
+        page: Int = 0,
+        size: Int = 10,
+        sort: String = "name",
+        direction: String = "asc",
+        filter: String = ""): OrganizationsPage!
+
+    usersPage(
+        page: Int = 0,
+        size: Int = 10,
+        sort: String = "login",
+        direction: String = "asc",
+        filter: String = ""): UsersPage!
+
+    rolesPage(
+        page: Int = 0,
+        size: Int = 10,
+        sort: String = "name",
+        direction: String = "asc",
+        filter: String = ""): RolesPage!
+}
+
+type OrganizationsPage {
+    content: [Organization]
+    page: Page
+}
+
+type Organization {
+    id: ID!
+    name: String!
+    address: Address!
+    phoneNumber: String!
+    emailAddress: String!
+    image: String!
+    logo: String!
+    roles: [Role]!
+    users: [User]!
+}
+
+type Address {
+    streetAndNumber: String!
+    postalCode: String!
+    city: String!
+    country: String!
+}
+
+type User {
+    id: ID!
+    login: String!
+    status: String!
+    inviteLanguage: String!
+    roles: [Role]!
+    isAdmin: Boolean
+}
+
+type UsersPage {
+    content: [User]
+    page: Page
+}
+
+type Role {
+    id: ID!
+    name: String!
+    role: String!
+}
+
+type RolesPage {
+    content: [Role]
+    page: Page
+}
+
+type Page {
+    totalPages: Int
+    totalElements: Int
+    number: Int
+    first: Boolean
+    last: Boolean
+    hasNext: Boolean
+    hasPrevious: Boolean
+}

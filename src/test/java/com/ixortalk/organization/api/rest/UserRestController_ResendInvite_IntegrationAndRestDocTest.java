@@ -90,7 +90,7 @@ public class UserRestController_ResendInvite_IntegrationAndRestDocTest extends A
                                                         USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME + " " + USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME,
                                                         ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts(),
                                                         organizationX.getName(),
-                                                        convertToHowItShouldBeSentToMailingService(userInOrganizationXInvited),
+                                                        convertToHowItShouldBeSentToMailingService(userInOrganizationXInvited, organizationX),
                                                         IMAGE_DOWNLOAD_URL_PREFIX + organizationX.getLogo(), true,
                                                         userRestResource.findById(userInOrganizationXInvited.getId()).get().getAcceptKey().getAcceptKey()))))));
     }

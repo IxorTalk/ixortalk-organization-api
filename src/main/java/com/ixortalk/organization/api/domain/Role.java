@@ -50,6 +50,9 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
+    @Column(name = "organization_id", updatable = false)
+    private Long organizationId;
+
     private Role() {
     }
 

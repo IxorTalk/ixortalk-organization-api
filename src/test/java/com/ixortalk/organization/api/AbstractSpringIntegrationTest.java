@@ -365,6 +365,7 @@ public abstract class AbstractSpringIntegrationTest  {
         organizationYInitialNumberOfUsers = organizationY.getUsers().size();
 
         organizationRestResource.saveAll(newArrayList(organizationX, organizationY, organizationZ));
+        organizationRestResource.findOneById(organizationX.getId());
     }
 
     @Before
@@ -454,8 +455,9 @@ public abstract class AbstractSpringIntegrationTest  {
         return new URL(HTTPS_SCHEME, HOST_IXORTALK_COM, contextPath + uri).toString();
     }
 
-    protected User convertToHowItShouldBeSentToMailingService(User user) {
+    protected User convertToHowItShouldBeSentToMailingService(User user, Organization organization) {
         ReflectionTestUtils.setField(user, "status", Status.INVITED);
+        setField(user, "organizationId", organization.getId());
         setField(user, "roles", null);
         return user;
     }
