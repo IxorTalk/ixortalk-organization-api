@@ -26,14 +26,18 @@ package com.ixortalk.organization.api.graphql;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.util.GraphQLUtil;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import graphql.schema.GraphQLSchema;
 import io.restassured.path.json.JsonPath;
+import org.junit.Before;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static io.restassured.http.ContentType.JSON;
+import javax.inject.Inject;
+
+import java.util.HashMap;
+
+import static com.ixortalk.organization.api.util.GraphQLUtil.PAGE_FIELDS;
+import static com.ixortalk.organization.api.util.GraphQLUtil.withGraphQLQuery;
+import static java.lang.String.join;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -42,30 +46,29 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 public class GraphQL_User_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
+    @Inject
+    private GraphQLSchema graphQLSchema;
+
+    private String graphQlQueryFieldNames;
+
+    @Before
+    public void initFieldNames() {
+        graphQlQueryFieldNames = "{ content {"
+                + join(",", GraphQLUtil.buildGraphQlFieldNames(graphQLSchema, "User", new HashMap<String, String>() {
+            {
+                put("roles", "Role");
+            }
+        }))
+                + "}" + PAGE_FIELDS + "}}";
+    }
+
     @Test
     public void asAdmin() {
         String query =
-                "{" +
-                "  usersPage(page:0, size:10, sort:\"login\", direction:\"asc\") {" +
-                "  content {" +
-                "          id" +
-                "          login" +
-                "          status" +
-                "          isAdmin" +
-                "          roles {" +
-                "              id" +
-                "              name" +
-                "          }" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
+                "{ usersPage(page:0, size:10, sort:\"login\", direction:\"asc\") "
+                + graphQlQueryFieldNames;
 
-        JsonPath jsonPath = given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT)))
-                .auth()
-                .preemptive()
-                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(GraphQLUtil.graphqlToJson(query))
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.ADMIN_JWT_TOKEN)
                 .filter(
                         document("graphql/users/as-admin/success",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -78,34 +81,16 @@ public class GraphQL_User_IntegrationAndRestDocTest extends AbstractSpringIntegr
                 .statusCode(SC_OK)
                 .extract()
                 .jsonPath();
-        userRestResource.findAll();
-        assertThat(jsonPath.getList("data.usersPage.content").size()).isEqualTo(8);
+        assertThat(jsonPath.getList("data.usersPage.content")).hasSize(8);
 
     }
 
     @Test
     public void pagingAndSorting() {
-        String query =
-                "{" +
-                        "  usersPage( size:2) {" +
-                        "  content {" +
-                        "          id" +
-                        "          login" +
-                        "          status" +
-                        "          isAdmin" +
-                        "          roles {" +
-                        "              id" +
-                        "              name" +
-                        "          }" +
-                        "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                        "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .param("query", query)
-                        .get("/graphql")
+        String query = "{ usersPage( size:2)  "
+                        + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.ADMIN_JWT_TOKEN)
+                        .post("/graphql")
                         .then()
                         .statusCode(SC_OK)
                         .extract().jsonPath();
@@ -116,27 +101,11 @@ public class GraphQL_User_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asUser() {
-        String query = "{" +
-                "  usersPage( size:2 ) {" +
-                "  content {" +
-                "          id" +
-                "          login" +
-                "          status" +
-                "          isAdmin" +
-                "          roles {" +
-                "              id" +
-                "              name" +
-                "          }" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
+        String query = "{ usersPage( size:2 )  "
+                + graphQlQueryFieldNames;
 
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .param("query", query)
-                        .get("/graphql")
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
+                        .post("/graphql")
                         .then()
                         .statusCode(SC_OK)
                         .extract().jsonPath();
@@ -146,25 +115,10 @@ public class GraphQL_User_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asOrganizationAdmin_notFilteringOnOrganizationId() {
-        String query = "{" +
-                "  usersPage( size:2 ) {" +
-                "  content {" +
-                "          id" +
-                "          login" +
-                "          status" +
-                "          isAdmin" +
-                "          roles {" +
-                "              id" +
-                "              name" +
-                "          }" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
+        String query = "{  usersPage( size:2 )  "
+                + graphQlQueryFieldNames;
         JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .body(GraphQLUtil.graphqlToJson(query))
+                withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("graphql/users/as-organization-admin/not-filtering-on-organization-id",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -181,25 +135,9 @@ public class GraphQL_User_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asOrganizationAdmin_filteringOnOrganizationId() {
-        String query = "{" +
-                "  usersPage(page:0, size:2, sort:\"login\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + "\") {" +
-                "  content {" +
-                "          id" +
-                "          login" +
-                "          status" +
-                "          isAdmin" +
-                "          roles {" +
-                "              id" +
-                "              name" +
-                "          }" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .body(GraphQLUtil.graphqlToJson(query))
+        String query = "{ usersPage(page:0, size:2, sort:\"login\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + "\") "
+                + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("graphql/users/as-organization-admin/success",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -218,24 +156,9 @@ public class GraphQL_User_IntegrationAndRestDocTest extends AbstractSpringIntegr
     @Test
     public void asOrganizationAdmin_combinedFilter() {
         String query = "{" +
-                "  usersPage(page:0, size:2, sort:\"login\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + ",login:user\") {" +
-                "  content {" +
-                "          id" +
-                "          login" +
-                "          status" +
-                "          isAdmin" +
-                "          roles {" +
-                "              id" +
-                "              name" +
-                "          }" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .body(GraphQLUtil.graphqlToJson(query))
+                "  usersPage(page:0, size:2, sort:\"login\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + ",login:user\") "
+                + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("graphql/users/as-organization-admin/combined-filter",
                                         preprocessRequest(staticUris(), prettyPrint()),

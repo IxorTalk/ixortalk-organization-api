@@ -26,14 +26,18 @@ package com.ixortalk.organization.api.graphql;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.util.GraphQLUtil;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import graphql.schema.GraphQLSchema;
 import io.restassured.path.json.JsonPath;
+import org.junit.Before;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static io.restassured.http.ContentType.JSON;
+import javax.inject.Inject;
+
+import java.util.HashMap;
+
+import static com.ixortalk.organization.api.util.GraphQLUtil.PAGE_FIELDS;
+import static com.ixortalk.organization.api.util.GraphQLUtil.withGraphQLQuery;
+import static java.lang.String.join;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -42,25 +46,30 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 public class GraphQL_Role_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
+    @Inject
+    private GraphQLSchema graphQLSchema;
+
+    private String graphQlQueryFieldNames;
+
+    @Before
+    public void initFieldNames() {
+        graphQlQueryFieldNames = "{ content {"
+                + join(",", GraphQLUtil.buildGraphQlFieldNames(graphQLSchema, "Role", new HashMap<String, String>() {
+            {
+                put("users", "User");
+            }
+        }))
+                + "}" + PAGE_FIELDS + "}}";
+    }
+
     @Test
     public void asAdmin() {
         String query =
-                "{" +
-                        "  rolesPage(page:0, size:10, sort:\"name\", direction:\"asc\") {" +
-                        "  content {" +
-                        "          id" +
-                        "          name" +
-                        "          role" +
-                        "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                        "}";
+                "{ rolesPage(page:0, size:10, sort:\"name\", direction:\"asc\") "
+                + graphQlQueryFieldNames;
 
-        JsonPath jsonPath = given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT)))
-                .auth()
-                .preemptive()
-                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(GraphQLUtil.graphqlToJson(query))
+
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.ADMIN_JWT_TOKEN)
                 .filter(
                         document("graphql/roles/as-admin/success",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -73,29 +82,16 @@ public class GraphQL_Role_IntegrationAndRestDocTest extends AbstractSpringIntegr
                 .statusCode(SC_OK)
                 .extract()
                 .jsonPath();
-        userRestResource.findAll();
-        assertThat(jsonPath.getList("data.rolesPage.content").size()).isEqualTo(3);
+        assertThat(jsonPath.getList("data.rolesPage.content")).hasSize(3);
 
     }
 
     @Test
     public void pagingAndSorting() {
-        String query =
-                "{" +
-                        "  rolesPage( size:2) {" +
-                        "  content {" +
-                        "          id" +
-                        "          name" +
-                        "          role" +
-                        "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                        "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .param("query", query)
-                        .get("/graphql")
+        String query = "{ rolesPage( size:2) "
+                        + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.ADMIN_JWT_TOKEN)
+                        .post("/graphql")
                         .then()
                         .statusCode(SC_OK)
                         .extract().jsonPath();
@@ -106,22 +102,11 @@ public class GraphQL_Role_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asUser() {
-        String query = "{" +
-                "  rolesPage( size:2 ) {" +
-                "  content {" +
-                "          id" +
-                "          name" +
-                "          role" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
+        String query = "{ rolesPage( size:2 )  "
+                + graphQlQueryFieldNames;
 
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .param("query", query)
-                        .get("/graphql")
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
+                        .post("/graphql")
                         .then()
                         .statusCode(SC_OK)
                         .extract().jsonPath();
@@ -131,20 +116,8 @@ public class GraphQL_Role_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asOrganizationAdmin_notFilteringOnOrganizationId() {
-        String query = "{" +
-                "  rolesPage( size:2 ) {" +
-                "  content {" +
-                "          id" +
-                "          name" +
-                "          role" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .body(GraphQLUtil.graphqlToJson(query))
+        String query = "{ rolesPage( size:2 )  " + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("graphql/roles/as-organization-admin/not-filtering-on-organization-id",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -161,20 +134,10 @@ public class GraphQL_Role_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asOrganizationAdmin_filteringOnOrganizationId() {
-        String query = "{" +
-                "  rolesPage(page:0, size:2, sort:\"name\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + "\") {" +
-                "  content {" +
-                "          id" +
-                "          name" +
-                "          role" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .body(GraphQLUtil.graphqlToJson(query))
+        String query =
+                "{ rolesPage(page:0, size:2, sort:\"name\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + "\")  "
+                + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("graphql/roles/as-organization-admin/success",
                                         preprocessRequest(staticUris(), prettyPrint()),
@@ -192,20 +155,10 @@ public class GraphQL_Role_IntegrationAndRestDocTest extends AbstractSpringIntegr
 
     @Test
     public void asOrganizationAdmin_combinedFilter() {
-        String query = "{" +
-                "  rolesPage(page:0, size:2, sort:\"name\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + ",name:First role\") {" +
-                "  content {" +
-                "          id" +
-                "          name" +
-                "          role" +
-                "      }" + GraphQLUtil.PAGE_FIELDS + "  }" +
-                "}";
-        JsonPath jsonPath =
-                given()
-                        .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                        .when()
-                        .contentType(JSON)
-                        .body(GraphQLUtil.graphqlToJson(query))
+        String query =
+                "{ rolesPage(page:0, size:2, sort:\"name\", direction:\"asc\", filter:\"organizationId:" + organizationX.getId() + ",name:First role\")  "
+                + graphQlQueryFieldNames;
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                         .filter(
                                 document("graphql/roles/as-organization-admin/combined-filter",
                                         preprocessRequest(staticUris(), prettyPrint()),

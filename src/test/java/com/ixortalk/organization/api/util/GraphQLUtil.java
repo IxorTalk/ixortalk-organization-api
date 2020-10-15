@@ -23,9 +23,23 @@
  */
 package com.ixortalk.organization.api.util;
 
+import graphql.schema.GraphQLNamedSchemaElement;
+import graphql.schema.GraphQLSchema;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
+import io.restassured.specification.RequestSpecification;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.config.EncoderConfig.encoderConfig;
+import static io.restassured.http.ContentType.JSON;
+import static java.lang.String.join;
 
 public class GraphQLUtil {
 
@@ -54,5 +68,31 @@ public class GraphQLUtil {
         return jsonPath.getObject("data", Object.class) == null
                 && jsonPath.getString("errors[0].message").equals("Access is denied")
                 && jsonPath.getString("errors[0].extensions.classification").equals("AccessDenied");
+    }
+
+    public static RequestSpecification withGraphQLQuery(String query, String token) {
+        return given()
+                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT)))
+                .auth()
+                .preemptive()
+                .oauth2(token)
+                .contentType(JSON)
+                .body(GraphQLUtil.graphqlToJson(query));
+    }
+
+    public static List<String> buildGraphQlFieldNames(GraphQLSchema graphQLSchema, String typeName, Map<String, String> nestedFieldNames) {
+       return getGraphQLTypeFieldNames(graphQLSchema, typeName, nestedFieldNames);
+    }
+
+    private static List<String> getGraphQLTypeFieldNames(GraphQLSchema graphQLSchema, String typeName,  Map<String, String> nestedFieldNames) {
+        return graphQLSchema
+                .getType(typeName)
+                .getChildren()
+                .stream()
+                .map(graphQLSchemaElement -> ((GraphQLNamedSchemaElement)graphQLSchemaElement).getName())
+                .map(fieldName -> nestedFieldNames.containsKey(fieldName) ?
+                        (fieldName + " { " + join(",", getGraphQLTypeFieldNames(graphQLSchema, nestedFieldNames.get(fieldName), nestedFieldNames)) + " } ")
+                        : fieldName)
+                .collect(Collectors.toList());
     }
 }

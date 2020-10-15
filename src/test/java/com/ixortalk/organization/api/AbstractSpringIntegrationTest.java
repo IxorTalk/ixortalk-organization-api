@@ -365,7 +365,6 @@ public abstract class AbstractSpringIntegrationTest  {
         organizationYInitialNumberOfUsers = organizationY.getUsers().size();
 
         organizationRestResource.saveAll(newArrayList(organizationX, organizationY, organizationZ));
-        organizationRestResource.findOneById(organizationX.getId());
     }
 
     @Before

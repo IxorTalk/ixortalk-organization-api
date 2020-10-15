@@ -26,14 +26,17 @@ package com.ixortalk.organization.api.graphql;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.util.GraphQLUtil;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import graphql.schema.GraphQLSchema;
 import io.restassured.path.json.JsonPath;
+import org.junit.Before;
 import org.junit.Test;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
-import static io.restassured.http.ContentType.JSON;
+import javax.inject.Inject;
+import java.util.HashMap;
+
+import static com.ixortalk.organization.api.util.GraphQLUtil.PAGE_FIELDS;
+import static com.ixortalk.organization.api.util.GraphQLUtil.withGraphQLQuery;
+import static java.lang.String.join;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -42,44 +45,32 @@ import static org.springframework.restdocs.restassured3.RestAssuredRestDocumenta
 
 public class GraphQL_Organization_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
+    @Inject
+    private GraphQLSchema graphQLSchema;
+
+    private String graphQlQueryFieldNames;
+
+    @Before
+    public void initFieldNames() {
+        graphQlQueryFieldNames = "{ content {"
+                + join(",", GraphQLUtil.buildGraphQlFieldNames(graphQLSchema, "Organization", new HashMap<String, String>() {
+            {
+                put("roles", "Role");
+                put("users", "User");
+                put("address", "Address");
+            }
+        }))
+                + "}" + PAGE_FIELDS + "}}";
+    }
+
     @Test
     public void asAdmin() {
         String query =
                 "{" +
-                        "  organizationsPage(page:0, size:2, sort:\"name\", direction:\"asc\", filter:\"name:org\") {" +
-                        "content {" +
-                    "          id" +
-                    "          name" +
-                    "          phoneNumber" +
-                    "          emailAddress" +
-                    "          image" +
-                    "          logo" +
-                    "          roles {" +
-                    "              id" +
-                    "              name" +
-                    "          }" +
-                    "          users {" +
-                    "              id" +
-                    "              login" +
-                    "          }" +
-                    "          address {" +
-                    "              streetAndNumber" +
-                    "              postalCode" +
-                    "              city" +
-                    "              country" +
-                    "          }" +
-                    "      }" +
-                        GraphQLUtil.PAGE_FIELDS +
-                        "  }" +
-                        "}";
+                        " organizationsPage(page:0, size:2, sort:\"name\", direction:\"asc\", filter:\"name:org\")"
+                        + graphQlQueryFieldNames;
 
-        JsonPath jsonPath = given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT)))
-                .auth()
-                .preemptive()
-                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(GraphQLUtil.graphqlToJson(query))
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.ADMIN_JWT_TOKEN)
                 .filter(
                         document("graphql/organizations/as-admin/success",
                                 preprocessRequest(staticUris(), prettyPrint()),
@@ -93,7 +84,7 @@ public class GraphQL_Organization_IntegrationAndRestDocTest extends AbstractSpri
                 .extract()
                 .jsonPath();
 
-        assertThat(jsonPath.getList("data.organizationsPage.content").size()).isEqualTo(2);
+        assertThat(jsonPath.getList("data.organizationsPage.content")).hasSize(2);
         assertThat(jsonPath.getInt("data.organizationsPage.page.totalElements")).isEqualTo(3);
     }
 
@@ -101,28 +92,10 @@ public class GraphQL_Organization_IntegrationAndRestDocTest extends AbstractSpri
     public void asNonAdminICanNotSearchOrganizations() {
         String query =
                 "{" +
-                        "  organizationsPage(page:0, size:10, sort:\"name\", direction:\"asc\", filter:\"name:group1\") {" +
-                        "content {" +
-                        "          id" +
-                        "          name" +
-                        "          address {" +
-                        "              streetAndNumber" +
-                        "              postalCode" +
-                        "              city" +
-                        "              country" +
-                        "          }" +
-                        "      }" +
-                        GraphQLUtil.PAGE_FIELDS +
-                        "  }" +
-                        "}";
+                        " organizationsPage(page:0, size:10, sort:\"name\", direction:\"asc\", filter:\"name:group1\")"
+                        + graphQlQueryFieldNames;
 
-        JsonPath jsonPath = given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT)))
-                .auth()
-                .preemptive()
-                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(GraphQLUtil.graphqlToJson(query))
+        JsonPath jsonPath = withGraphQLQuery(query, TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
                         document("graphql/organizations/not-as-admin/access-denied",
                                 preprocessRequest(staticUris(), prettyPrint()),
