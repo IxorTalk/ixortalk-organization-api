@@ -25,8 +25,6 @@ package com.ixortalk.organization.api.util;
 
 import graphql.schema.GraphQLNamedSchemaElement;
 import graphql.schema.GraphQLSchema;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import org.json.JSONException;
@@ -37,7 +35,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
-import static io.restassured.config.EncoderConfig.encoderConfig;
 import static io.restassured.http.ContentType.JSON;
 import static java.lang.String.join;
 
@@ -72,7 +69,6 @@ public class GraphQLUtil {
 
     public static RequestSpecification withGraphQLQuery(String query, String token) {
         return given()
-                .config(RestAssured.config().encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT)))
                 .auth()
                 .preemptive()
                 .oauth2(token)
