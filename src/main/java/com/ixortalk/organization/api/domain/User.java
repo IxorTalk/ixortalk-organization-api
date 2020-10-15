@@ -65,6 +65,9 @@ public class User {
 
     private boolean isAdmin = false;
 
+    @Column(name = "organization_id", updatable = false, insertable = false)
+    private Long organizationId;
+
     private User() {
     }
 

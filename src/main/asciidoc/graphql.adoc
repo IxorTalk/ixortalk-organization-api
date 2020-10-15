@@ -1,0 +1,154 @@
+
+= Organizations (GraphQL)
+
+== Find All
+
+List all organizations. Only users with admin role can access this operation.
+
+=== Request
+
+Via curl:
+include::{snippets}/graphql/organizations/as-admin/success/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/graphql/organizations/as-admin/success/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/graphql/organizations/as-admin/success/request-headers.adoc[]
+
+=== Response
+
+include::{snippets}/graphql/organizations/as-admin/success/curl-request.adoc[]
+
+include::{snippets}/graphql/organizations/as-admin/success/http-request.adoc[]
+
+include::{snippets}/graphql/organizations/as-admin/success//http-response.adoc[]
+
+
+
+
+= Users (GraphQL)
+
+== Find All
+
+List all users, in this module filtering is supported out of the box.
+
+=== Request
+
+==== No Filtering
+
+Via curl:
+include::{snippets}/graphql/users/as-admin/success/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/graphql/users/as-admin/success/http-request.adoc[]
+
+==== Filtering
+
+It is possible to filter on specified fields by including them as request parameters:
+
+Via curl:
+include::{snippets}/graphql/users/as-organization-admin/success/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/graphql/users/as-organization-admin/success/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/graphql/users/as-admin/success/request-headers.adoc[]
+
+=== Response
+
+==== No filtering
+
+include::{snippets}/graphql/users/as-admin/success/curl-request.adoc[]
+
+include::{snippets}/graphql/users/as-admin/success/http-request.adoc[]
+
+include::{snippets}/graphql/users/as-admin/success/http-response.adoc[]
+
+==== Filtering
+
+Filtering can be applied on all fields, but note that filtering on `organizationId` is required to enforce organization admin rights.
+
+include::{snippets}/graphql/users/as-organization-admin/success/curl-request.adoc[]
+
+include::{snippets}/graphql/users/as-organization-admin/success/http-request.adoc[]
+
+include::{snippets}/graphql/users/as-organization-admin/success/http-response.adoc[]
+
+As organization admin without filtering on `organizationId`
+
+include::{snippets}/graphql/users/as-organization-admin/not-filtering-on-organization-id/http-response.adoc[]
+
+Combined filtering:
+
+include::{snippets}/graphql/users/as-organization-admin/combined-filter/curl-request.adoc[]
+
+include::{snippets}/graphql/users/as-organization-admin/combined-filter/http-request.adoc[]
+
+include::{snippets}/graphql/users/as-organization-admin/combined-filter/http-response.adoc[]
+
+
+
+= Roles (GraphQL)
+
+== Find All
+
+List all roles, in this module filtering is supported out of the box.
+
+=== Request
+
+==== No Filtering
+
+Via curl:
+include::{snippets}/graphql/roles/as-admin/success/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/graphql/roles/as-admin/success/http-request.adoc[]
+
+==== Filtering
+
+It is possible to filter on specified fields by including them as request parameters:
+
+Via curl:
+include::{snippets}/graphql/roles/as-organization-admin/success/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/graphql/roles/as-organization-admin/success/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/graphql/roles/as-admin/success/request-headers.adoc[]
+
+=== Response
+
+==== No filtering
+
+include::{snippets}/graphql/roles/as-admin/success/curl-request.adoc[]
+
+include::{snippets}/graphql/roles/as-admin/success/http-request.adoc[]
+
+include::{snippets}/graphql/roles/as-admin/success/http-response.adoc[]
+
+==== Filtering
+
+Filtering can be applied on all fields, but note that filtering on `organizationId` is required to enforce organization admin rights.
+
+include::{snippets}/graphql/roles/as-organization-admin/success/curl-request.adoc[]
+
+include::{snippets}/graphql/roles/as-organization-admin/success/http-request.adoc[]
+
+include::{snippets}/graphql/roles/as-organization-admin/success/http-response.adoc[]
+
+As organization admin without filtering on `organizationId`
+
+include::{snippets}/graphql/roles/as-organization-admin/not-filtering-on-organization-id/http-response.adoc[]
+
+Combined filtering:
+
+include::{snippets}/graphql/roles/as-organization-admin/combined-filter/curl-request.adoc[]
+
+include::{snippets}/graphql/roles/as-organization-admin/combined-filter/http-request.adoc[]
+
+include::{snippets}/graphql/roles/as-organization-admin/combined-filter/http-response.adoc[]

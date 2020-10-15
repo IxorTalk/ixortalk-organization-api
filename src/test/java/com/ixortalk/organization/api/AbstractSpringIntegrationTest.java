@@ -41,6 +41,7 @@ import com.ixortalk.organization.api.rest.docs.RestDocDescriptors;
 import com.ixortalk.organization.api.util.RestResourcesTransactionalHelper;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -86,6 +87,7 @@ import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.organization.api.domain.RoleTestBuilder.aRole;
 import static com.ixortalk.organization.api.domain.UserTestBuilder.aUser;
 import static com.ixortalk.test.util.Randomizer.nextString;
+import static io.restassured.config.EncoderConfig.encoderConfig;
 import static io.restassured.config.ObjectMapperConfig.objectMapperConfig;
 import static io.restassured.config.RedirectConfig.redirectConfig;
 import static io.restassured.config.RestAssuredConfig.config;
@@ -254,7 +256,9 @@ public abstract class AbstractSpringIntegrationTest  {
         RestAssured.config =
                 config()
                         .objectMapperConfig(objectMapperConfig().jackson2ObjectMapperFactory((cls, charset) -> objectMapper))
+                        .encoderConfig(encoderConfig().encodeContentTypeAs("application/graphql", ContentType.TEXT))
                         .redirect(redirectConfig().followRedirects(false));
+
         RestAssured.requestSpecification =
                 new RequestSpecBuilder()
                         .addFilter(documentationConfiguration(this.restDocumentation))
@@ -454,8 +458,9 @@ public abstract class AbstractSpringIntegrationTest  {
         return new URL(HTTPS_SCHEME, HOST_IXORTALK_COM, contextPath + uri).toString();
     }
 
-    protected User convertToHowItShouldBeSentToMailingService(User user) {
+    protected User convertToHowItShouldBeSentToMailingService(User user, Organization organization) {
         ReflectionTestUtils.setField(user, "status", Status.INVITED);
+        setField(user, "organizationId", organization.getId());
         setField(user, "roles", null);
         return user;
     }

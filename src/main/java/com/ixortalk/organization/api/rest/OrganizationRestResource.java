@@ -27,10 +27,12 @@ import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.Role;
 import com.ixortalk.organization.api.domain.Status;
 import com.ixortalk.organization.api.domain.User;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
@@ -43,7 +45,8 @@ import java.util.Optional;
 
 @RepositoryRestResource
 @PreAuthorize("hasRole('ROLE_ADMIN')")
-public interface OrganizationRestResource extends PagingAndSortingRepository<Organization, Long> {
+public interface OrganizationRestResource extends PagingAndSortingRepository<Organization, Long>,
+        QuerydslPredicateExecutor<Organization> {
 
     @Override
     @PreAuthorize("permitAll()")
@@ -63,6 +66,11 @@ public interface OrganizationRestResource extends PagingAndSortingRepository<Org
             " where ?#{ hasRole('ROLE_ADMIN') } = true or " +
             "                (u.login = ?#{ @userEmailProvider.currentUsersEmail.orElse(null) } and u.isAdmin = true)")
     Page<Organization> findAll(Pageable pageable);
+
+    @Override
+    @RestResource(exported = false)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    Page<Organization> findAll(@P("predicate") Predicate predicate, Pageable pageable);
 
     @Override
     @PreAuthorize("permitAll()")

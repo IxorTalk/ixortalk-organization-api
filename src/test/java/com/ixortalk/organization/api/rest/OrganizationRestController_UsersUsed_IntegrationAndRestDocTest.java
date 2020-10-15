@@ -111,7 +111,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
                                                         USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME + " " + USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME,
                                                         ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts(),
                                                         organizationX.getName(),
-                                                        convertToHowItShouldBeSentToMailingService(userInOrganizationXCreated),
+                                                        convertToHowItShouldBeSentToMailingService(userInOrganizationXCreated, organizationX),
                                                         IMAGE_DOWNLOAD_URL_PREFIX +  organizationX.getLogo(),
                                                         true,
                                                         acceptKey.getAcceptKey()
@@ -265,7 +265,7 @@ public class OrganizationRestController_UsersUsed_IntegrationAndRestDocTest exte
                                                         USER_IN_ORGANIZATION_X_ADMIN_ROLE_FIRST_NAME + " " + USER_IN_ORGANIZATION_X_ADMIN_ROLE_LAST_NAME,
                                                         ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts(),
                                                         organizationX.getName(),
-                                                        convertToHowItShouldBeSentToMailingService(userInOrganizationXCreated),
+                                                        convertToHowItShouldBeSentToMailingService(userInOrganizationXCreated, organizationX),
                                                         IMAGE_DOWNLOAD_URL_PREFIX + organizationX.getLogo(),
                                                         false,
                                                         userRestResource.findById(userInOrganizationXCreated.getId()).map(User::getAcceptKey).orElseThrow(() -> new IllegalStateException("User should be present")).getAcceptKey()))))));

@@ -33,7 +33,6 @@ import com.ixortalk.organization.api.error.BadRequestException;
 import com.ixortalk.organization.api.mail.InviteUserService;
 import com.ixortalk.organization.api.rest.dto.UserInOrganizationDTO;
 import com.ixortalk.organization.api.service.SecurityService;
-import com.ixortalk.organization.api.service.UserService;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,9 +72,6 @@ public class UserRestController {
 
     @Inject
     private Auth0Users auth0Users;
-
-    @Inject
-    private UserService userService;
 
     @PostMapping(path = "/{userId}/{acceptKey}/accept-invite")
     public ResponseEntity<?> acceptInviteByKey(@PathVariable("userId") Long userId, @PathVariable("acceptKey") String acceptKey) {

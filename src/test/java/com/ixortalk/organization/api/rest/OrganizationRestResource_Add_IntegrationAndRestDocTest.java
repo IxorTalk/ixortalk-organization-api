@@ -129,7 +129,7 @@ public class OrganizationRestResource_Add_IntegrationAndRestDocTest extends Abst
                 .statusCode(SC_CREATED);
 
         assertThat(organizationRestResource.findByName(myTestOrganization.getName())).isPresent();
-        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).size()).isEqualTo(1);
+        assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName())).hasSize(1);
         assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).isAdmin()).isTrue();
         assertThat(restResourcesTransactionalHelper.getUsers(myTestOrganization.getName()).get(0).getLogin()).isEqualTo(USER_EMAIL);
     }

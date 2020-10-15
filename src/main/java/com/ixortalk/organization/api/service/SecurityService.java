@@ -23,15 +23,22 @@
  */
 package com.ixortalk.organization.api.service;
 
-import com.ixortalk.organization.api.domain.Organization;
-import com.ixortalk.organization.api.domain.Role;
-import com.ixortalk.organization.api.domain.User;
+import com.ixortalk.organization.api.domain.*;
+import com.ixortalk.organization.api.graphql.querydsl.ValidateFilteredOnOrganizationIdVisitor;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.NumberPath;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Optional;
+import java.util.Set;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @Named
 public class SecurityService {
@@ -41,6 +48,21 @@ public class SecurityService {
 
     @Inject
     private OrganizationRestResource organizationRestResource;
+
+    public final static String ROLE_ADMIN = "ROLE_ADMIN";
+
+    public boolean isAdmin() {
+        return getPrincipalAuthorities().stream().anyMatch(role -> role.equals(ROLE_ADMIN));
+    }
+
+    public Set<String> getPrincipalAuthorities() {
+        return getContext()
+                .getAuthentication()
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(toSet());
+    }
 
     public boolean isCurrentUser(Optional<User> user) {
         return user.map(this::isCurrentUser).orElse(false);
@@ -52,6 +74,10 @@ public class SecurityService {
 
     public boolean isCurrentUser(String login) {
         return userEmailProvider.getCurrentUsersEmail().map(email -> login.toLowerCase().equals(email)).orElse(false);
+    }
+
+    public boolean isAdminOfOrganization(Long organizationId) {
+        return isAdminOfOrganization(organizationRestResource.findById(organizationId));
     }
 
     public boolean isAdminOfOrganization(Optional<Organization> organization) {
@@ -76,5 +102,19 @@ public class SecurityService {
 
     public boolean hasAdminAccess(Role role) {
         return organizationRestResource.findByRoles(role).map(this::isAdminOfOrganization).orElse(true);
+    }
+
+    public boolean roleForOrganizationsWithOrganizationAdminAccess(Predicate predicate ) {
+        return forOrganizationsWithOrganizationAdminAccess(predicate, QRole.role1.organizationId);
+    }
+
+    public boolean userForOrganizationsWithOrganizationAdminAccess(Predicate predicate ) {
+        return forOrganizationsWithOrganizationAdminAccess(predicate, QUser.user.organizationId);
+    }
+
+    private boolean forOrganizationsWithOrganizationAdminAccess(Predicate predicate, NumberPath<Long> organizationPath) {
+        return ofNullable(predicate.accept(
+                new ValidateFilteredOnOrganizationIdVisitor(organizationPath), this::isAdminOfOrganization)
+        ).orElse(false);
     }
 }
