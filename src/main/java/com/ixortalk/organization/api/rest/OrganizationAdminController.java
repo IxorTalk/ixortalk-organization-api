@@ -95,7 +95,7 @@ public class OrganizationAdminController {
     private Optional<User> getUser(Long organizationId, Long userId) {
         return userRestResource.findById(userId).map(user -> {
             Organization organization = organizationRestResource.findById(organizationId).orElseThrow(ResourceNotFoundException::new);
-            if (!organization.containsUser(user) || !auth0Users.userExists(user.getLogin())){
+            if (!organization.containsUser(user)){
                 throw new BadRequestException();
             }
             return user;

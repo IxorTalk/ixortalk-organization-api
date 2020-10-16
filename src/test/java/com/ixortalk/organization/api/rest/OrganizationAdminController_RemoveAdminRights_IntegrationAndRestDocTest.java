@@ -165,27 +165,5 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
         verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
 
     }
-
-    @Test
-    public void userNotFoundInAuth0() {
-
-        when(auth0Users.userExists(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL)).thenReturn(false);
-
-        given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                .filter(
-                        document("organizations/remove-admin-rights/organization-does-not-exist",
-                                preprocessRequest(staticUris(), prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
-                                PATH_PARAMETERS_SNIPPET
-                        ))
-                .contentType(JSON)
-                .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
-                .then()
-                .statusCode(HTTP_BAD_REQUEST);
-
-        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
-    }
 }
 
