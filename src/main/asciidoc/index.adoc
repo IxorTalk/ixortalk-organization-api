@@ -1212,65 +1212,65 @@ When the role does not exist:
 
 include::{snippets}/organizations/unlink-role/role-does-not-exist/http-response.adoc[]
 
-== Assign Organization Admin Role to User
+== Promote User to Organization Administrator
 
 === Request
 
 Via curl:
-include::{snippets}/organizations/assign-admin-role/ok/curl-request.adoc[]
+include::{snippets}/organizations/promote-to-admin/ok/curl-request.adoc[]
 
 HTTP request:
-include::{snippets}/organizations/assign-admin-role/ok/http-request.adoc[]
+include::{snippets}/organizations/promote-to-admin/ok/http-request.adoc[]
 
 ==== Request Headers
-include::{snippets}/organizations/assign-admin-role/ok/request-headers.adoc[]
+include::{snippets}/organizations/promote-to-admin/ok/request-headers.adoc[]
 
 ==== Path Parameters
-include::{snippets}/organizations/assign-admin-role/ok/path-parameters.adoc[]
+include::{snippets}/organizations/promote-to-admin/ok/path-parameters.adoc[]
 
 === Response
 
 Success when executed as an organization admin:
 
-include::{snippets}/organizations/assign-admin-role/ok/http-response.adoc[]
+include::{snippets}/organizations/promote-to-admin/ok/http-response.adoc[]
 
 When executed as a user of the same organization:
 
-include::{snippets}/organizations/assign-admin-role/as-user-of-org-x/http-response.adoc[]
+include::{snippets}/organizations/promote-to-admin/as-user-of-org-x/http-response.adoc[]
 
 When executed as an admin of a different organization:
 
-include::{snippets}/organizations/assign-admin-role/admin-of-org-y/http-response.adoc[]
+include::{snippets}/organizations/promote-to-admin/admin-of-org-y/http-response.adoc[]
 
-== Remove Organization Admin Role from User
+== Remove Organization Admin Rights from User
 
 === Request
 
 Via curl:
-include::{snippets}/organizations/remove-admin-role/ok/curl-request.adoc[]
+include::{snippets}/organizations/remove-admin-rights/ok/curl-request.adoc[]
 
 HTTP request:
-include::{snippets}/organizations/remove-admin-role/ok/http-request.adoc[]
+include::{snippets}/organizations/remove-admin-rights/ok/http-request.adoc[]
 
 ==== Request Headers
-include::{snippets}/organizations/remove-admin-role/ok/request-headers.adoc[]
+include::{snippets}/organizations/remove-admin-rights/ok/request-headers.adoc[]
 
 ==== Path Parameters
-include::{snippets}/organizations/remove-admin-role/ok/path-parameters.adoc[]
+include::{snippets}/organizations/remove-admin-rights/ok/path-parameters.adoc[]
 
 === Response
 
 Success when executed as an organization admin:
 
-include::{snippets}/organizations/remove-admin-role/ok/http-response.adoc[]
+include::{snippets}/organizations/remove-admin-rights/ok/http-response.adoc[]
 
 When executed as a user of the same organization:
 
-include::{snippets}/organizations/remove-admin-role/as-user-of-org-x/http-response.adoc[]
+include::{snippets}/organizations/remove-admin-rights/as-user-of-org-x/http-response.adoc[]
 
 When executed as an admin of a different organization:
 
-include::{snippets}/organizations/remove-admin-role/admin-of-org-y/http-response.adoc[]
+include::{snippets}/organizations/remove-admin-rights/admin-of-org-y/http-response.adoc[]
 
 = Invites
 

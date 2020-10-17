@@ -23,7 +23,6 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.autoconfigure.oauth2.auth0.mgmt.api.Auth0Users;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.User;
 import com.ixortalk.organization.api.error.BadRequestException;
@@ -52,9 +51,6 @@ public class OrganizationAdminController {
 
     @Inject
     private UserService userService;
-
-    @Inject
-    private Auth0Users auth0Users;
 
     /**
      * @deprecated
@@ -95,7 +91,7 @@ public class OrganizationAdminController {
     private Optional<User> getUser(Long organizationId, Long userId) {
         return userRestResource.findById(userId).map(user -> {
             Organization organization = organizationRestResource.findById(organizationId).orElseThrow(ResourceNotFoundException::new);
-            if (!organization.containsUser(user) || !auth0Users.userExists(user.getLogin())){
+            if (!organization.containsUser(user)){
                 throw new BadRequestException();
             }
             return user;

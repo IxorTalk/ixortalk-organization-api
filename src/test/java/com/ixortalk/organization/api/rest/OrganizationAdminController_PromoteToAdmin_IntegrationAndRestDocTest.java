@@ -33,8 +33,6 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.net.HttpURLConnection.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -51,7 +49,6 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
 
     @Test
     public void asAdmin() {
-
         given()
                 .auth().preemptive().oauth2(TestConstants.ADMIN_JWT_TOKEN)
                 .contentType(JSON)
@@ -65,8 +62,6 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
 
     @Test
     public void asUserInOrganizationXAdminRole() {
-
-
         given()
                 .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .filter(
@@ -122,8 +117,6 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
                 .post("/{organizationId}/{userId}/promote-to-admin", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
-
-        verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
     }
 
     @Test
@@ -142,8 +135,6 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
                 .post("/{organizationId}/{userId}/promote-to-admin", 666, userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
-
-        verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
     }
 
     @Test
@@ -162,30 +153,5 @@ public class OrganizationAdminController_PromoteToAdmin_IntegrationAndRestDocTes
                 .post("/{organizationId}/{userId}/promote-to-admin", organizationX.getId(), 666)
                 .then()
                 .statusCode(HTTP_NOT_FOUND);
-
-        verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
-
-    }
-
-    @Test
-    public void userNotFoundInAuth0() {
-
-        when(auth0Users.userExists(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL)).thenReturn(false);
-
-        given()
-                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                .filter(
-                        document("organizations/promote-to-admin/organization-does-not-exist",
-                                preprocessRequest(staticUris(), prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
-                                PATH_PARAMETERS_SNIPPET
-                        ))
-                .contentType(JSON)
-                .post("/{organizationId}/{userId}/promote-to-admin", organizationX.getId(), userInOrganizationXInvited.getId())
-                .then()
-                .statusCode(HTTP_BAD_REQUEST);
-
-        verify(auth0Roles, never()).assignRolesToUser(anyString(), anySet());
     }
 }
