@@ -33,9 +33,6 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.net.HttpURLConnection.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anySetOf;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -59,8 +56,6 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
                 .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_NO_CONTENT);
-
-        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
     }
 
     @Test
@@ -102,7 +97,6 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
 
-        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
     }
 
     @Test
@@ -122,7 +116,6 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
 
-        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
     }
 
     @Test
@@ -141,8 +134,6 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
                 .post("/{organizationId}/{userId}/remove-admin-rights", Long.MAX_VALUE, userInOrganizationXInvited.getId())
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
-
-        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
     }
 
     @Test
@@ -161,9 +152,6 @@ public class OrganizationAdminController_RemoveAdminRights_IntegrationAndRestDoc
                 .post("/{organizationId}/{userId}/remove-admin-rights", organizationX.getId(), Long.MAX_VALUE)
                 .then()
                 .statusCode(HTTP_NOT_FOUND);
-
-        verify(auth0Roles, never()).removeRolesFromUser(anyString(), anySetOf(String.class));
-
     }
 }
 
