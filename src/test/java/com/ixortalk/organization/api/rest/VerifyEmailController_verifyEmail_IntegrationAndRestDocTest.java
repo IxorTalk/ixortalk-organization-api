@@ -61,8 +61,10 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
     public static final String AUTH_0_STATE_KEY = nextString("auth0StateKey");
     public static final String USER_S_FIRST_NAME = nextString("userSFirstName");
     public static final String USER_S_LAST_NAME = nextString("userSLastName");
+    public static final String USER_S_USER_ID = nextString("google-oauth2|109999999999999999999");
     public static final String USER_IN_ORGANIZATION_X_INVITED_EMAIL_TICKET_URL = "userInOrganizationXInvitedEmailTicketUrl";
     public static final String USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL_TICKET_URL = "userInOrganizationXAcceptedEmailTicketUrl";
+    public static final String USER_ID_PARAM_NAME = "userId";
     public static final String EMAIL_PARAM_NAME = "email";
     public static final String ACCEPT_KEY_PARAM_NAME = "acceptKey";
     public static final String FIRST_NAME_PARAM_NAME = "firstName";
@@ -96,7 +98,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
 
         when(auth0Users
                 .createEmailVerificationTicket(
-                        USER_IN_ORGANIZATION_X_INVITED_EMAIL,
+                        USER_S_USER_ID,
                         ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts(),
                         ixorTalkConfigProperties.getOrganization().getApi().getAcceptKeyMaxAgeInHours() * 3600))
         .thenReturn(USER_IN_ORGANIZATION_X_INVITED_EMAIL_TICKET_URL);
@@ -113,6 +115,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestParameters(
+                                        parameterWithName(USER_ID_PARAM_NAME).description("The registering user's user id"),
                                         parameterWithName(EMAIL_PARAM_NAME).description("The registering user's used email address"),
                                         parameterWithName(ACCEPT_KEY_PARAM_NAME).description("The acceptKey passed in when authenticating, can be empty in case the user initiated the sign up himself/herself"),
                                         parameterWithName(FIRST_NAME_PARAM_NAME).description("The registering user's first name"),
@@ -121,6 +124,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
                                 )
                         )
                 )
+                .param(USER_ID_PARAM_NAME, USER_IN_ORGANIZATION_X_INVITED_EMAIL)
                 .param(EMAIL_PARAM_NAME, USER_IN_ORGANIZATION_X_INVITED_EMAIL)
                 .param(ACCEPT_KEY_PARAM_NAME, acceptKey)
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
@@ -146,6 +150,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestParameters(
+                                        parameterWithName(USER_ID_PARAM_NAME).description("The registering user's user id"),
                                         parameterWithName(EMAIL_PARAM_NAME).description("The registering user's used email address"),
                                         parameterWithName(ACCEPT_KEY_PARAM_NAME).description("The acceptKey passed in when authenticating, can be empty in case the user initiated the sign up himself/herself"),
                                         parameterWithName(FIRST_NAME_PARAM_NAME).description("The registering user's first name"),
@@ -154,6 +159,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
                                 )
                         )
                 )
+                .param(USER_ID_PARAM_NAME, USER_S_USER_ID)
                 .param(EMAIL_PARAM_NAME, USER_IN_ORGANIZATION_X_INVITED_EMAIL)
                 .param(ACCEPT_KEY_PARAM_NAME, "invalidKey")
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
@@ -173,6 +179,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
     public void noAcceptKey() throws JsonProcessingException {
 
         given()
+                .param(USER_ID_PARAM_NAME, USER_S_USER_ID)
                 .param(EMAIL_PARAM_NAME, USER_IN_ORGANIZATION_X_INVITED_EMAIL)
                 .param(ACCEPT_KEY_PARAM_NAME, "")
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
@@ -193,12 +200,13 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
 
         when(auth0Users
                 .createEmailVerificationTicket(
-                        USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL,
+                        USER_S_USER_ID,
                         ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts(),
                         ixorTalkConfigProperties.getOrganization().getApi().getAcceptKeyMaxAgeInHours() * 3600))
                 .thenReturn(USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL_TICKET_URL);
 
         given()
+                .param(USER_ID_PARAM_NAME, USER_S_USER_ID)
                 .param(EMAIL_PARAM_NAME, USER_IN_ORGANIZATION_X_ACCEPTED_EMAIL)
                 .param(ACCEPT_KEY_PARAM_NAME, acceptKey)
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
@@ -218,6 +226,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
     public void noEmail() {
 
         given()
+                .param(USER_ID_PARAM_NAME, USER_S_USER_ID)
                 .param(ACCEPT_KEY_PARAM_NAME, acceptKey)
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
                 .param(LAST_NAME_PARAM_NAME, USER_S_LAST_NAME)
@@ -235,6 +244,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
     public void invalidEmail() {
 
         given()
+                .param(USER_ID_PARAM_NAME, USER_S_USER_ID)
                 .param(EMAIL_PARAM_NAME, "user@.com")
                 .param(ACCEPT_KEY_PARAM_NAME, acceptKey)
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
@@ -256,6 +266,7 @@ public class VerifyEmailController_verifyEmail_IntegrationAndRestDocTest extends
         userRestResource.save(userInOrganizationXInvited);
 
         given()
+                .param(USER_ID_PARAM_NAME, USER_S_USER_ID)
                 .param(EMAIL_PARAM_NAME, USER_IN_ORGANIZATION_X_INVITED_EMAIL)
                 .param(ACCEPT_KEY_PARAM_NAME, acceptKey)
                 .param(FIRST_NAME_PARAM_NAME, USER_S_FIRST_NAME)
