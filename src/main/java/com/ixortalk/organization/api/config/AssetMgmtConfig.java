@@ -21,31 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.organization.api.asset;
+package com.ixortalk.organization.api.config;
 
-import com.ixortalk.autoconfigure.oauth2.feign.ServiceToServiceFeignConfiguration;
-import com.ixortalk.organization.api.domain.OrganizationId;
+import com.ixortalk.organization.api.asset.AssetMgmt;
+import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import com.ixortalk.organization.api.service.AssetMgmtFacade;
+import com.ixortalk.organization.api.service.AssetMgmtOrganizationEventListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @ConditionalOnProperty("ixortalk.server.assetmgmt.url")
-@FeignClient(name = "assetMgmt",url = "${ixortalk.server.assetmgmt.url}", configuration = ServiceToServiceFeignConfiguration.class, decode404 = true)
-public interface AssetMgmt {
+@Configuration
+public class AssetMgmtConfig {
 
-    @PostMapping(value = "/assets/search/property", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    List<Asset> getAssets(@RequestBody OrganizationId organizationId);
+    @Bean
+    public AssetMgmtFacade assetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource) {
+        return new AssetMgmtFacade(assetMgmt, organizationRestResource);
+    }
 
-    @PostMapping(value = "/assets/find/property", consumes = APPLICATION_JSON_VALUE)
-    Asset getAssetByDeviceId(@RequestBody DeviceId deviceId);
-
-    @PatchMapping(value = "/assets/{assetId}", consumes = APPLICATION_JSON_VALUE)
-    void  saveAsset(@PathVariable("assetId") String assetId, @RequestBody Object assetRoles);
-
-    @PutMapping(value = "/assets/{assetId}/properties", consumes = APPLICATION_JSON_VALUE)
-    void saveProperties(@PathVariable("assetId") String assetId, @RequestBody Object properties);
+    @Bean
+    @ConditionalOnBean(AssetMgmtFacade.class)
+    public AssetMgmtOrganizationEventListener assetMgmtOrganizationEventListener() {
+        return new AssetMgmtOrganizationEventListener();
+    }
 }
