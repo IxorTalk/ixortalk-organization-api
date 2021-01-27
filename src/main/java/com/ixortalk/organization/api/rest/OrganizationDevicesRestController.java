@@ -43,6 +43,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.ixortalk.organization.api.asset.Properties.MappedField.IMAGE;
+import static com.ixortalk.organization.api.config.AssetMgmtConfig.IXORTALK_SERVER_ASSETMGMT_URL;
 import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -50,7 +51,7 @@ import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.http.ResponseEntity.*;
 import static org.springframework.web.util.UriComponentsBuilder.fromUriString;
 
-@ConditionalOnProperty("ixortalk.server.assetmgmt.url")
+@ConditionalOnProperty(IXORTALK_SERVER_ASSETMGMT_URL)
 @Transactional
 @RestController
 @RequestMapping("/organizations")

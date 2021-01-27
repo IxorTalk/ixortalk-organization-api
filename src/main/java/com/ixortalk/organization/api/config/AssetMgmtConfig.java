@@ -32,9 +32,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@ConditionalOnProperty("ixortalk.server.assetmgmt.url")
+@ConditionalOnProperty(AssetMgmtConfig.IXORTALK_SERVER_ASSETMGMT_URL)
 @Configuration
 public class AssetMgmtConfig {
+
+    public static final String IXORTALK_SERVER_ASSETMGMT_URL = "ixortalk.server.assetmgmt.url";
 
     @Bean
     public AssetMgmtFacade assetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource) {
