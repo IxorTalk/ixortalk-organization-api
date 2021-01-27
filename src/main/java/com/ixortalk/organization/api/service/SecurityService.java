@@ -26,6 +26,7 @@ package com.ixortalk.organization.api.service;
 import com.ixortalk.organization.api.domain.*;
 import com.ixortalk.organization.api.graphql.querydsl.ValidateFilteredOnOrganizationIdVisitor;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
+import com.ixortalk.organization.api.rest.UserRestResource;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.NumberPath;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -49,6 +50,9 @@ public class SecurityService {
     @Inject
     private OrganizationRestResource organizationRestResource;
 
+    @Inject
+    private UserRestResource userRestResource;
+
     public final static String ROLE_ADMIN = "ROLE_ADMIN";
 
     public boolean isAdmin() {
@@ -62,6 +66,10 @@ public class SecurityService {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(toSet());
+    }
+
+    public boolean isCurrentUserOrNotFound(Long userId) {
+        return userRestResource.findById(userId).map(this::isCurrentUser).orElse(true);
     }
 
     public boolean isCurrentUser(Optional<User> user) {
