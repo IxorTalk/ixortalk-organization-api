@@ -74,7 +74,7 @@ public class VerifyEmailController {
     private MailingService mailingService;
 
     @GetMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(HttpServletResponse response, @RequestParam String state, @RequestParam @NotEmpty @Email String email, @RequestParam String acceptKey, @RequestParam String firstName, @RequestParam String lastName) throws IOException {
+    public ResponseEntity<?> verifyEmail(HttpServletResponse response, @RequestParam String state, @RequestParam String userId, @RequestParam @NotEmpty @Email String email, @RequestParam String acceptKey, @RequestParam String firstName, @RequestParam String lastName) throws IOException {
 
         Optional<User> user =
                 userRestResource
@@ -99,7 +99,7 @@ public class VerifyEmailController {
                     ixorTalkConfigProperties.getOrganization().getApi().getMail().getVerifyMailTemplate(),
                     new TemplateVariables(
                             auth0Users.createEmailVerificationTicket(
-                                    email,
+                                    userId,
                                     ixorTalkConfigProperties.getLoadbalancer().getExternal().getUrlWithoutStandardPorts(),
                                     ixorTalkConfigProperties.getOrganization().getApi().getAcceptKeyMaxAgeInHours() * 3600),
                             firstName,
