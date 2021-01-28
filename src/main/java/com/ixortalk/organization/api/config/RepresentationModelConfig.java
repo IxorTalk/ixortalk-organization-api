@@ -77,7 +77,7 @@ public class RepresentationModelConfig {
                                 .withRel("adminUsers"));
                 resource.add(
                         linkTo(
-                                methodOn(OrganizationRestController.class)
+                                methodOn(OrganizationDevicesRestController.class)
                                         .getDevices(resource.getContent().getId()))
                                 .withRel("devices"));
                 resource.add(

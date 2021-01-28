@@ -32,7 +32,6 @@ import com.ixortalk.organization.api.error.BadRequestException;
 import com.ixortalk.organization.api.error.ConflictException;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import com.ixortalk.organization.api.rest.RoleRestResource;
-import com.ixortalk.organization.api.service.AssetMgmtFacade;
 import com.ixortalk.organization.api.service.SecurityService;
 import com.ixortalk.organization.api.service.UserEmailProvider;
 import org.springframework.data.rest.core.annotation.*;
@@ -65,9 +64,6 @@ public class OrganizationEventHandler {
     private OrganizationCallbackAPI organizationCallbackAPI;
 
     @Inject
-    private AssetMgmtFacade assetMgmtFacade;
-
-    @Inject
     private SecurityService securityService;
 
     @HandleBeforeCreate
@@ -94,8 +90,6 @@ public class OrganizationEventHandler {
 
         if (!organization.getRoles().isEmpty()) throw new BadRequestException("Roles not empty");
         organizationCallbackAPI.organizationPreDeleteCheck(organization.getId());
-        if (assetMgmtFacade.getDevicesFromAssetMgmt(organization).findAny().isPresent())
-            throw new BadRequestException("Devices still exist");
     }
 
     private boolean containsOnlyCurrentUser(Organization organization) {

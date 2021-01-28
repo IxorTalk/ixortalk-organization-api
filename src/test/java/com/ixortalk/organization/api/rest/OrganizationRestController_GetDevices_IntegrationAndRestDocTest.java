@@ -46,7 +46,7 @@ import static com.ixortalk.organization.api.TestConstants.UNMAPPED_DEVICE_INFO_F
 import static com.ixortalk.organization.api.asset.AssetTestBuilder.anAsset;
 import static com.ixortalk.organization.api.asset.DeviceId.deviceId;
 import static com.ixortalk.organization.api.config.TestConstants.*;
-import static com.ixortalk.organization.api.rest.OrganizationRestController.DEVICE_STATE_FIELD_NAME;
+import static com.ixortalk.organization.api.rest.OrganizationDevicesRestController.DEVICE_STATE_FIELD_NAME;
 import static com.ixortalk.test.util.Randomizer.nextString;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;

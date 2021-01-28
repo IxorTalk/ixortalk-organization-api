@@ -25,14 +25,17 @@ package com.ixortalk.organization.api.asset;
 
 import com.ixortalk.autoconfigure.oauth2.feign.ServiceToServiceFeignConfiguration;
 import com.ixortalk.organization.api.domain.OrganizationId;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.ixortalk.organization.api.config.AssetMgmtConfig.IXORTALK_SERVER_ASSETMGMT_URL;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@FeignClient(name = "assetMgmt",url = "${ixortalk.server.assetmgmt.url}", configuration = ServiceToServiceFeignConfiguration.class, decode404 = true)
+@ConditionalOnProperty(IXORTALK_SERVER_ASSETMGMT_URL)
+@FeignClient(name = "assetMgmt",url = "${" + IXORTALK_SERVER_ASSETMGMT_URL + "}", configuration = ServiceToServiceFeignConfiguration.class, decode404 = true)
 public interface AssetMgmt {
 
     @PostMapping(value = "/assets/search/property", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

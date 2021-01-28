@@ -31,22 +31,22 @@ import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.ixortalk.organization.api.asset.RemoveAssetFromOrganizationDTO.removeAssetFromOrganizationDTO;
 import static java.util.Optional.ofNullable;
 
-@Named
 public class AssetMgmtFacade {
 
-    @Inject
     private AssetMgmt assetMgmt;
 
-    @Inject
     private OrganizationRestResource organizationRestResource;
+
+    public AssetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource) {
+        this.assetMgmt = assetMgmt;
+        this.organizationRestResource = organizationRestResource;
+    }
 
     public Stream<Asset> getDevicesFromAssetMgmt(Long organizationId) {
         return getDevicesFromAssetMgmt(organizationRestResource.findById(organizationId).orElseThrow(ResourceNotFoundException::new));
