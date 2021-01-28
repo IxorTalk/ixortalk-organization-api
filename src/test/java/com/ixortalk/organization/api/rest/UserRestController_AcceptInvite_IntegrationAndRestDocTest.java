@@ -34,8 +34,7 @@ import org.springframework.restdocs.request.ParameterDescriptor;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.USER_ACCEPTED_CALLBACK_PATH;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
-import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static java.net.HttpURLConnection.*;
@@ -105,10 +104,31 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
     }
 
     @Test
-    public void accept_AsDifferentUser() {
+    public void accept_AsDifferentUserOfOrganizationWithAdminFlag() {
 
         given()
                 .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
+                .contentType(JSON)
+                .filter(
+                        document("organizations/accept-invite/different_admin_user",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(USER_ID_PATH_PARAMETER)
+                        )
+                )
+                .post("/users/{userId}/accept-invite", userInOrganizationXInvited.getId())
+                .then()
+                .statusCode(HTTP_FORBIDDEN);
+
+        assertThat(userRestResource.findById(userInOrganizationXInvited.getId())).get().extracting(User::getStatus).isEqualTo(Status.INVITED);
+    }
+
+    @Test
+    public void accept_AsDifferentUser() {
+
+        given()
+                .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_ACCEPTED_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
                         document("organizations/accept-invite/different-user",
@@ -120,7 +140,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
                 )
                 .post("/users/{userId}/accept-invite", userInOrganizationXInvited.getId())
                 .then()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_FORBIDDEN);
 
         assertThat(userRestResource.findById(userInOrganizationXInvited.getId())).get().extracting(User::getStatus).isEqualTo(Status.INVITED);
     }
@@ -163,7 +183,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
                 )
                 .post("/users/{userId}/decline-invite", userInOrganizationXInvited.getId())
                 .then()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_FORBIDDEN);
 
         assertThat(restResourcesTransactionalHelper.getUsers(organizationX.getId())).extracting(User::getLogin).contains(TestConstants.USER_IN_ORGANIZATION_X_INVITED_EMAIL);
         assertThat(userRestResource.findById(userInOrganizationXInvited.getId())).get().extracting(User::getStatus).isEqualTo(Status.INVITED);
@@ -185,7 +205,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
                 )
                 .post("/users/{userId}/accept-invite", Long.MAX_VALUE)
                 .then()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_NOT_FOUND);
     }
 
     @Test
@@ -204,7 +224,7 @@ public class UserRestController_AcceptInvite_IntegrationAndRestDocTest extends A
                 )
                 .post("/users/{userId}/decline-invite", Long.MAX_VALUE)
                 .then()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_NOT_FOUND);
     }
 
     @Test
