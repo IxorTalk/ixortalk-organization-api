@@ -35,6 +35,7 @@ import com.ixortalk.organization.api.rest.dto.UserInOrganizationDTO;
 import com.ixortalk.organization.api.service.SecurityService;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -74,6 +75,7 @@ public class UserRestController {
     private Auth0Users auth0Users;
 
     @PostMapping(path = "/{userId}/{acceptKey}/accept-invite")
+    @PreAuthorize("@securityService.isCurrentUserOrNotFound(#userId)")
     public ResponseEntity<?> acceptInviteByKey(@PathVariable("userId") Long userId, @PathVariable("acceptKey") String acceptKey) {
         if (userRestResource.findById(userId).map(User::isAccepted).orElse(false)) {
             return noContent().build();
@@ -83,8 +85,9 @@ public class UserRestController {
     }
 
     @PostMapping(path = "/{userId}/accept-invite")
+    @PreAuthorize("@securityService.isCurrentUserOrNotFound(#userId)")
     public ResponseEntity<?> acceptInvite(@PathVariable("userId") Long userId) {
-        return acceptInvite(userRestResource.findById(userId).filter(user -> securityService.isCurrentUser(user)));
+        return acceptInvite(userRestResource.findById(userId));
     }
 
     private ResponseEntity<Object> acceptInvite(Optional<User> optionalUser) {
@@ -96,25 +99,23 @@ public class UserRestController {
                     auth0Roles.assignRolesToUser(user.getLogin(), user.getRoles().stream().map(Role::getRole).collect(toSet()));
                     return noContent().build();
                 })
-                .orElse(badRequest().build());
+                .orElse(ResponseEntity.notFound().build());
     }
 
 
     @PostMapping(path = "/{userId}/decline-invite")
+    @PreAuthorize("@securityService.isCurrentUserOrNotFound(#userId)")
     public ResponseEntity<?> declineInvite(@PathVariable("userId") Long userId) {
-        User user =
-                userRestResource.findById(userId)
-                        .filter(foundUser -> securityService.isCurrentUser(foundUser))
-                        .orElseThrow(BadRequestException::new);
-
-        return organizationRestResource.findByUsers(user)
-                .map(organization -> organization.removeUser(user))
-                .filter(removed -> removed)
-                .map(organization -> {
-                    userRestResource.delete(user);
-                    return noContent().build();
-                })
-                .orElse(badRequest().build());
+        return userRestResource.findById(userId).map(user ->
+                organizationRestResource.findByUsers(user)
+                        .map(organization -> organization.removeUser(user))
+                        .filter(removed -> removed)
+                        .map(organization -> {
+                            userRestResource.delete(user);
+                            return noContent().build();
+                        })
+                        .orElse(badRequest().build()))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping(path = "/{userId}/resend-invite")

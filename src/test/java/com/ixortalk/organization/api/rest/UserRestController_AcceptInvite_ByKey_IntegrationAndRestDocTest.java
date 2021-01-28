@@ -163,7 +163,7 @@ public class UserRestController_AcceptInvite_ByKey_IntegrationAndRestDocTest ext
                 .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN)
                 .post("/users/{userId}/{acceptKey}/accept-invite", userInOrganizationXInvited.getId(), "incorrect-key")
                 .then()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_NOT_FOUND);
 
         organizationCallbackApiWireMockRule.verify(0, postRequestedFor(urlEqualTo("/org-callback-api" + USER_ACCEPTED_CALLBACK_PATH.configValue())));
         verifyZeroInteractions(auth0Roles);
@@ -183,14 +183,14 @@ public class UserRestController_AcceptInvite_ByKey_IntegrationAndRestDocTest ext
                 .auth().preemptive().oauth2(USER_IN_ORGANIZATION_X_INVITED_JWT_TOKEN)
                 .post("/users/{userId}/{acceptKey}/accept-invite", Long.MAX_VALUE, acceptKey)
                 .then()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_NOT_FOUND);
 
         organizationCallbackApiWireMockRule.verify(0, postRequestedFor(urlEqualTo("/org-callback-api" + USER_ACCEPTED_CALLBACK_PATH.configValue())));
         verifyZeroInteractions(auth0Roles);
     }
 
     @Test
-    public void notAuthorized() {
+    public void notAuthorizedAsDifferentUser() {
 
         given()
                 .filter(
@@ -201,6 +201,23 @@ public class UserRestController_AcceptInvite_ByKey_IntegrationAndRestDocTest ext
                         )
                 )
                 .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ACCEPTED_JWT_TOKEN)
+                .post("/users/{userId}/{acceptKey}/accept-invite", userInOrganizationXInvited.getId(), acceptKey)
+                .then()
+                .statusCode(HTTP_FORBIDDEN);
+
+        User actual = userRestResource.findById(userInOrganizationXInvited.getId()).orElseThrow(() -> new IllegalStateException("User should be present"));
+        assertThat(actual.isAccepted()).isFalse();
+        assertThat(actual.getAcceptKey().getAcceptKey()).isEqualTo(acceptKey);
+
+        organizationCallbackApiWireMockRule.verify(0, postRequestedFor(urlEqualTo("/org-callback-api" + USER_ACCEPTED_CALLBACK_PATH.configValue())));
+        verifyZeroInteractions(auth0Roles);
+    }
+
+    @Test
+    public void notAuthorizedAsAdminOfSameOrganization() {
+
+        given()
+                .auth().preemptive().oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .post("/users/{userId}/{acceptKey}/accept-invite", userInOrganizationXInvited.getId(), acceptKey)
                 .then()
                 .statusCode(HTTP_FORBIDDEN);
