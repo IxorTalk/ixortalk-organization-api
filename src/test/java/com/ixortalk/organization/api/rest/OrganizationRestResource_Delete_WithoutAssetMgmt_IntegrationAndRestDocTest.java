@@ -25,29 +25,36 @@ package com.ixortalk.organization.api.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
-import com.ixortalk.organization.api.asset.AssetTestBuilder;
-import com.ixortalk.organization.api.domain.Organization;
-import com.ixortalk.organization.api.domain.OrganizationTestBuilder;
+import com.ixortalk.organization.api.domain.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.test.context.TestPropertySource;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.google.common.collect.Lists.newArrayList;
+import static com.github.tomakehurst.wiremock.matching.RequestPattern.everything;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.ORGANIZATION_PRE_DELETE_CHECK_CALLBACK_PATH;
 import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
+import static com.ixortalk.organization.api.domain.UserTestBuilder.aUser;
 import static io.restassured.RestAssured.given;
 import static java.lang.String.valueOf;
 import static java.util.Optional.of;
-import static org.apache.http.HttpStatus.SC_NO_CONTENT;
+import static org.apache.http.HttpStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
 @TestPropertySource(properties = {"ixortalk.server.assetmgmt.url=false"})
 public class OrganizationRestResource_Delete_WithoutAssetMgmt_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+
+    private static final ParameterDescriptor ORGANIZATION_ID_PATH_PARAMETER = parameterWithName("id").description("The id of the organization to delete.");
 
     private static final String ORGANIZATION_ADMIN_TOKEN = "organizationAdminToken";
 
@@ -68,24 +75,10 @@ public class OrganizationRestResource_Delete_WithoutAssetMgmt_IntegrationAndRest
                 .andMatching(retrievedAdminTokenAuthorizationHeader())
                 .withQueryParam("organizationId", equalTo(valueOf(organizationToDelete.getId())))
                 .willReturn(ok()));
-
-        assetMgmtWireMockRule.stubFor(
-                post(urlEqualTo("/assetmgmt/assets/search/property"))
-                        .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withHeader(CONTENT_TYPE, equalTo(APPLICATION_JSON_VALUE))
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(organizationToDelete.getOrganizationId())))
-                        .willReturn(okJson(objectMapper.writeValueAsString(newArrayList()))));
     }
 
     @Test
-    public void assetMgmtNotCalledOnDelete() throws JsonProcessingException {
-
-        assetMgmtWireMockRule.stubFor(
-                post(urlEqualTo("/assetmgmt/assets/search/property"))
-                        .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withHeader(CONTENT_TYPE, equalTo(APPLICATION_JSON_VALUE))
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(organizationToDelete.getOrganizationId())))
-                        .willReturn(okJson(objectMapper.writeValueAsString(newArrayList(AssetTestBuilder.anAsset().build())))));
+    public void asAdmin() {
 
         given()
                 .auth()
@@ -97,5 +90,199 @@ public class OrganizationRestResource_Delete_WithoutAssetMgmt_IntegrationAndRest
                 .statusCode(SC_NO_CONTENT);
 
         assertThat(organizationRestResource.findById(organizationToDelete.getId())).isNotPresent();
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void asOrganizationAdmin() {
+        adminInOrganizationX = aUser().withLogin("admin@organization-to-delete.com").withStatus(Status.ACCEPTED).withIsAdmin(true).build();
+        organizationToDelete.getUsers().add(adminInOrganizationX);
+        organizationRestResource.save(organizationToDelete);
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ORGANIZATION_ADMIN_TOKEN)
+                .filter(
+                        document("organizations/delete/as-organization-admin",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(
+                                        ORGANIZATION_ID_PATH_PARAMETER
+                                ))
+                )
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_NO_CONTENT);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isNotPresent();
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void asOrganizationAdminForOtherOrganization() {
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
+                .filter(
+                        document("organizations/delete/no-access",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(
+                                        ORGANIZATION_ID_PATH_PARAMETER
+                                ))
+                )
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_FORBIDDEN);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+        verifyZeroInteractions(auth0Roles);
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void userExists() {
+
+        organizationToDelete.getUsers().add(UserTestBuilder.aUser().build());
+        organizationRestResource.save(organizationToDelete);
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ADMIN_JWT_TOKEN)
+                .filter(
+                        document("organizations/delete/organization-not-empty",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(
+                                        ORGANIZATION_ID_PATH_PARAMETER
+                                ))
+                )
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+        verifyZeroInteractions(auth0Roles);
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void userNextToAdminExists() {
+        adminInOrganizationX = aUser().withLogin("admin@organization-to-delete.com").withStatus(Status.ACCEPTED).withIsAdmin(true).build();
+        organizationToDelete.getUsers().add(adminInOrganizationX);
+        organizationToDelete.getUsers().add(UserTestBuilder.aUser().build());
+        organizationRestResource.save(organizationToDelete);
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ORGANIZATION_ADMIN_TOKEN)
+                .filter(
+                        document("organizations/delete/as-organization-admin-and-other-user",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                pathParameters(
+                                        ORGANIZATION_ID_PATH_PARAMETER
+                                ))
+                )
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+        verifyZeroInteractions(auth0Roles);
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void roleExists() {
+
+        organizationToDelete.getRoles().add(RoleTestBuilder.aRole().build());
+        organizationRestResource.save(organizationToDelete);
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ADMIN_JWT_TOKEN)
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+        verifyZeroInteractions(auth0Roles);
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void preDeleteCheckFails() {
+
+        organizationCallbackApiWireMockRule.stubFor(get(urlPathEqualTo("/org-callback-api" + ORGANIZATION_PRE_DELETE_CHECK_CALLBACK_PATH.configValue()))
+                .andMatching(retrievedAdminTokenAuthorizationHeader())
+                .withQueryParam("organizationId", equalTo(valueOf(organizationToDelete.getId())))
+                .willReturn(badRequest()));
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ADMIN_JWT_TOKEN)
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+        verifyZeroInteractions(auth0Roles);
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void preDeleteCheckNotFound() {
+
+        organizationCallbackApiWireMockRule.stubFor(get(urlPathEqualTo("/org-callback-api" + ORGANIZATION_PRE_DELETE_CHECK_CALLBACK_PATH.configValue()))
+                .andMatching(retrievedAdminTokenAuthorizationHeader())
+                .withQueryParam("organizationId", equalTo(valueOf(organizationToDelete.getId())))
+                .willReturn(notFound()));
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ADMIN_JWT_TOKEN)
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_NOT_FOUND);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isPresent();
+        verifyZeroInteractions(auth0Roles);
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
+    }
+
+    @Test
+    public void deviceExists() throws JsonProcessingException {
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ADMIN_JWT_TOKEN)
+                .when()
+                .delete("/organizations/{id}", organizationToDelete.getId())
+                .then()
+                .statusCode(SC_NO_CONTENT);
+
+        assertThat(organizationRestResource.findById(organizationToDelete.getId())).isNotPresent();
+        assertThat(assetMgmtWireMockRule.countRequestsMatching(everything()).getCount()).isZero();
     }
 }
