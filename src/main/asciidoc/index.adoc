@@ -348,6 +348,51 @@ Including paging and sorting:
 
 include::{snippets}/users/find-by-organization-and-login/paging-and-sorting/http-response.adoc[]
 
+== Find all Users By Login and Status
+
+Find call that queries users filtering on login and status.
+
+=== Request
+
+Via curl:
+include::{snippets}/users/find-all-by-login-and-status/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/users/find-all-by-login-and-status/ok/http-request.adoc[]
+
+Including paging and sorting:
+
+Via curl:
+include::{snippets}/users/find-all-by-login-and-status/paging-and-sorting/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/users/find-all-by-login-and-status/paging-and-sorting/http-request.adoc[]
+
+
+==== Request Headers
+include::{snippets}/users/find-all-by-login-and-status/ok/request-headers.adoc[]
+
+==== Request Parameters
+include::{snippets}/users/find-all-by-login-and-status/ok/request-parameters.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/users/find-all-by-login-and-status/paging-and-sorting/request-parameters.adoc[]
+
+=== Response
+
+Success:
+
+include::{snippets}/users/find-all-by-login-and-status/ok/http-response.adoc[]
+
+When the user has no access to the organization:
+
+include::{snippets}/users/find-all-by-login-and-status/access-denied/http-response.adoc[]
+
+Including paging and sorting:
+
+include::{snippets}/users/find-all-by-login-and-status/paging-and-sorting/http-response.adoc[]
+
 == Find Admin Users in Organization
 
 Find call that queries users that are admin in the organization, and already applies the endhanced user projections.
