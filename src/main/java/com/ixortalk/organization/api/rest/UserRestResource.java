@@ -23,6 +23,7 @@
  */
 package com.ixortalk.organization.api.rest;
 
+import com.ixortalk.organization.api.domain.Status;
 import com.ixortalk.organization.api.domain.User;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
@@ -70,6 +71,9 @@ public interface UserRestResource extends PagingAndSortingRepository<User, Long>
             countQuery = "select count(*) "+ FIND_BY_ORGANIZATION_ID_QUERY,
             nativeQuery = true)
     Page<User> findByOrganizationId(Pageable pageable, @Param("organizationId") Long organizationId);
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @securityService.isCurrentUser(#login)")
+    Page<User> findAllByLoginAndStatus(String login, Status status, Pageable pageable);
 
     @Override
     @RestResource(exported = false)

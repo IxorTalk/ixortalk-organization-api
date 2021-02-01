@@ -144,6 +144,18 @@ public class RepresentationModelConfig {
         resource.add(
                 WebMvcLinkBuilder.linkTo(
                         methodOn(UserRestController.class)
+                                .acceptInvite(user.getId()))
+                        .withRel("accept-invite"));
+
+        resource.add(
+                WebMvcLinkBuilder.linkTo(
+                        methodOn(UserRestController.class)
+                                .declineInvite(user.getId()))
+                        .withRel("decline-invite"));
+
+        resource.add(
+                WebMvcLinkBuilder.linkTo(
+                        methodOn(UserRestController.class)
                                 .resendInvite(user.getId()))
                         .withRel("resend-invite"));
 
