@@ -64,8 +64,14 @@ public class IxorTalkConfigProperties {
 
         private Api api = new Api();
 
+        private Assetmgmt assetmgmt = new Assetmgmt();
+
         public Api getApi() {
             return api;
+        }
+
+        public Assetmgmt getAssetmgmt() {
+            return assetmgmt;
         }
 
         public static class Api {
@@ -146,6 +152,15 @@ public class IxorTalkConfigProperties {
                 public void setDefaultMailLanguageTag(String defaultMailLanguageTag) {
                     this.defaultMailLanguageTag = defaultMailLanguageTag;
                 }
+            }
+        }
+
+        public static class Assetmgmt {
+
+            private Map<String, List<String>> allowedSaveCalls = newHashMap();
+
+            public Map<String, List<String>> getAllowedSaveCalls() {
+                return allowedSaveCalls;
             }
         }
     }

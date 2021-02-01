@@ -21,23 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.organization.api.rest.docs;
+package com.ixortalk.organization.api.rest.dto;
 
-import org.springframework.restdocs.headers.HeaderDescriptor;
-import org.springframework.restdocs.request.ParameterDescriptor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.ixortalk.organization.api.asset.DeviceId;
+import com.ixortalk.organization.api.domain.OrganizationId;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static com.ixortalk.organization.api.domain.OrganizationId.organizationId;
 
-public class RestDocDescriptors {
+public class SaveDevicePropertiesDTO {
 
-    public static class TokenHeaderDescriptors {
-        public static final HeaderDescriptor TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES = headerWithName(AUTHORIZATION).description("The bearer token needed to authorize this request.  Organization administrator privileges required for this call.");
-        public static final HeaderDescriptor TOKEN_WITH_USER_PRIVILEGES = headerWithName(AUTHORIZATION).description("The bearer token needed to authorize this request.  A bearer token with user privileges.");
+    private DeviceId deviceId;
+
+    private Long organizationId;
+
+    private String propertiesPath;
+
+    private SaveDevicePropertiesDTO() {}
+
+    @JsonUnwrapped
+    public DeviceId getDeviceId() {
+        return deviceId;
     }
 
-    public static class PathParameters {
-        public static final ParameterDescriptor ORGANIZATION_ID_PATH_PARAMETER = parameterWithName("id").description("The id of the organization.");
+    @JsonUnwrapped
+    public OrganizationId getOrganizationId() {
+        return organizationId(organizationId);
+    }
+
+    public String getPropertiesPath() {
+        return propertiesPath;
+    }
+
+    @JsonIgnore
+    public DeviceInOrganizationDTO getDeviceInOrganizationDTO() {
+        return new DeviceInOrganizationDTO(organizationId, deviceId);
     }
 }

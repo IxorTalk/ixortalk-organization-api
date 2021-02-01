@@ -141,7 +141,7 @@ public abstract class AbstractSpringIntegrationTest  {
 
     protected static final PathParametersSnippet DEVICE_IN_ORGANIZATION_PATH_PARAMETERS = pathParameters(
             parameterWithName("id").description("The id of the organization."),
-            parameterWithName("deviceId").description("The known `deviceId` for the device where actions will be saved to.")
+            parameterWithName("deviceId").description("The known `deviceId` for the device to perform the operation on.")
     );
 
     protected static final String ROLE_ONLY_IN_AUTH0 = "someRoleInAuth0";

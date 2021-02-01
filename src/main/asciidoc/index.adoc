@@ -1,3 +1,4 @@
+
 = IxorTalk Organization API
 :doctype: book
 :icons: font
@@ -957,6 +958,71 @@ include::{snippets}/organizations/save-info/organization-does-not-exist/http-res
 When the device does not exist:
 
 include::{snippets}/organizations/save-info/deviceid-does-not-exist/http-response.adoc[]
+
+== Save Device Properties
+
+Generic, config based, `/save-*` calls are available to save device properties.  The configuration determines which paths are allowed to save, and for each allowed path, a list of allowed keys is specified.
+
+Examples below have been executed for config:
+
+```
+ixortalk:
+  organization:
+    assetmgmt:
+      allowed-save-calls:
+        test-properties:
+          - allowedProperty
+          - otherAllowedProperty
+```
+
+=== Request
+
+Via curl:
+include::{snippets}/organizations/save-device-properties/ok/curl-request.adoc[]
+
+HTTP request:
+include::{snippets}/organizations/save-device-properties/ok/http-request.adoc[]
+
+==== Request Headers
+include::{snippets}/organizations/save-device-properties/ok/request-headers.adoc[]
+
+==== Path Parameters
+include::{snippets}/organizations/save-device-properties/ok/path-parameters.adoc[]
+
+==== Request Fields
+include::{snippets}/organizations/save-device-properties/ok/request-fields.adoc[]
+
+=== Response
+
+As organization admin:
+
+include::{snippets}/organizations/save-device-properties/ok/http-response.adoc[]
+
+When the save path is not a valid/configured path:
+
+include::{snippets}/organizations/save-device-properties/unallowed-path/http-request.adoc[]
+include::{snippets}/organizations/save-device-properties/unallowed-path/http-response.adoc[]
+
+When the payload contains a property which is not allowed by the config:
+
+include::{snippets}/organizations/save-device-properties/unallowed-property/http-request.adoc[]
+include::{snippets}/organizations/save-device-properties/unallowed-property/http-response.adoc[]
+
+As a user:
+
+include::{snippets}/organizations/save-device-properties/as-user/http-response.adoc[]
+
+As an organization admin from a different organization:
+
+include::{snippets}/organizations/save-device-properties/different-admin/http-response.adoc[]
+
+When the organization does not exist:
+
+include::{snippets}/organizations/save-device-properties/organization-does-not-exist/http-response.adoc[]
+
+When the device does not exist:
+
+include::{snippets}/organizations/save-device-properties/deviceid-does-not-exist/http-response.adoc[]
 
 == Remove Device from Organization
 
