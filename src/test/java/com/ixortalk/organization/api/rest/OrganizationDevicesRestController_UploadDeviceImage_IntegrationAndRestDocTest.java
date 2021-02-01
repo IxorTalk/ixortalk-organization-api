@@ -50,7 +50,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.partWith
 import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class OrganizationRestController_UploadDeviceImage_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_UploadDeviceImage_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final String ORIGINAL_IMAGE_CONTENT_TYPE = IMAGE_PNG_VALUE;
     private static final String FILE_REQUEST_PART_NAME = "file";

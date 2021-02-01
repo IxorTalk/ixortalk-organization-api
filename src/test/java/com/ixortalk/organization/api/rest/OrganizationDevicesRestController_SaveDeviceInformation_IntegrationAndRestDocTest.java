@@ -52,7 +52,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_SaveDeviceInformation_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final DeviceId TEST_DEVICE = deviceId(nextString("testDevice"));
 

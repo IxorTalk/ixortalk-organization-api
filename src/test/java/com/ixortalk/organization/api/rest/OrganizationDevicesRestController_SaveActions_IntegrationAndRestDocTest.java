@@ -49,7 +49,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class OrganizationRestController_SaveActions_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_SaveActions_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private Asset asset;
 

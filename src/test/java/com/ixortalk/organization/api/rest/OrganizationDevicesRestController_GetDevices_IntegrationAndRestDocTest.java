@@ -65,7 +65,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static wiremock.com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes.ARRAY;
 
-public class OrganizationRestController_GetDevices_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_GetDevices_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     public static final String ASSET_UNMAPPED_DEVICE_INFO_FIELD_VALUE = "assetUnmappedDeviceInfoFieldValue";
     public static final String ASSET_2_UNMAPPED_DEVICE_INFO_FIELD_VALUE = "asset2UnmappedDeviceInfoFieldValue";

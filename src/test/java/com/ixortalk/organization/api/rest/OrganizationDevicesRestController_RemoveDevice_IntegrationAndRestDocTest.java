@@ -49,7 +49,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class OrganizationRestController_RemoveDevice_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_RemoveDevice_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final String REMOVE_DEVICE_SCENARIO = "removeDeviceScenario";
     private static final String ASSET_PROPERTIES_CLEARED = "assetPropertiesCleared";
