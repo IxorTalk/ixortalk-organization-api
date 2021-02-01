@@ -23,10 +23,8 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.asset.ActionsDTO;
 import com.ixortalk.organization.api.asset.Asset;
 import com.ixortalk.organization.api.asset.DeviceId;
-import com.ixortalk.organization.api.asset.DeviceInformationDTO;
 import com.ixortalk.organization.api.callback.api.OrganizationCallbackAPI;
 import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
 import com.ixortalk.organization.api.image.ImageService;
@@ -97,17 +95,6 @@ public class OrganizationDevicesRestController {
                 .map(Asset::getDeviceId)
                 .map(DeviceId::stringValue)
                 .collect(toList());
-    }
-
-    // TODO #37: Remove existing save-* calls and DTOs
-    @PostMapping(path = "/{organizationId}/devices/{deviceId}/save-actions")
-    public void saveActions(DeviceInOrganizationDTO deviceInOrganizationDTO, @RequestBody ActionsDTO actions) {
-        assetMgmtFacade.getOwnedDevice(deviceInOrganizationDTO).ifPresent(asset -> assetMgmtFacade.saveAssetProperties(asset, actions));
-    }
-
-    @PostMapping(path = "/{organizationId}/devices/{deviceId}/save-info")
-    public void saveDeviceInformation(DeviceInOrganizationDTO deviceInOrganizationDTO, @RequestBody DeviceInformationDTO deviceInformationDTO) {
-        assetMgmtFacade.getOwnedDevice(deviceInOrganizationDTO).ifPresent(asset -> assetMgmtFacade.saveAssetProperties(asset, deviceInformationDTO));
     }
 
     @PostMapping(path = "/{organizationId}/devices/{deviceId}/save-{propertiesPath}")
