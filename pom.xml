@@ -51,6 +51,7 @@
         <ixortalk-test.version>2.0.0</ixortalk-test.version>
         <ixortalk-util.version>1.0.2</ixortalk-util.version>
         <ixortalk-oauth2-spring-boot-starter.version>1.1.0</ixortalk-oauth2-spring-boot-starter.version>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <organization>
@@ -391,6 +392,14 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>javax.activation-api</artifactId>
+                        <version>1.2.0</version>
+                        <scope>compile</scope>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>
