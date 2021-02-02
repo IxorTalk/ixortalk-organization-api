@@ -4,15 +4,6 @@
     "properties": {
       "hostname": "1.2.3.4",
       "port": 7789,
-      "actions": [
-        {
-          "name": "testing",
-          "payload": {
-            "relayNr": 5,
-            "action": "HIGH"
-          }
-        }
-      ],
       "company": {
         "color": "#fff",
         "logo": "",

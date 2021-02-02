@@ -67,7 +67,7 @@ public class OrganizationDevicesRestController_RemoveDevice_IntegrationAndRestDo
                         .withOrganizationId(organizationX.getOrganizationId())
                         .withDeviceId(DEVICE_TO_REMOVE)
                         .withOtherProperty(IMAGE.getPropertyName(), "https://organization_x.com/image.png")
-                        .withActions("existing actions within organization X")
+                        .withOtherProperty("actions", "existing actions within organization X")
                         .withOtherProperty("deviceName", "The device's name within Organization X")
                         .withOtherProperty("deviceInformation", "The device information within Organization X")
                         .build();

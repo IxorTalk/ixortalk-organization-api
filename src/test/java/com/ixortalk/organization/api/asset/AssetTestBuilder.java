@@ -27,6 +27,7 @@ import com.ixortalk.organization.api.domain.OrganizationId;
 import com.ixortalk.test.builder.ReflectionInstanceTestBuilder;
 
 import static com.ixortalk.organization.api.asset.AssetId.assetId;
+import static com.ixortalk.organization.api.asset.AssetPropertiesTestBuilder.anAssetProperties;
 import static com.ixortalk.test.util.Randomizer.nextString;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
@@ -34,7 +35,7 @@ public class AssetTestBuilder extends ReflectionInstanceTestBuilder<Asset> {
 
     private AssetId assetId = assetId(nextString("testAssetId"));
 
-    private AssetPropertiesTestBuilder assetPropertiesTestBuilder = AssetPropertiesTestBuilder.anAssetProperties();
+    private final AssetPropertiesTestBuilder assetPropertiesTestBuilder = anAssetProperties();
 
     private AssetTestBuilder() {}
 
@@ -60,11 +61,6 @@ public class AssetTestBuilder extends ReflectionInstanceTestBuilder<Asset> {
 
     public AssetTestBuilder withDeviceId(DeviceId deviceId) {
         this.assetPropertiesTestBuilder.withDeviceId(deviceId);
-        return this;
-    }
-
-    public AssetTestBuilder withActions(Object actions) {
-        this.assetPropertiesTestBuilder.withActions(actions);
         return this;
     }
 

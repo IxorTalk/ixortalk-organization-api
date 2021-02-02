@@ -33,8 +33,8 @@ import static com.google.common.collect.Lists.newArrayList;
 
 public class RemoveAssetFromOrganizationDTO {
 
-    private OrganizationId organizationId;
-    private String image;
+    private final OrganizationId organizationId;
+    private final String image;
 
     private RemoveAssetFromOrganizationDTO(OrganizationId organizationId, String image) {
         this.organizationId = organizationId;

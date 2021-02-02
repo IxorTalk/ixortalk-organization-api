@@ -70,7 +70,6 @@ ixortalk:
       device-info-fields:
         - deviceId # Mapped
         - deviceName #Unmapped
-        - actions
       accept-key-max-age-in-hours: 3
       verify-email-landing-page-path: /onboarding/complete-registration
     assetmgmt:

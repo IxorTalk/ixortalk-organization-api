@@ -54,11 +54,6 @@ public class Asset {
         return getAssetProperties().getDeviceId();
     }
 
-    // TODO #37: Check for other usages of actions/deviceName/deviceInformation --> all references should be gone...
-    public Object getActions() {
-        return getAssetProperties().getActions();
-    }
-
     public Optional<OrganizationId> getOrganizationId() {
         return getAssetProperties().getOrganizationId();
     }

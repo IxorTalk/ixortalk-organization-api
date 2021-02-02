@@ -42,7 +42,6 @@ public class Properties {
 
     private OrganizationId organizationId;
     private DeviceId deviceId;
-    private Object actions;
 
     private Map<String, Object> otherProperties = newHashMap();
 
@@ -57,10 +56,6 @@ public class Properties {
     @JsonUnwrapped
     public DeviceId getDeviceId() {
         return deviceId;
-    }
-
-    public Object getActions() {
-        return actions;
     }
 
     @JsonAnySetter
@@ -84,15 +79,14 @@ public class Properties {
 
         ORGANIZATION_ID("organizationId", Properties::getOrganizationId, o -> ((OrganizationId)o).longValue()),
         DEVICE_ID("deviceId", Properties::getDeviceId, o -> ((DeviceId)o).stringValue()),
-        ACTIONS("actions", Properties::getActions),
         IMAGE("image", properties -> properties.getOtherProperties().get("image"));
 
         public static final Map<String, MappedField> INDEXED_PROPERTIES = stream(MappedField.values()).collect(toMap(MappedField::getPropertyName, identity()));
 
-        private String propertyName;
-        private Function<Properties, Object> mappedGetter;
+        private final String propertyName;
+        private final Function<Properties, Object> mappedGetter;
 
-        private Optional<Function<Object, Object>> unwrap;
+        private final Optional<Function<Object, Object>> unwrap;
 
         MappedField(String propertyName, Function<Properties, Object> mappedGetter) {
             this(propertyName, mappedGetter, null);

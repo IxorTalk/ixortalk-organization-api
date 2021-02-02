@@ -28,9 +28,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Map;
 
-import static com.ixortalk.organization.api.TestConstants.JsonTestConstants.*;
+import static com.ixortalk.organization.api.TestConstants.JsonTestConstants.ASSET_WITHOUT_ORGANIZATION_ID_DEVICE_NAME;
+import static com.ixortalk.organization.api.TestConstants.JsonTestConstants.ASSET_WITH_ORGANIZATION_ID_DEVICE_ID;
+import static com.ixortalk.organization.api.TestConstants.JsonTestConstants.ASSET_WITH_ORGANIZATION_ID_ORGANIZATION_ID;
 import static com.ixortalk.organization.api.TestConstants.UNMAPPED_DEVICE_INFO_FIELD;
 import static com.ixortalk.organization.api.asset.DeviceId.deviceId;
 import static com.ixortalk.organization.api.asset.Properties.MappedField.IMAGE;
@@ -55,7 +56,6 @@ public class Asset_JsonMapping_IntegrationTest extends AbstractSpringIntegration
         assertThat(assetWithOrganizationId.getDeviceId()).isEqualTo(deviceId(ASSET_WITH_ORGANIZATION_ID_DEVICE_ID.configValue()));
 
         assertThat(assetWithoutOrganizationId.getOrganizationId()).isNotPresent();
-        assertThat(assetWithoutOrganizationId.getActions()).asList().first().isInstanceOfSatisfying(Map.class, map -> assertThat(map.get("name")).isEqualTo(ASSET_WITHOUT_ORGANIZATION_FIRST_ACTION_S_NAME.configValue()));
     }
 
     @Test
@@ -67,8 +67,6 @@ public class Asset_JsonMapping_IntegrationTest extends AbstractSpringIntegration
     public void getMappedFieldAsProperty() {
         assertThat(assetWithOrganizationId.getAssetProperty("organizationId")).isEqualTo(ASSET_WITH_ORGANIZATION_ID_ORGANIZATION_ID.configValueAsLong());
         assertThat(assetWithOrganizationId.getAssetProperty("deviceId")).isEqualTo(ASSET_WITH_ORGANIZATION_ID_DEVICE_ID.configValue());
-
-        assertThat(assetWithoutOrganizationId.getAssetProperty("actions")).asList().first().isInstanceOfSatisfying(Map.class, map -> assertThat(map.get("name")).isEqualTo(ASSET_WITHOUT_ORGANIZATION_FIRST_ACTION_S_NAME.configValue()));
     }
 
     @Test

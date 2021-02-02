@@ -53,11 +53,6 @@ public class AssetPropertiesTestBuilder extends ReflectionInstanceTestBuilder<As
         return this;
     }
 
-    public AssetPropertiesTestBuilder withActions(Object actions) {
-        this.propertiesTestBuilder.withActions(actions);
-        return this;
-    }
-
     public AssetPropertiesTestBuilder withOtherProperty(String key, Object value) {
         this.propertiesTestBuilder.withOtherProperty(key, value);
         return this;
