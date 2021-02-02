@@ -472,10 +472,9 @@ public abstract class AbstractSpringIntegrationTest  {
     protected static Map<String, Object> assetMgmtFieldsToBeCleared() {
         Map<String, Object> fields = newHashMap();
         fields.put("organizationId", null);
-        fields.put("deviceName", "");
-        fields.put("deviceInformation", "");
-        fields.put("actions", newArrayList());
-        fields.put("image", "");
+        fields.put("image", null);
+        fields.put(SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY.configValue(), null);
+        fields.put(SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY.configValue(), null);
         return fields;
     }
 }

@@ -39,6 +39,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
 import static com.ixortalk.organization.api.TestConstants.DEVICE_REMOVED_CALLBACK_PATH;
+import static com.ixortalk.organization.api.TestConstants.SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY;
+import static com.ixortalk.organization.api.TestConstants.SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY;
 import static com.ixortalk.organization.api.asset.DeviceId.deviceId;
 import static com.ixortalk.organization.api.asset.Properties.MappedField.IMAGE;
 import static com.ixortalk.organization.api.util.ExpectedValueObjectSerializer.serializedDeviceId;
@@ -67,9 +69,8 @@ public class OrganizationDevicesRestController_RemoveDevice_IntegrationAndRestDo
                         .withOrganizationId(organizationX.getOrganizationId())
                         .withDeviceId(DEVICE_TO_REMOVE)
                         .withOtherProperty(IMAGE.getPropertyName(), "https://organization_x.com/image.png")
-                        .withOtherProperty("actions", "existing actions within organization X")
-                        .withOtherProperty("deviceName", "The device's name within Organization X")
-                        .withOtherProperty("deviceInformation", "The device information within Organization X")
+                        .withOtherProperty(SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY.configValue(), nextString("allowedPropertyValue"))
+                        .withOtherProperty(SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY.configValue(), nextString("otherAllowedPropertyValue"))
                         .build();
 
         deviceInOrganizationDTO = new DeviceInOrganizationDTO(organizationX.getId(), DEVICE_TO_REMOVE);

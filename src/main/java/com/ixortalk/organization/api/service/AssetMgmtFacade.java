@@ -25,12 +25,16 @@ package com.ixortalk.organization.api.service;
 
 import com.ixortalk.organization.api.asset.Asset;
 import com.ixortalk.organization.api.asset.AssetMgmt;
+import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
 import com.ixortalk.organization.api.domain.Organization;
 import com.ixortalk.organization.api.domain.OrganizationId;
 import com.ixortalk.organization.api.rest.OrganizationRestResource;
 import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -42,10 +46,12 @@ public class AssetMgmtFacade {
     private AssetMgmt assetMgmt;
 
     private OrganizationRestResource organizationRestResource;
+    private IxorTalkConfigProperties ixorTalkConfigProperties;
 
-    public AssetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource) {
+    public AssetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource, IxorTalkConfigProperties ixorTalkConfigProperties) {
         this.assetMgmt = assetMgmt;
         this.organizationRestResource = organizationRestResource;
+        this.ixorTalkConfigProperties = ixorTalkConfigProperties;
     }
 
     public Stream<Asset> getDevicesFromAssetMgmt(Long organizationId) {
@@ -78,6 +84,17 @@ public class AssetMgmtFacade {
     }
 
     public void removeFromOrganization(Asset asset) {
-        saveAssetProperties(asset, removeAssetFromOrganizationDTO());
+
+        Map<String, Object> fieldsToClear =
+                ixorTalkConfigProperties
+                        .getOrganization()
+                        .getAssetmgmt()
+                        .getAllowedSaveCalls()
+                        .values()
+                        .stream()
+                        .flatMap(Collection::stream)
+                        .collect(HashMap::new, (map, property) -> map.put(property, null), HashMap::putAll);
+
+        saveAssetProperties(asset, removeAssetFromOrganizationDTO(fieldsToClear));
     }
 }

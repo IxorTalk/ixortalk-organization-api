@@ -23,26 +23,31 @@
  */
 package com.ixortalk.organization.api.asset;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.ixortalk.organization.api.domain.OrganizationId;
 
-import java.util.List;
+import java.util.Map;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.ixortalk.organization.api.domain.OrganizationId.noOrganizationId;
 
 public class RemoveAssetFromOrganizationDTO {
 
     private final OrganizationId organizationId;
     private final String image;
 
-    private RemoveAssetFromOrganizationDTO(OrganizationId organizationId, String image) {
+    @JsonIgnore
+    private final Map<String, Object> fieldsToClear;
+
+    private RemoveAssetFromOrganizationDTO(OrganizationId organizationId, String image, Map<String, Object> fieldsToClear) {
         this.organizationId = organizationId;
         this.image = image;
+        this.fieldsToClear = fieldsToClear;
     }
 
-    public static RemoveAssetFromOrganizationDTO removeAssetFromOrganizationDTO() {
-        return new RemoveAssetFromOrganizationDTO(OrganizationId.noOrganizationId(), "");
+    public static RemoveAssetFromOrganizationDTO removeAssetFromOrganizationDTO(Map<String, Object> fieldsToClear) {
+        return new RemoveAssetFromOrganizationDTO(noOrganizationId(), null, fieldsToClear);
     }
 
     @JsonUnwrapped
@@ -54,19 +59,8 @@ public class RemoveAssetFromOrganizationDTO {
         return image;
     }
 
-    // TODO #37: Below properties should not be hard-coded but "erase" all properties allowed to be saved
-    @JsonProperty
-    public List<?> getActions() {
-        return newArrayList();
-    }
-
-    @JsonProperty
-    public String getDeviceName() {
-        return "";
-    }
-
-    @JsonProperty
-    public String getDeviceInformation() {
-        return "";
+    @JsonAnyGetter
+    public Map<String, Object> getFieldsToClear() {
+        return fieldsToClear;
     }
 }
