@@ -142,4 +142,8 @@ public class User {
     public void loginToLowercase() {
         this.login = this.login.toLowerCase();
     }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
 }
