@@ -23,140 +23,107 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.asset.Asset;
 import com.ixortalk.organization.api.config.TestConstants;
 import com.ixortalk.organization.api.util.ExpectedValueObjectSerializer;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.restdocs.payload.RequestFieldsSnippet;
 
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
-import static com.ixortalk.organization.api.asset.AssetTestBuilder.anAsset;
-import static com.ixortalk.organization.api.config.TestConstants.*;
 import static com.ixortalk.test.util.FileUtil.jsonFile;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static javax.servlet.http.HttpServletResponse.*;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class OrganizationRestController_SaveActions_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_AddDevice_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
-    private Asset asset;
-
-    private Object actionsField;
-
-    private static final RequestFieldsSnippet REQUEST_FIELDS_SNIPPET = requestFields(
-            subsectionWithPath("actions").type(ARRAY).description("The list of actions to be saved.")
-    );
-
+    private Asset asset, asset2;
 
     @Before
     public void before() throws IOException {
 
-        asset =
-                anAsset()
-                        .withOrganizationId(organizationX.getOrganizationId())
-                        .withDeviceId(TEST_DEVICE)
-                        .build();
-
-        actionsField = objectMapper.readValue(jsonFile("actionsList.json"), Object.class);
+        asset = objectMapper.readValue(jsonFile("assetWithoutOrganizationId.json"), Asset.class);
+        asset2 = objectMapper.readValue(jsonFile("assetWithOrganizationId.json"), Asset.class);
 
         assetMgmtWireMockRule.stubFor(
                 post(urlEqualTo("/assetmgmt/assets/find/property"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(ExpectedValueObjectSerializer.serializedDeviceId(TEST_DEVICE)))
-                        .willReturn(okJson(objectMapper.writeValueAsString(asset))));
+                        .withRequestBody(equalToJson(ExpectedValueObjectSerializer.serializedDeviceId(asset.getDeviceId())))
+                        .willReturn(okJson(jsonFile("assetWithoutOrganizationId.json"))));
 
         assetMgmtWireMockRule.stubFor(
                 put(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(actionsField)))
                         .willReturn(ok()));
+
+        assetMgmtWireMockRule.stubFor(
+                post(urlEqualTo("/assetmgmt/assets/find/property"))
+                        .andMatching(retrievedAdminTokenAuthorizationHeader())
+                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(asset2.getDeviceId())))
+                        .willReturn(aResponse()
+                                .withStatus(SC_OK)
+                                .withBody(
+                                        jsonFile("assetWithOrganizationId.json")
+                                )));
     }
 
     @Test
-    public void asAdmin() throws JsonProcessingException {
+    public void asAdmin() throws JSONException {
 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(ADMIN_JWT_TOKEN)
+                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
                 .contentType(JSON)
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", organizationX.getId(), TEST_DEVICE.stringValue())
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset.getDeviceId().stringValue())
                 .then()
                 .statusCode(SC_OK);
 
         assetMgmtWireMockRule.verify(
                 putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(actionsField))));
+                        .withRequestBody(equalToJson(new JSONObject().put("organizationId", organizationX.getId()).toString())));
     }
 
     @Test
-    public void asOrganizationAdmin() throws JsonProcessingException {
+    public void asOrganizationAdmin() throws JSONException {
 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
+                .oauth2(TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-actions/ok",
+                        document("organizations/add-device/ok",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
-                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
-                                REQUEST_FIELDS_SNIPPET
-                        ))
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", organizationX.getId(), TEST_DEVICE.stringValue())
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        )
+                )
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset.getDeviceId().stringValue())
                 .then()
                 .statusCode(SC_OK);
 
         assetMgmtWireMockRule.verify(
                 putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(actionsField))));
+                        .withRequestBody(equalToJson(new JSONObject().put("organizationId", organizationX.getId()).toString())));
     }
 
     @Test
-    public void asUser() throws JsonProcessingException {
-
-        given()
-                .auth()
-                .preemptive()
-                .oauth2(USER_JWT_TOKEN)
-                .contentType(JSON)
-                .filter(
-                        document("organizations/save-actions/as-user",
-                                preprocessRequest(staticUris(), prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
-                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
-                                REQUEST_FIELDS_SNIPPET
-                        ))
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", organizationX.getId(), TEST_DEVICE.stringValue())
-                .then()
-                .statusCode(SC_FORBIDDEN);
-
-        assetMgmtWireMockRule.verify(0, postRequestedFor(urlEqualTo("/assetmgmt/assets/find/property")));
-        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties")));
-    }
-
-    @Test
-    public void asOrganizationAdminFromDifferentOrganization() throws JsonProcessingException {
+    public void asOrganizationAdminFromDifferentOrganization() {
 
         given()
                 .auth()
@@ -164,15 +131,14 @@ public class OrganizationRestController_SaveActions_IntegrationAndRestDocTest ex
                 .oauth2(TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-actions/different-admin",
+                        document("organizations/add-device/different-admin",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
-                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
-                                REQUEST_FIELDS_SNIPPET
-                        ))
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", organizationX.getId(), TEST_DEVICE.stringValue())
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        )
+                )
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset.getDeviceId().stringValue())
                 .then()
                 .statusCode(SC_FORBIDDEN);
 
@@ -181,23 +147,99 @@ public class OrganizationRestController_SaveActions_IntegrationAndRestDocTest ex
     }
 
     @Test
-    public void organizationDoesNotExist() throws JsonProcessingException {
+    public void asUser() {
 
         given()
                 .auth()
                 .preemptive()
-                .oauth2(ADMIN_JWT_TOKEN)
+                .oauth2(TestConstants.USER_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-actions/organization-does-not-exist",
+                        document("organizations/add-device/as-user",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
                                 requestHeaders(describeAuthorizationTokenHeader()),
-                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
-                                REQUEST_FIELDS_SNIPPET
-                        ))
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", Long.MAX_VALUE, TEST_DEVICE.stringValue())
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        )
+                )
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset.getDeviceId().stringValue())
+                .then()
+                .statusCode(SC_FORBIDDEN);
+
+        assetMgmtWireMockRule.verify(0, postRequestedFor(urlEqualTo("/assetmgmt/assets/find/property")));
+        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties")));
+    }
+
+    @Test
+    public void whenOtherOrganizationIdAlreadyPresentOnAsset() {
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
+                .contentType(JSON)
+                .filter(
+                        document("organizations/add-device/role-present",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        )
+                )
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset2.getDeviceId().stringValue())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset2.getAssetId().stringValue() + "/properties")));
+    }
+
+    @Test
+    public void whenAssetDoesNotExist() {
+
+        assetMgmtWireMockRule.stubFor(
+                post(urlEqualTo("/assetmgmt/assets/find/property"))
+                        .andMatching(retrievedAdminTokenAuthorizationHeader())
+                        .withRequestBody(equalToJson(ExpectedValueObjectSerializer.serializedDeviceId(asset.getDeviceId())))
+                        .willReturn(aResponse()
+                                .withStatus(SC_NOT_FOUND)
+                        ));
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
+                .contentType(JSON)
+                .filter(
+                        document("organizations/add-device/asset-does-not-exist",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        )
+                )
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset.getDeviceId().stringValue())
+                .then()
+                .statusCode(SC_BAD_REQUEST);
+
+        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties")));
+    }
+
+    @Test
+    public void whenOrganizationDoesNotExist() {
+
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
+                .contentType(JSON)
+                .filter(
+                        document("organizations/add-device/organization-does-not-exist",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(describeAuthorizationTokenHeader()),
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        )
+                )
+                .post("/organizations/{id}/devices/{deviceId}", Long.MAX_VALUE, asset.getDeviceId().stringValue())
                 .then()
                 .statusCode(SC_NOT_FOUND);
 
@@ -206,50 +248,24 @@ public class OrganizationRestController_SaveActions_IntegrationAndRestDocTest ex
     }
 
     @Test
-    public void deviceIdDoesNotExist() throws JsonProcessingException {
+    public void whenAssetMgmtDoesReturnOK() {
 
         assetMgmtWireMockRule.stubFor(
-                put(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
+                post(urlEqualTo("/assetmgmt/assets/find/property"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
+                        .withRequestBody(equalToJson(ExpectedValueObjectSerializer.serializedDeviceId(asset.getDeviceId())))
                         .willReturn(aResponse()
-                                .withStatus(SC_NOT_FOUND)));
-
+                                .withStatus(SC_UNAUTHORIZED)
+                        ));
         given()
                 .auth()
                 .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
+                .oauth2(TestConstants.ADMIN_JWT_TOKEN)
                 .contentType(JSON)
-                .filter(
-                        document("organizations/save-actions/deviceid-does-not-exist",
-                                preprocessRequest(staticUris(), prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
-                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
-                                REQUEST_FIELDS_SNIPPET
-                        ))
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", organizationX.getId(), TEST_DEVICE.stringValue())
+                .post("/organizations/{id}/devices/{deviceId}", organizationX.getId(), asset.getDeviceId().stringValue())
                 .then()
-                .statusCode(SC_NOT_FOUND);
-    }
+                .statusCode(SC_UNAUTHORIZED);
 
-    @Test
-    public void assetMgmtFails() throws JsonProcessingException {
-
-        assetMgmtWireMockRule.stubFor(
-                put(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
-                        .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .willReturn(aResponse()
-                                .withStatus(SC_INTERNAL_SERVER_ERROR)));
-
-        given()
-                .auth()
-                .preemptive()
-                .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
-                .contentType(JSON)
-                .body(objectMapper.writeValueAsString(actionsField))
-                .post("/organizations/{id}/devices/{deviceId}/save-actions", organizationX.getId(), TEST_DEVICE.stringValue())
-                .then()
-                .statusCode(SC_INTERNAL_SERVER_ERROR);
+        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties")));
     }
 }

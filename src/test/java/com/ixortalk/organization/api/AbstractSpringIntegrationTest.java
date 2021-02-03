@@ -141,7 +141,7 @@ public abstract class AbstractSpringIntegrationTest  {
 
     protected static final PathParametersSnippet DEVICE_IN_ORGANIZATION_PATH_PARAMETERS = pathParameters(
             parameterWithName("id").description("The id of the organization."),
-            parameterWithName("deviceId").description("The known `deviceId` for the device where actions will be saved to.")
+            parameterWithName("deviceId").description("The known `deviceId` for the device to perform the operation on.")
     );
 
     protected static final String ROLE_ONLY_IN_AUTH0 = "someRoleInAuth0";
@@ -472,10 +472,9 @@ public abstract class AbstractSpringIntegrationTest  {
     protected static Map<String, Object> assetMgmtFieldsToBeCleared() {
         Map<String, Object> fields = newHashMap();
         fields.put("organizationId", null);
-        fields.put("deviceName", "");
-        fields.put("deviceInformation", "");
-        fields.put("actions", newArrayList());
-        fields.put("image", "");
+        fields.put("image", null);
+        fields.put(SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY.configValue(), null);
+        fields.put(SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY.configValue(), null);
         return fields;
     }
 }

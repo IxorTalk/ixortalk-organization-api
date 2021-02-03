@@ -23,11 +23,13 @@
  */
 package com.ixortalk.organization.api.rest;
 
-import com.ixortalk.organization.api.asset.*;
+import com.ixortalk.organization.api.asset.Asset;
+import com.ixortalk.organization.api.asset.DeviceId;
 import com.ixortalk.organization.api.callback.api.OrganizationCallbackAPI;
 import com.ixortalk.organization.api.config.IxorTalkConfigProperties;
 import com.ixortalk.organization.api.image.ImageService;
 import com.ixortalk.organization.api.rest.dto.DeviceInOrganizationDTO;
+import com.ixortalk.organization.api.rest.dto.SaveDevicePropertiesDTO;
 import com.ixortalk.organization.api.service.AssetMgmtFacade;
 import com.ixortalk.organization.api.service.ImageMethodsService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -48,7 +50,13 @@ import static java.util.Collections.singletonMap;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpHeaders.LOCATION;
-import static org.springframework.http.ResponseEntity.*;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.notFound;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.util.UriComponentsBuilder.fromUriString;
 
 @ConditionalOnProperty(IXORTALK_SERVER_ASSETMGMT_URL)
@@ -89,14 +97,18 @@ public class OrganizationDevicesRestController {
                 .collect(toList());
     }
 
-    @PostMapping(path = "/{organizationId}/devices/{deviceId}/save-actions")
-    public void saveActions(DeviceInOrganizationDTO deviceInOrganizationDTO, @RequestBody ActionsDTO actions) {
-        assetMgmtFacade.getOwnedDevice(deviceInOrganizationDTO).ifPresent(asset -> assetMgmtFacade.saveAssetProperties(asset, actions));
-    }
+    @PostMapping(path = "/{organizationId}/devices/{deviceId}/save-{propertiesPath}")
+    public ResponseEntity<?> saveDeviceProperties(SaveDevicePropertiesDTO saveDevicePropertiesDTO, @RequestBody Map<String, Object> properties) {
+        if (!ixorTalkConfigProperties.getOrganization().getAssetmgmt().getAllowedSaveCalls().containsKey(saveDevicePropertiesDTO.getPropertiesPath())) {
+            return notFound().build();
+        }
 
-    @PostMapping(path = "/{organizationId}/devices/{deviceId}/save-info")
-    public void saveDeviceInformation(DeviceInOrganizationDTO deviceInOrganizationDTO, @RequestBody DeviceInformationDTO deviceInformationDTO) {
-        assetMgmtFacade.getOwnedDevice(deviceInOrganizationDTO).ifPresent(asset -> assetMgmtFacade.saveAssetProperties(asset, deviceInformationDTO));
+        if (!ixorTalkConfigProperties.getOrganization().getAssetmgmt().getAllowedSaveCalls().get(saveDevicePropertiesDTO.getPropertiesPath()).containsAll(properties.keySet())) {
+            return status(FORBIDDEN).build();
+        }
+
+        assetMgmtFacade.getOwnedDevice(saveDevicePropertiesDTO.getDeviceInOrganizationDTO()).ifPresent(asset -> assetMgmtFacade.saveAssetProperties(asset, properties));
+        return ok().build();
     }
 
     @PostMapping(path = "/{organizationId}/devices/{deviceId}")

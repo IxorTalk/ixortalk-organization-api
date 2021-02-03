@@ -50,6 +50,12 @@ public enum TestConstants {
     LOADBALANCER_EXTERNAL_URL("https://integration-test.ixortalk.com"),
     IMAGE_SERVICE_CONTEXT_PATH("/image"),
     IMAGE_SERVICE_DOWNLOAD_PATH("/download"),
+
+    SAVE_DEVICE_PROPERTIES_PATH("test-properties"),
+    SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY("allowedProperty"),
+    SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY("otherAllowedProperty")
+
+
     ;
 
     private String configValue;

@@ -5,8 +5,7 @@
       "port": 3828,
       "organizationId": 1234,
       "deviceName": "assetWithOrganizationIdDeviceName",
-      "deviceId": "c2",
-      "actions": []
+      "deviceId": "c2"
     }
   },
   "children": [],

@@ -23,25 +23,31 @@
  */
 package com.ixortalk.organization.api.asset;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.ixortalk.organization.api.domain.OrganizationId;
 
+import java.util.Map;
+
+import static com.ixortalk.organization.api.domain.OrganizationId.noOrganizationId;
+
 public class RemoveAssetFromOrganizationDTO {
 
-    private OrganizationId organizationId;
-    private DeviceInformationDTO deviceInformationDTO;
-    private ActionsDTO actionsDTO;
-    private String image;
+    private final OrganizationId organizationId;
+    private final String image;
 
-    private RemoveAssetFromOrganizationDTO(OrganizationId organizationId, DeviceInformationDTO deviceInformationDTO, ActionsDTO actionsDTO, String image) {
+    @JsonIgnore
+    private final Map<String, Object> fieldsToClear;
+
+    private RemoveAssetFromOrganizationDTO(OrganizationId organizationId, String image, Map<String, Object> fieldsToClear) {
         this.organizationId = organizationId;
-        this.deviceInformationDTO = deviceInformationDTO;
-        this.actionsDTO = actionsDTO;
         this.image = image;
+        this.fieldsToClear = fieldsToClear;
     }
 
-    public static RemoveAssetFromOrganizationDTO removeAssetFromOrganizationDTO() {
-        return new RemoveAssetFromOrganizationDTO(OrganizationId.noOrganizationId(), DeviceInformationDTO.clearedDeviceInformation(), ActionsDTO.clearedActions(), "");
+    public static RemoveAssetFromOrganizationDTO removeAssetFromOrganizationDTO(Map<String, Object> fieldsToClear) {
+        return new RemoveAssetFromOrganizationDTO(noOrganizationId(), null, fieldsToClear);
     }
 
     @JsonUnwrapped
@@ -49,17 +55,12 @@ public class RemoveAssetFromOrganizationDTO {
         return organizationId;
     }
 
-    @JsonUnwrapped
-    public DeviceInformationDTO getDeviceInformationDTO() {
-        return deviceInformationDTO;
-    }
-
-    @JsonUnwrapped
-    public ActionsDTO getActionsDTO() {
-        return actionsDTO;
-    }
-
     public String getImage() {
         return image;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getFieldsToClear() {
+        return fieldsToClear;
     }
 }

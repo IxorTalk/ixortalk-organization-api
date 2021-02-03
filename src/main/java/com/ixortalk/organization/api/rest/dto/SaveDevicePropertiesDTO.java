@@ -21,25 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.organization.api.asset;
+package com.ixortalk.organization.api.rest.dto;
 
-public class DeviceInformationDTO {
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.ixortalk.organization.api.asset.DeviceId;
+import com.ixortalk.organization.api.domain.OrganizationId;
 
-    private String deviceName = "";
-    private String deviceInformation = "";
+import static com.ixortalk.organization.api.domain.OrganizationId.organizationId;
 
-    private DeviceInformationDTO() {
+public class SaveDevicePropertiesDTO {
+
+    private DeviceId deviceId;
+
+    private Long organizationId;
+
+    private String propertiesPath;
+
+    private SaveDevicePropertiesDTO() {}
+
+    @JsonUnwrapped
+    public DeviceId getDeviceId() {
+        return deviceId;
     }
 
-    public static DeviceInformationDTO clearedDeviceInformation() {
-        return new DeviceInformationDTO();
+    @JsonUnwrapped
+    public OrganizationId getOrganizationId() {
+        return organizationId(organizationId);
     }
 
-    public String getDeviceName() {
-        return deviceName;
+    public String getPropertiesPath() {
+        return propertiesPath;
     }
 
-    public String getDeviceInformation() {
-        return deviceInformation;
+    @JsonIgnore
+    public DeviceInOrganizationDTO getDeviceInOrganizationDTO() {
+        return new DeviceInOrganizationDTO(organizationId, deviceId);
     }
 }

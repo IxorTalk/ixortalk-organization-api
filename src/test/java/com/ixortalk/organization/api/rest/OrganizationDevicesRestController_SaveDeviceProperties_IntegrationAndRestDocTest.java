@@ -26,55 +26,78 @@ package com.ixortalk.organization.api.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ixortalk.organization.api.AbstractSpringIntegrationTest;
 import com.ixortalk.organization.api.asset.Asset;
-import com.ixortalk.organization.api.asset.AssetTestBuilder;
 import com.ixortalk.organization.api.asset.DeviceId;
-import com.ixortalk.organization.api.asset.DeviceInformationDTO;
 import com.ixortalk.organization.api.util.ExpectedValueObjectSerializer;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 
 import java.io.IOException;
+import java.util.Map;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.ixortalk.autoconfigure.oauth2.OAuth2TestConfiguration.retrievedAdminTokenAuthorizationHeader;
+import static com.ixortalk.organization.api.TestConstants.SAVE_DEVICE_PROPERTIES_PATH;
+import static com.ixortalk.organization.api.TestConstants.SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY;
+import static com.ixortalk.organization.api.TestConstants.SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY;
+import static com.ixortalk.organization.api.asset.AssetTestBuilder.anAsset;
 import static com.ixortalk.organization.api.asset.DeviceId.deviceId;
-import static com.ixortalk.organization.api.config.TestConstants.*;
-import static com.ixortalk.test.util.FileUtil.jsonFile;
+import static com.ixortalk.organization.api.config.TestConstants.ADMIN_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN;
+import static com.ixortalk.organization.api.config.TestConstants.USER_JWT_TOKEN;
+import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHeaderDescriptors.TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES;
+import static com.ixortalk.organization.api.rest.docs.RestDocDescriptors.TokenHeaderDescriptors.TOKEN_WITH_USER_PRIVILEGES;
 import static com.ixortalk.test.util.Randomizer.nextString;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
+import static wiremock.com.google.common.collect.Maps.newHashMap;
 
-public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_SaveDeviceProperties_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final DeviceId TEST_DEVICE = deviceId(nextString("testDevice"));
 
     private Asset asset;
 
-    private DeviceInformationDTO deviceInformation;
-
     private static final RequestFieldsSnippet REQUEST_FIELDS_SNIPPET = requestFields(
-            fieldWithPath("deviceName").type(STRING).description("The name of the device."),
-            fieldWithPath("deviceInformation").type(STRING).description("Information of the device.")
+            fieldWithPath(SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY.configValue()).type(STRING).description("The value for `" + SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY.configValue() + "` to be saved."),
+            fieldWithPath(SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY.configValue()).type(STRING).description("The value for `" + SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY.configValue() + "` to be saved.")
     );
+
+    private Map<String, String> deviceProperties;
 
     @Before
     public void before() throws IOException {
 
         asset =
-                AssetTestBuilder.anAsset()
+                anAsset()
                         .withOrganizationId(organizationX.getOrganizationId())
                         .withDeviceId(TEST_DEVICE)
                         .build();
 
-        deviceInformation = objectMapper.readValue(jsonFile("deviceInformation.json"), DeviceInformationDTO.class);
+        deviceProperties = newHashMap();
+        deviceProperties.put(SAVE_DEVICE_PROPERTY_ALLOWED_PROPERTY.configValue(), nextString("allowedPropertyValue"));
+        deviceProperties.put(SAVE_DEVICE_PROPERTY_OTHER_ALLOWED_PROPERTY.configValue(), nextString("otherAllowedPropertyValue"));
 
         assetMgmtWireMockRule.stubFor(
                 post(urlEqualTo("/assetmgmt/assets/find/property"))
@@ -85,7 +108,7 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
         assetMgmtWireMockRule.stubFor(
                 put(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(deviceInformation)))
+                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(deviceProperties)))
                         .willReturn(ok()));
     }
 
@@ -97,15 +120,15 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
                 .preemptive()
                 .oauth2(ADMIN_JWT_TOKEN)
                 .contentType(JSON)
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
                 .statusCode(SC_OK);
 
         assetMgmtWireMockRule.verify(
                 putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(deviceInformation))));
+                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(deviceProperties))));
     }
 
     @Test
@@ -117,22 +140,22 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
             .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
             .contentType(JSON)
             .filter(
-                    document("organizations/save-info/ok",
+                    document("organizations/save-device-properties/ok",
                             preprocessRequest(staticUris(), prettyPrint()),
                             preprocessResponse(prettyPrint()),
-                            requestHeaders(describeAuthorizationTokenHeader()),
+                            requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
                             DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
                             REQUEST_FIELDS_SNIPPET
                     ))
-            .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+            .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
             .statusCode(SC_OK);
 
         assetMgmtWireMockRule.verify(
                 putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
                         .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(deviceInformation))));
+                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(deviceProperties))));
     }
 
     @Test
@@ -144,15 +167,15 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
                 .oauth2(USER_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-info/as-user",
+                        document("organizations/save-device-properties/as-user",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
+                                requestHeaders(TOKEN_WITH_USER_PRIVILEGES),
                                 DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
                                 REQUEST_FIELDS_SNIPPET
                         ))
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
                 .statusCode(SC_FORBIDDEN);
 
@@ -169,15 +192,15 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
                 .oauth2(USER_IN_ORGANIZATION_Y_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-info/different-admin",
+                        document("organizations/save-device-properties/different-admin",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
+                                requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
                                 DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
                                 REQUEST_FIELDS_SNIPPET
                         ))
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
                 .statusCode(SC_FORBIDDEN);
 
@@ -194,15 +217,15 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
                 .oauth2(ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-info/organization-does-not-exist",
+                        document("organizations/save-device-properties/organization-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
+                                requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
                                 DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
                                 REQUEST_FIELDS_SNIPPET
                         ))
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", Long.MAX_VALUE, TEST_DEVICE.stringValue())
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), Long.MAX_VALUE, TEST_DEVICE.stringValue())
                 .then()
                 .statusCode(SC_NOT_FOUND);
 
@@ -225,15 +248,15 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
                 .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
                 .filter(
-                        document("organizations/save-info/deviceid-does-not-exist",
+                        document("organizations/save-device-properties/deviceid-does-not-exist",
                                 preprocessRequest(staticUris(), prettyPrint()),
                                 preprocessResponse(prettyPrint()),
-                                requestHeaders(describeAuthorizationTokenHeader()),
+                                requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
                                 DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
                                 REQUEST_FIELDS_SNIPPET
                         ))
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
                 .statusCode(SC_NOT_FOUND);
     }
@@ -252,30 +275,57 @@ public class OrganizationRestController_SaveDeviceInformation_IntegrationAndRest
                 .preemptive()
                 .oauth2(USER_IN_ORGANIZATION_X_ADMIN_JWT_TOKEN)
                 .contentType(JSON)
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
                 .statusCode(SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test
-    public void otherAssetFieldsShouldNotBeUpdated() throws IOException {
+    public void unallowedProperty() throws IOException {
 
-        Object deviceInformation = objectMapper.readValue(jsonFile("deviceInformation.json"), Object.class);
+        deviceProperties.put("anUnallowedProperty", "someValue");
 
         given()
                 .auth()
                 .preemptive()
                 .oauth2(ADMIN_JWT_TOKEN)
                 .contentType(JSON)
-                .body(objectMapper.writeValueAsString(deviceInformation))
-                .post("/organizations/{id}/devices/{deviceId}/save-info", organizationX.getId(), TEST_DEVICE.stringValue())
+                .filter(
+                        document("organizations/save-device-properties/unallowed-property",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS
+                        ))
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-" + SAVE_DEVICE_PROPERTIES_PATH.configValue(), organizationX.getId(), TEST_DEVICE.stringValue())
                 .then()
-                .statusCode(SC_OK);
+                .statusCode(SC_FORBIDDEN);
 
-        assetMgmtWireMockRule.verify(
-                putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties"))
-                        .andMatching(retrievedAdminTokenAuthorizationHeader())
-                        .withRequestBody(equalToJson(objectMapper.writeValueAsString(this.deviceInformation))));
+        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties")));
+    }
+
+    @Test
+    public void unallowedPath() throws JsonProcessingException {
+        given()
+                .auth()
+                .preemptive()
+                .oauth2(ADMIN_JWT_TOKEN)
+                .contentType(JSON)
+                .filter(
+                        document("organizations/save-device-properties/unallowed-path",
+                                preprocessRequest(staticUris(), prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                requestHeaders(TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES),
+                                DEVICE_IN_ORGANIZATION_PATH_PARAMETERS,
+                                REQUEST_FIELDS_SNIPPET
+                        ))
+                .body(objectMapper.writeValueAsString(deviceProperties))
+                .post("/organizations/{id}/devices/{deviceId}/save-unallowed-path", organizationX.getId(), TEST_DEVICE.stringValue())
+                .then()
+                .statusCode(SC_NOT_FOUND);
+
+        assetMgmtWireMockRule.verify(0, putRequestedFor(urlEqualTo("/assetmgmt/assets/" + asset.getAssetId().stringValue() + "/properties")));
     }
 }

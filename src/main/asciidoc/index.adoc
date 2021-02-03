@@ -1,3 +1,4 @@
+
 = IxorTalk Organization API
 :doctype: book
 :icons: font
@@ -917,91 +918,70 @@ When the device is not suitable for onboarding in a new organization:
 
 include::{snippets}/organizations/add-device/role-present/http-response.adoc[]
 
-== Save Actions of an Organization
+== Save Device Properties
 
-Save a list of actions to a device belonging to an organization.
+Generic, config based, `/save-*` calls are available to save device properties.  The configuration determines which paths are allowed to save, and for each allowed path, a list of allowed keys is specified.
+
+Examples below have been executed for config:
+
+```
+ixortalk:
+  organization:
+    assetmgmt:
+      allowed-save-calls:
+        test-properties:
+          - allowedProperty
+          - otherAllowedProperty
+```
 
 === Request
 
 Via curl:
-include::{snippets}/organizations/save-actions/ok/curl-request.adoc[]
+include::{snippets}/organizations/save-device-properties/ok/curl-request.adoc[]
 
 HTTP request:
-include::{snippets}/organizations/save-actions/ok/http-request.adoc[]
+include::{snippets}/organizations/save-device-properties/ok/http-request.adoc[]
 
 ==== Request Headers
-include::{snippets}/organizations/save-actions/ok/request-headers.adoc[]
+include::{snippets}/organizations/save-device-properties/ok/request-headers.adoc[]
 
 ==== Path Parameters
-include::{snippets}/organizations/save-actions/ok/path-parameters.adoc[]
+include::{snippets}/organizations/save-device-properties/ok/path-parameters.adoc[]
 
 ==== Request Fields
-include::{snippets}/organizations/save-actions/ok/request-fields.adoc[]
+include::{snippets}/organizations/save-device-properties/ok/request-fields.adoc[]
 
 === Response
 
 As organization admin:
 
-include::{snippets}/organizations/save-actions/ok/http-response.adoc[]
+include::{snippets}/organizations/save-device-properties/ok/http-response.adoc[]
+
+When the save path is not a valid/configured path:
+
+include::{snippets}/organizations/save-device-properties/unallowed-path/http-request.adoc[]
+include::{snippets}/organizations/save-device-properties/unallowed-path/http-response.adoc[]
+
+When the payload contains a property which is not allowed by the config:
+
+include::{snippets}/organizations/save-device-properties/unallowed-property/http-request.adoc[]
+include::{snippets}/organizations/save-device-properties/unallowed-property/http-response.adoc[]
 
 As a user:
 
-include::{snippets}/organizations/save-actions/as-user/http-response.adoc[]
+include::{snippets}/organizations/save-device-properties/as-user/http-response.adoc[]
 
 As an organization admin from a different organization:
 
-include::{snippets}/organizations/save-actions/different-admin/http-response.adoc[]
+include::{snippets}/organizations/save-device-properties/different-admin/http-response.adoc[]
 
 When the organization does not exist:
 
-include::{snippets}/organizations/save-actions/organization-does-not-exist/http-response.adoc[]
+include::{snippets}/organizations/save-device-properties/organization-does-not-exist/http-response.adoc[]
 
 When the device does not exist:
 
-include::{snippets}/organizations/save-actions/deviceid-does-not-exist/http-response.adoc[]
-
-== Save Device Information of an Organization
-
-Save or update information of the device belonging to an organization.
-
-=== Request
-
-Via curl:
-include::{snippets}/organizations/save-info/ok/curl-request.adoc[]
-
-HTTP request:
-include::{snippets}/organizations/save-info/ok/http-request.adoc[]
-
-==== Request Headers
-include::{snippets}/organizations/save-info/ok/request-headers.adoc[]
-
-==== Path Parameters
-include::{snippets}/organizations/save-info/ok/path-parameters.adoc[]
-
-==== Request Fields
-include::{snippets}/organizations/save-info/ok/request-fields.adoc[]
-
-=== Response
-
-As organization admin:
-
-include::{snippets}/organizations/save-info/ok/http-response.adoc[]
-
-As a user:
-
-include::{snippets}/organizations/save-info/as-user/http-response.adoc[]
-
-As an organization admin from a different organization:
-
-include::{snippets}/organizations/save-info/different-admin/http-response.adoc[]
-
-When the organization does not exist:
-
-include::{snippets}/organizations/save-info/organization-does-not-exist/http-response.adoc[]
-
-When the device does not exist:
-
-include::{snippets}/organizations/save-info/deviceid-does-not-exist/http-response.adoc[]
+include::{snippets}/organizations/save-device-properties/deviceid-does-not-exist/http-response.adoc[]
 
 == Remove Device from Organization
 

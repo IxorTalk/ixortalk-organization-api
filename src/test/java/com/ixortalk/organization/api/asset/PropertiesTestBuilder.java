@@ -39,7 +39,6 @@ public class PropertiesTestBuilder extends ReflectionInstanceTestBuilder<Propert
 
     private OrganizationId organizationId = organizationId(nextLong());
     private DeviceId deviceId = deviceId(nextString("deviceId"));
-    private Object actions = nextString("testBuilderActions");
     private Map<String, Object> otherProperties = newHashMap();
 
     private PropertiesTestBuilder() {}
@@ -52,18 +51,12 @@ public class PropertiesTestBuilder extends ReflectionInstanceTestBuilder<Propert
     public void setFields(Properties instance) {
         setField(instance, "organizationId", organizationId);
         setField(instance, "deviceId", deviceId);
-        setField(instance, "actions", actions);
 
         setField(instance, "otherProperties", otherProperties);
     }
 
     public PropertiesTestBuilder withDeviceId(DeviceId deviceId) {
         this.deviceId = deviceId;
-        return this;
-    }
-
-    public PropertiesTestBuilder withActions(Object actions) {
-        this.actions = actions;
         return this;
     }
 

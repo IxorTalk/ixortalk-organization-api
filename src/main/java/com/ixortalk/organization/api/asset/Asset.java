@@ -54,10 +54,6 @@ public class Asset {
         return getAssetProperties().getDeviceId();
     }
 
-    public Object getActions() {
-        return getAssetProperties().getActions();
-    }
-
     public Optional<OrganizationId> getOrganizationId() {
         return getAssetProperties().getOrganizationId();
     }

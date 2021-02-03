@@ -39,8 +39,8 @@ public class AssetMgmtConfig {
     public static final String IXORTALK_SERVER_ASSETMGMT_URL = "ixortalk.server.assetmgmt.url";
 
     @Bean
-    public AssetMgmtFacade assetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource) {
-        return new AssetMgmtFacade(assetMgmt, organizationRestResource);
+    public AssetMgmtFacade assetMgmtFacade(AssetMgmt assetMgmt, OrganizationRestResource organizationRestResource, IxorTalkConfigProperties ixorTalkConfigProperties) {
+        return new AssetMgmtFacade(assetMgmt, organizationRestResource, ixorTalkConfigProperties);
     }
 
     @Bean

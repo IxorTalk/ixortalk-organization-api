@@ -26,13 +26,15 @@ package com.ixortalk.organization.api.rest.docs;
 import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
 public class RestDocDescriptors {
 
     public static class TokenHeaderDescriptors {
-        public static final HeaderDescriptor TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES = headerWithName("Authorization").description("The bearer token needed to authorize this request.  Organization administrator privileges required for this call.");
+        public static final HeaderDescriptor TOKEN_WITH_ORGANIZATION_ADMIN_PRIVILEGES = headerWithName(AUTHORIZATION).description("The bearer token needed to authorize this request.  Organization administrator privileges required for this call.");
+        public static final HeaderDescriptor TOKEN_WITH_USER_PRIVILEGES = headerWithName(AUTHORIZATION).description("The bearer token needed to authorize this request.  A bearer token with user privileges.");
     }
 
     public static class PathParameters {

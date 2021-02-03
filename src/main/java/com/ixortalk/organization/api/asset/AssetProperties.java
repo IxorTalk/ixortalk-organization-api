@@ -44,8 +44,6 @@ public class AssetProperties {
         return this.properties.getDeviceId();
     }
 
-    public Object getActions() { return this.properties.getActions(); }
-
     public Optional<OrganizationId> getOrganizationId() {
         return ofNullable(this.properties.getOrganizationId()).filter(organizationId -> organizationId.longValue() != null);
     }

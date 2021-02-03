@@ -52,7 +52,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 
-public class OrganizationRestController_GetDeviceIds_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
+public class OrganizationDevicesRestController_GetDeviceIds_IntegrationAndRestDocTest extends AbstractSpringIntegrationTest {
 
     private static final DeviceId OTHER_DEVICE_ID = deviceId(nextString("otherDeviceId"));
 
