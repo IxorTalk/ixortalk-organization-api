@@ -22,7 +22,7 @@
 # SOFTWARE.
 #
 
-FROM openjdk:8u181-jdk
+FROM openjdk:11.0.10-jdk
 ADD healthcheck.sh /
 ADD ixortalk-organization-api-*.jar app.jar
 RUN chmod +x /healthcheck.sh && sh -c 'touch /app.jar'
